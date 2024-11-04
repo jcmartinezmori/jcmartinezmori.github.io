@@ -25,7 +25,7 @@ My postdoctoral mentor is <a href="https://sites.gatech.edu/alejandro-toriello/"
 </p>
 
 <p>
-I am interested in discrete optimization, game theory, algebraic combinatorics, and real-world applications.
+I am interested in discrete optimization, game theory, algebraic combinatorics, and real-world applications in transportation and public decision-making.
 </p>
 
 <p>
