@@ -50,7 +50,7 @@ I was born and raised in <a href="https://en.wikipedia.org/wiki/Guayaquil">Guaya
 </p>
 
 <p>
-Are you wondering <a href="https://www.ams.org/journals/notices/202408/rnoti-p1062.pdf">what is a parking function?</a>
+Are you wondering <a href="https://www.ams.org/journals/notices/202408/rnoti-p1062.pdf">what's a parking function?</a>
 </p>
 
 <p>
@@ -58,7 +58,7 @@ Are you wondering <a href="https://arxiv.org/abs/2409.12107">who's the GOAT?</a>
 </p>
 
 <p>
-Are you wondering <a href="https://www.youtube.com/watch?v=w0i_ZFlGTVY">what is combinatorics?</a>
+Are you wondering <a href="https://www.youtube.com/watch?v=w0i_ZFlGTVY">what's combinatorics?</a>
 </p>
 
 <h4>axioms</h4>
