@@ -57,6 +57,10 @@ Are you wondering <a href="https://www.ams.org/journals/notices/202408/rnoti-p10
 Are you wondering <a href="https://arxiv.org/abs/2409.12107">who's the GOAT?</a>
 </p>
 
+<p>
+Are you wondering <a href="https://www.youtube.com/watch?v=w0i_ZFlGTVY">what is combinatorics?</a>
+</p>
+
 <h4>axioms</h4>
 <p>
 I subscribe to <a href="https://www.ams.org/publications/journals/notices/201610/rnoti-p1164.pdf">Federico Ardila's axioms</a>:
