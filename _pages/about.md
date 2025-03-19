@@ -25,6 +25,10 @@ My postdoctoral mentor is <a href="https://sites.gatech.edu/alejandro-toriello/"
 </p>
 
 <p>
+This Fall, I will join the <a href='https://clas.ucdenver.edu/mathematical-and-statistical-sciences/'>Department of Mathematical and Statistical Sciences</a> at the University of Colorado Denver as an Assitant Professor.
+</p>
+
+<p>
 I am interested in discrete optimization, game theory, enumerative and algebraic combinatorics, and real-world applications in transportation and public decision-making.
 </p>
 
