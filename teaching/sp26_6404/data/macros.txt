@@ -6,6 +6,10 @@
 \usepackage{tcolorbox}
 \usepackage{xcolor}
 \usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{axiom}[theorem]{Axiom}
