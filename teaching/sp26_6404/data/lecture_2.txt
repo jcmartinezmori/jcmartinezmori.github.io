@@ -1,0 +1,376 @@
+ \documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$2$}
+\newcommand{\lecturetitle}{More on Graphs}
+%\newcommand{\scribename}{Carlos Mart\'inez}
+\newcommand{\scribename}{Mark Johnson}
+\newcommand{\lecturedate}{January 26, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Degree}
+
+\subsection{Undirected Graphs}
+For an undirected graph $G=(V,E)$, for each $u \in V$, $\textrm{deg}(u)$ is the number of edges adjacent to it.
+Formally,
+\begin{equation*}
+    \textrm{deg}(u):=|\{e=\{v, w\}\in E : u \in e\}|.
+\end{equation*}
+Note the following terminology:
+\begin{itemize}
+    \item 
+    If $\textrm{deg}(u)=1$, $u$ is a leaf.
+    \item 
+    If $\textrm{deg}(u)=0$, $u$ is isolated.
+\end{itemize}
+
+\subsection{Directed Graphs}
+For a directed graph, there are two different notions of degree.
+The in-degree (out-degree) of $u \in V$ is the number of edges going into (out of) $u$.
+Formally,
+\begin{equation*}
+    \textrm{deg}^{-}(u)\coloneqq |\{e = (v, w)\in E: w=u\}|
+\end{equation*}
+and
+\begin{equation*}
+    \textrm{deg}^{+}(u)\coloneqq |\{e = (v, w)\in E: v=u\}|.
+\end{equation*}
+
+\subsection{Examples}
+Consider the undirected graph in Figure~\ref{fig: undirected}.
+\begin{figure}[ht]
+    \centering
+    \resizebox{0.333\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=0,y=0,label=$1$]{1}
+            \Vertex[x=-2,y=2,label=$2$]{2}
+            \Vertex[x=2,y=2,label=$3$]{3}
+            \Edge(1)(2)
+            \Edge(2)(3)
+        \end{tikzpicture}
+    }
+\caption{An undirected graph.}
+\label{fig: undirected}
+\end{figure}
+Then, we have
+\begin{itemize}
+    \item $\textrm{deg}(1) = 1$,
+    \item $\textrm{deg}(2) = 2$, and
+    \item $\textrm{deg}(3) = 1$.
+\end{itemize}
+
+Similarly, consider the directed graph in Figure~\ref{fig: directed}.
+\begin{figure}[ht]
+    \centering
+    \resizebox{0.333\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=0,y=0,label=$1$]{1}
+            \Vertex[x=-2,y=2,label=$2$]{2}
+            \Vertex[x=2,y=2,label=$3$]{3}
+            \Edge[Direct](1)(2)
+            \Edge[Direct](2)(3)
+        \end{tikzpicture}
+    }
+\caption{A directed graph.}
+\label{fig: directed}
+\end{figure}
+Then, we have
+\begin{itemize}
+    \item 
+    $\textrm{deg}^{-}(1)=0$ and $\textrm{deg}^{+}(1)=1$,
+    \item 
+    $\textrm{deg}^{-}(2)=1$ and $\textrm{deg}^{+}(2)=1$, and
+    \item 
+    $\textrm{deg}^{-}(3)=1$ and $\textrm{deg}^{+}(3)=0$.
+\end{itemize}
+
+\section{Subgraphs}
+Let $G=(V(G), E(G))$ and $H=(V(H), E(H))$.
+$H$ is a subgraph of $G$ if $V(H)\subseteq V(G)$ and $E(H)\subseteq E(G)$.
+
+\section{Union of Graphs}
+The union of $G = (V(G), E(G))$ and $H = (V(H), E(H))$ is a graph $W = (V(W), E(W))$ such that
+\begin{itemize}
+    \item 
+    $V(W)=V(G)\cup V(H)$ and
+    \item 
+    $E(W)=E(G)\cup E(H)$.
+\end{itemize}
+
+\section{Paths}
+
+\subsection{Undirected Graphs}
+A path is a graph $P=(V(P), E(P))$ where $V(P)$ can be totally ordered such that two nodes are adjacent in $P$ only if they are adjacent in the order.
+
+We can visualize this in Figure~\ref{fig: a path} and Figure~\ref{fig: another path}.
+\begin{figure}[ht]
+    \centering
+    \resizebox{.5\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=-4,y=0,label=$1$]{1}
+            \Vertex[x=-2,y=0,label=$2$]{2}
+            \Vertex[x=0,y=0,label=$3$]{3}
+            \Vertex[x=2,y=0,label=$4$]{4}
+            \Vertex[x=4,y=0,label=$5$]{5}
+            \Edge(1)(2)
+            \Edge(2)(3)
+            \Edge(3)(4)
+            \Edge(4)(5)
+        \end{tikzpicture}
+    }
+    \caption{A path.}
+    \label{fig: a path}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \resizebox{.5\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=-4,y=0,label=$a$]{1}
+            \Vertex[x=-2,y=0,label=$d$]{2}
+            \Vertex[x=0,y=0,label=$w$]{3}
+            \Vertex[x=2,y=0,label=$z$]{4}
+            \Vertex[x=4,y=0,label=$f$]{5}
+            \Edge(1)(2)
+            \Edge(2)(3)
+            \Edge(3)(4)
+            \Edge(4)(5)
+        \end{tikzpicture}
+    }
+    \caption{Another path.}
+    \label{fig: another path}
+\end{figure}
+In the example, both graphs are paths.
+The graph in Figure~\ref{fig: another path} is a a path: to see this algebraically, we can map each node to $\mathbb{N}$ where $a$ maps to $1$, $d$ maps to $2$, $w$ maps to $3$, and so on.
+A path can be expressed as:
+\begin{itemize}
+    \item 
+    A sequence of nodes, such as $v_1, v_2, \ldots, v_k$.
+    \item 
+    A sequence of edges, such as $e_1, e_2, \ldots, e_{k-1}$.
+    \item
+    A sequence of nodes and edges, such as
+    $v_1,e_1,v_2,e_2, \ldots,v_k,e_{k-1}$.
+\end{itemize}
+Note that $|E(P)| = |V(P)| - 1$.
+If $v_1=s$ and $v_k=t$, we say $P$ is an $\{s, t\}-$path.
+If $P$ is an $\{s,t\}-$path $P$, then
+\begin{itemize}
+    \item 
+    $\textrm{deg}(s) = 1$,
+    \item 
+    $\textrm{deg}(t)=1$, and
+    \item 
+    $\textrm{deg}(u) = 2$ for all $u \in V(P)$ with $u \neq s, t$.
+\end{itemize}
+    
+\subsection{Directed Graphs}
+Directed paths have the same formal definition with the additional requirement that
+\begin{equation*}
+    e_i=(v_i, v_{i+1})
+\end{equation*}
+for all $i \in [k - 1]$.
+In other words, the head of an edge is the same as the tail of the subsequent edge.
+Figure~\ref{fig: a directed path} shows a directed path.
+\begin{figure}[ht]
+    \centering
+    \resizebox{.5\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=-4,y=0,label=$a$]{1}
+            \Vertex[x=-2,y=0,label=$d$]{2}
+            \Vertex[x=0,y=0,label=$w$]{3}
+            \Vertex[x=2,y=0,label=$z$]{4}
+            \Vertex[x=4,y=0,label=$f$]{5}
+            \Edge[Direct](1)(2)
+            \Edge[Direct](2)(3)
+            \Edge[Direct](3)(4)
+            \Edge[Direct](4)(5)
+        \end{tikzpicture}
+    }
+    \caption{A directed path.}
+    \label{fig: a directed path}
+\end{figure}
+
+Note that again $|E(P)| = |V(P)| - 1$.
+If $P$ is an $(s,t)$-path, then
+\begin{itemize}
+    \item 
+    $\textrm{deg}^{-}(s)=0$ and $\textrm{deg}^{+}(s)=1$, 
+    \item 
+    $\textrm{deg}^{-}(t)=1$ and $\textrm{deg}^{+}(t)=0$, and
+    \item 
+    $\textrm{deg}^{-}(u) = \textrm{deg}^{+}(u)= 1$ for all $u \in V(P)$ with $u \neq s, t$.
+\end{itemize}
+
+\section{Cycles}
+\subsection{Undirected Graphs}
+A cycle is a graph $C=(V(C),E(C))$ such that its nodes can be placed around a circle on the plane with two nodes
+are adjacent on the circle if and only if they are adjacent in $C$. 
+Figure~\ref{fig: a cycle} shows a cycle.
+\begin{figure}[ht]
+    \centering
+    \resizebox{.4\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=-2,y=0,label=$a$]{1}
+            \Vertex[x=2,y=0,label=$d$]{2}
+            \Vertex[x=2,y=-2,label=$w$]{3}
+            \Vertex[x=0,y=-4,label=$z$]{4}
+            \Vertex[x=-2,y=-2,label=$f$]{5}
+            \Edge(1)(2)
+            \Edge(2)(3)
+            \Edge(3)(4)
+            \Edge(4)(5)
+            \Edge(5)(1)
+            
+        \end{tikzpicture}
+    }
+    \caption{A cycle.}
+    \label{fig: a cycle}
+\end{figure}
+
+Alternatively, a cycle $C$ is a path for which we connect its endpoints with an edge.
+Note that $|E(C)| = |V(C)|$ and $\textrm{deg}(u) = 2$ for all $u \in V(C)$.
+
+\subsection{Directed Graphs}
+Directed cycles have the same formal definition with the additional requirement of respecting directionality.
+
+\section{Connectivity}
+\subsection{Undirected Graphs}
+
+Let $G=(V,E)$ be an undirected graph. 
+Two (unordered) nodes $u, v\in V$ are connected if $G$ contains a $\{u, v\}$-path. 
+The graph $G$ is connected if all (unordered) pairs $u, v \in V$ are connected.
+Figure~\ref{fig: a connected graph} shows a connected graph with multiple $\{u,v\}$-paths.
+\begin{figure}[ht]
+    \centering
+    \resizebox{.4\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=0,y=0]{1}
+            \Vertex[x=2,y=-2,label=$v$]{2}
+            \Vertex[x=1,y=-4]{3}
+            \Vertex[x=-1,y=-4]{4}
+            \Vertex[x=-2,y=-2,label=$u$]{5}
+            \Edge(1)(2)
+            \Edge(2)(3)
+            \Edge(3)(4)
+            \Edge(4)(5)
+            \Edge(5)(1)
+            \Edge(4)(1)
+            \draw[red, very thick] (2) -- (3);
+            \draw[red, very thick] (3) -- (4);
+            \draw[red, very thick] (4) -- (5);
+        \end{tikzpicture}
+    }
+    \caption{A  connected graph.}
+    \label{fig: a connected graph}
+\end{figure}
+
+\subsection{Directed Graphs}
+For a directed graph $G = (V,E)$, there are two notions of connectivity:
+\begin{itemize}
+    \item 
+    $G$ is weakly connected if its corresponding undirected graph is connected.
+    For example, the graph in Figure~\ref{fig: a directed path} is weakly connected.
+    \item
+    $G$ is strongly connected if it contains a $(u,v)$-path for all ordered pairs $u, v \in V$.
+\end{itemize}
+
+\newpage
+
+\section{Connected Components}
+\subsection{Undirected Graphs}
+
+A connected component of graph $G = (V, E)$ is an inclusion-wise maximal connected subgraph of $G$.
+Here, inclusion-wise maximal means there does not exist another other subgraph with the same property (i.e., connectivity) that strictly contains it.
+For example, Figure~\ref{fig: a graph with three connected components} shows a graph with three connected components, of sizes $4$, $3$, and $1$ from left to right.
+\begin{figure}[ht]
+    \centering
+    \tikzset{
+        VertexStyle/.style={draw,circle,fill=blue!25, minimum size=7mm, inner sep=0pt},
+        EdgeStyle/.style={thick}
+    }
+    \begin{tikzpicture}[scale=0.8]
+        \Vertex[x=0,  y=0]{1}
+        \Vertex[x=2,  y=-2]{2}
+        \Vertex[x=0,  y=-4]{3}
+        \Vertex[x=-2, y=-2]{4}
+        \Edge(1)(2)
+        \Edge(2)(3)
+        \Edge(3)(4)
+        \Edge(4)(1)
+        \Edge(3)(1)
+
+        \Vertex[x=6,  y=0]{5}
+        \Vertex[x=8,  y=-2]{6}
+        \Vertex[x=6,  y=-4]{7}
+        \Edge(5)(6)
+        \Edge(7)(5)
+
+        \Vertex[x=12, y=0]{8}
+    \end{tikzpicture}
+    \caption{A graph with three connected components.}
+    \label{fig: a graph with three connected components}
+\end{figure}
+
+\subsection{Directed Graphs}
+A weakly connected component of a directed graph $G = (V,E)$ is an inclusion-wise maximal weakly connected subgraph of $G$.
+Similarly, a strongly connected component of $G$ is an inclusion-wise maximal strongly connected subgraph of $G$.
+
+\end{document}
