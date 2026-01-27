@@ -332,12 +332,10 @@ For a directed graph $G = (V,E)$, there are two notions of connectivity:
     $G$ is strongly connected if it contains a $(u,v)$-path for all ordered pairs $u, v \in V$.
 \end{itemize}
 
-\newpage
-
 \section{Connected Components}
 \subsection{Undirected Graphs}
 
-A connected component of graph $G = (V, E)$ is an inclusion-wise maximal connected subgraph of $G$.
+A connected component of a graph $G = (V, E)$ is an inclusion-wise maximal connected subgraph of $G$.
 Here, inclusion-wise maximal means there does not exist another other subgraph with the same property (i.e., connectivity) that strictly contains it.
 For example, Figure~\ref{fig: a graph with three connected components} shows a graph with three connected components, of sizes $4$, $3$, and $1$ from left to right.
 \begin{figure}[ht]
