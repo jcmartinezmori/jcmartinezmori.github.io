@@ -1,0 +1,197 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$3$}
+\newcommand{\lecturetitle}{Combinatorial Arguments}
+\newcommand{\scribename}{Simon Ruland}
+\newcommand{\lecturedate}{January 28, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+This lecture considers several strategies for constructing combinatorial proofs, including:
+\begin{itemize}
+    \item 
+    ``Counting two ways"
+    \item
+    (Strong) induction
+    \item
+    The ``product principle" and the ``sum principle"
+    \item 
+    ``Extremality" and sequences on finite structures
+\end{itemize}
+
+\section{Counting Two Ways}
+
+The idea of this technique is to show that two expressions are equal by showing they both count the same set.
+As an example, consider the ``handshaking lemma":
+\begin{theorem}
+For any undirected graph $G = (V,E)$ we have that
+\begin{equation*}
+    \sum_{u \in V} \textrm{deg}(u) = 2|E|.
+\end{equation*}
+\end{theorem}
+\begin{proof}
+Let $P = \{(u,e)\in V \times E: u \in e\}$.
+We first count this set as
+\begin{equation*}
+    |P| = \sum_{u\in V}|\{e \in E: u \in e\}| = \sum_{u\in V}\textrm{deg}(u).
+\end{equation*}
+We now count this set as
+\begin{equation*}
+    |P| = \sum_{e\in E} |\{u \in V: u \in e\}| = 2|E|,
+\end{equation*}
+where the last equality holds since every edge contains exactly two nodes.
+\end{proof}
+
+\section{Induction}
+
+The idea of an inductive proof is to first directly show that the statement we are trying to prove is true for a ``small'' case (e.g., $n = 0$).
+Then, we use what we assume (but soon will know) is true for ``smaller'' cases (e.g., for $1 < n \leq k$ for some $k$) to show that the statement is conditionally true for ``larger'' cases (e.g., $n = k +1)$.
+The magic of induction is to transform our assumption to facts one step at a time given that we indeed started with a fact (e.g., which we directly showed for $n = 0$).
+
+As an example of an inductive argument, we consider walks and paths on undirected graphs.
+A walk of length $\ell$ is a sequence $v_0,v_1,v_2,\ldots,v_\ell \in V$ such that 
+\begin{equation*}
+    \{v_{i-1}, v_i\} \in E
+\end{equation*}
+for all $i \in [\ell]$.
+In other words, a walk is a generalization of paths that allows repetitions.
+
+\begin{theorem}
+Let $G=(V,E)$ be an undirected graph. 
+Then, any $\{s,t\}$-walk contains an $\{s,t\}$-path. 
+\end{theorem}
+\begin{proof}
+Let $W$ be an $\{s,t\}$-walk $s = v_0,v_1,\ldots,v_\ell=t$.
+For the base case, consider the case in which $\ell = 0$
+Then, $W$ is automatically a path.
+
+By way of induction, suppose that $\ell \geq 1$ and that every $\{s,t\}$-walk of length $0\leq k\leq \ell - 1$ contains an $\{s,t\}$-path.
+We need to show that every $\{s,t\}$-walk of length $\ell$ contains an $\{s,t\}$-path.
+If $W$ is a walk but not a path, then it contains a repeated node $v_i = v_j$ such that $i < j$.
+Let $W' = v_0, v_1, \ldots, v_i, v_{j+1}, v_{j+2}, \ldots, v_\ell$. 
+Then,  $W'$ is an $\{s,t\}$-walk of length strictly smaller than $\ell$.
+By the inductive hypothesis, $W'$ contains an $\{s,t\}$-path. 
+Therefore, so does $W$.
+\end{proof}
+
+\section{``Product Principle" and the ``Sum Principle"}
+
+The idea of these proof techniques is that we can multiply the numbers of independent choices and sum over mutually exclusive and collectively exhaustive cases.
+
+\begin{theorem}
+Let $V = [n]$. 
+Then,
+\begin{enumerate}
+    \item 
+    There are $2^{\binom{n}{2}}$ different undirected graphs on $V$.
+    \item 
+    There are $\binom{\binom{n}{2}}{k}$ different undirected graphs on $V$ with $|E|=k$
+    \item 
+    $\sum_{k=0}^{\binom{n}{2}}\binom{\binom{n}{2}}{k} = 2^{\binom{n}{2}}$
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+Since $V$ is given, a graph $G=(V,E)$ is completely determined by our choice of $E$.
+We now prove each of the statements.
+\begin{enumerate}
+    \item 
+    Note that
+    $E\subseteq \{\{u,v\}\}: u\in V, v \in V\}$.
+    That is, the set of candidate edges to construct our graph is of size $\binom{n}{2}$.
+    Each edge can be included or excluded, so there are $2^{\binom{n}{2}}$ possible undirected graphs.
+    \item 
+    If $|E| = k$, then we must pick a set of size k from our set of candidates (without repetition). There are $\binom{\binom{n}{2}}{k}$ ways of doing this.
+    \item
+    Any graph on $G$ must have $0\leq k \leq \binom{n}{2}$; these options are mutually exclusive and collectively exhaustive.
+    Therefore, we use the sum principle to obtain
+    \begin{equation*}
+    \sum_{k=0}^{\binom{n}{2}} \binom{\binom{n}{2}}{k} = 2^{\binom{n}{2}}
+    \end{equation*}
+\end{enumerate}
+\end{proof}
+More generally, for any $m \in \mathbb{N}$, we have
+\begin{equation*}
+\sum_{k=0}^{m} \binom{m}{k} = 2^m
+\end{equation*}
+This expression sums over the rows of Pascal's Triangle (check out \href{https://oeis.org/A007318}{OEIS A007318}).
+
+\section{``Extremality" and Finite Structures}
+
+\begin{theorem}
+Let $D = (V,A)$ be a directed graph. 
+Then, $\textrm{deg}^-(u) = \textrm{deg}^+(u) = 1$ for all $u \in V$ if and only if $D$ is the disjoint union of directed cycles.
+\end{theorem}
+\begin{proof}
+
+Per usual, one direction is ``easy.''
+If $D$ is the disjoint union of directed cycles, then each $u\in V$ is in a unique directed cycle as its entire component. 
+So, $\text{deg}^-(u) = \text{deg}^+(u) = 1$ for all $u \in V$.
+
+To prove the other direction, consider any $v_1 \in V$. 
+Since $\textrm{deg}^+(v_1) = 1$, there is a unique $v_2 \in V$ such that $(v_1, v_2) \in A$. Similarly, there is a unique $v_3 \in V$ such that $(v_3, v_1) \in A$, and so on.
+Inductively, there is a sequence $v_1,v_2,v_3,\ldots$ with corresponding arcs. 
+Since $D$ is finite, at some point the sequence has a repetition. 
+So, there exists a first (i.e., in this sense ``extreme'') pair $i<j$ with $v_i = v_j$.
+Note that we must have $v_i = v_1$ since otherwise $(v_{i-1}, v_i) \in A$ and also $(v_{j-1}, v_j) \in A$; and these arcs are distinct by our choice of ``first'' repetition.
+But then $\text{deg}^-(v_i)\geq2 $, which contradicts the assumption that $\textrm{deg}^-(u) = 1$ for all $u \in V$. 
+So, $v_i=v_1$ and $v_1,v_2,...,v_{j-1},v_i=v_1$ forms a directed cycle. 
+We can remove this cycle and further decompose the graph.
+\end{proof}
+\end{document}
