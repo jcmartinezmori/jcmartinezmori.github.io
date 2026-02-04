@@ -1,0 +1,299 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{listings}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\range}{range}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+ % Add course number and course name 
+  \fancyhead[c]{
+  \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph
+  Theory} \hfill CU Denver} \
+    \rule{\textwidth}{0.5pt} \
+ % Add semester and instuctor
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$4$}
+\newcommand{\lecturetitle}{Combinatorial Arguments (Continued)}
+\newcommand{\scribename}{Jon Terry}
+\newcommand{\lecturedate}{February 2, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+The purpose of this lecture is to demonstrate that bijections can be quite
+useful in combinatorial proofs. 
+But in order to conduct the demonstration, we
+need some definitions. 
+
+\section{Trees}
+A \textit{tree} $T=(V,E)$ is an undirected graph that is connected and acyclic.
+For example, the following graph is a tree.
+
+\begin{figure}[ht]
+  \centering
+  \resizebox{.4\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=0,  y=0,  label=1]{1}
+            \Vertex[x=-2, y=-2, label=2]{2}
+            \Vertex[x=-3, y=-4, label=4]{4}
+            \Vertex[x=-1, y=-4, label=5]{5}
+            \Vertex[x=2,  y=-2, label=3]{3}
+            \Vertex[x=2,  y=-4, label=6]{6}
+            \Edge(1)(2)
+            \Edge(2)(4)
+            \Edge(2)(5)
+            \Edge(1)(3)
+            \Edge(3)(6)
+        \end{tikzpicture}
+  }
+  \caption{A tree.}
+  \label{fig:a tree}
+\end{figure}
+The vertices 4, 5, and 6 are each called \textit{leaves} of the tree. Formally,
+if $T=(V,E)$ is a tree, then $u\in V$ is a leaf of $T$ if and only if $\left| \{ v\in V :
+\{u,v\}\in E \} \right|=1 $.
+
+\subsection{Facts about Trees}
+Here are some facts about trees, presented without proof.
+For any tree $T=(V,E)$, the following statements are true: 
+\begin{itemize}
+  \item 
+  If $\left| V \right| \ge 2$, then $T$ has at least two leaves.
+  \item 
+  If $u\in V$ is a leaf of $T$, then $T'=T-u$ is a also a tree. 
+  In other
+  words, removing a leaf from a tree yields a new tree (but with one less vertex
+  than the tree we started with).
+  \item 
+  $\left| V \right|=\left| E \right| + 1 $. However the converse is not
+  always true. 
+  In other words if $G=(V,E)$ is any graph with $\left| V \right|
+  =\left| E \right| +1$, $G$ is not necessarily a tree.
+  \item For all $u,v\in V$, there is a unique $\{u,v\}$-path in $T$. This fact
+  follows almost immediately from the fact that $T$ is connected and acyclic.
+  Also, be aware that we often write $\,\exists!\,$ to stand for the phrase
+  ``there exists a unique \textellipsis.''
+\end{itemize}
+
+\section{Bijections}
+First, recall that given two sets $X$ and $Y$, the function $f:X\to Y$ is a
+\textit{bijection} between $X$ and $Y$ if $f$ is \textit{onto}, meaning that for
+all $y\in Y$ there is an $x\in X$ such that $f(x)=y$, and $f$ is
+\textit{one-to-one}, meaning that if $f(x_1)=f(x_2)$, then $x_1=x_2$. 
+Now, if
+$f$ is a bijection, then we can define another function $f^{-1}=
+g:Y\to X$ given by $y=f(x)\mapsto x$. 
+So another way to think about a bijection
+is to say that $f:X\to Y$ is a bijection if there exists a function $g:Y\to X$
+such that $f\circ g= \text{id}_Y$ and $g\circ f=\text{id}_X$. 
+
+Now, here's what's neat about bijections and why they are useful in combinatorial proofs. 
+Suppose we have a set $A$ whose size (i.e.  \textit{cardinality}) we want to know, but this quantity is difficult to
+calculate. On the other hand, suppose we have a second set, $B$, whose
+cardinality is known (or at least easy to find).  If we suspect that the cardinality of $B$ and the cardinality of $A$ are the same, then notice that
+if we can find a bijection between $A$ and $B$, then $\left| A \right| = \left|
+B \right|$ and we're done!
+
+\section{Bijective Proofs}
+We can use this technique of constructing a bijection between sets to prove that
+there are $n^{n-2}$ labeled trees on $n$ vertices. Before we formally state the
+theorem, let's define our target set, $B$. Let $B$ be the set of all strings of
+length $n-2$ we can form from an alphabet of $[n] \coloneqq \{1,2,\ldots,n\}$ symbols. The
+claim is that there are $n^{n-2}$ such strings.  Why? Well, notice there are $n$
+choices for the first symbol of such a string, and $n$ choices for the second
+symbol, and so on, up to the last ($n-2$) symbol. Since these choices are
+independent of each other, then by the product principle discussed in Lecture 3,
+we have $\left| B \right| = n^{n-2}$. 
+
+
+\begin{theorem}
+\label{theorem: main}
+For any $n \geq 1$, the number of labeled trees on $n$ vertices is $n^{n-2}$.
+\end{theorem}
+
+\begin{proof}
+  If $n=1$, then the theorem is true, since $1^{1-2}=1^{-1}=1/1=1$ and a graph
+  with one vertex and no edges is a tree trivially. 
+  So assume $n\ge 2$. Let
+  $f:\mathcal{T} \to P([n], n-2)$, where $\mathcal{T}$ is the set of all trees
+  on $n$ vertices and $P([n],n-2)$ is the set of all strings of length $n-2$
+  that we can obtain from an alphabet of $n$ symbols. 
+  We define $f$ as Algorithm~\ref{alg: prufer}.
+  
+\begin{algorithm}[ht]
+\DontPrintSemicolon
+\While{$|V(T)|>2$}{
+  Let $\ell_i'$ be the leaf of $T$ with the largest label\;
+  Let $w_i$ be the unique neighbor of $\ell_i'$\;
+  Remove $\ell_i'$ from $T$\;
+}
+\Return $(w_1,w_2,\ldots,w_{n-2})$\;
+\caption{Pr\"ufer Code Algorithm.}
+\label{alg: prufer}
+\end{algorithm}
+This called Pr\"ufer's algorithm, and it gives us the map we want from the set
+of trees to the set of $n-2$-length strings.
+For example, consider the tree
+
+\begin{figure}[ht]
+  \centering
+  \resizebox{.4\linewidth}{!}{%
+        \begin{tikzpicture}
+            \Vertex[x=0,  y=0,  label=1]{1}
+            \Vertex[x=4, y=-1, label=2]{2}
+            \Vertex[x=3.5, y=-2.5, label=3]{3}
+            \Vertex[x=2, y=-3, label=4]{4}
+            \Vertex[x=-1,  y=-3, label=5]{5}
+            \Vertex[x=-2,  y=-1, label=6]{6}
+            \Edge(1)(4)
+            \Edge(2)(3)
+            \Edge(3)(4)
+            \Edge(5)(6)
+            \Edge(6)(3)
+        \end{tikzpicture}
+  }
+  \caption{A tree on six nodes.}
+  \label{fig:a tree on six nodes}
+\end{figure}
+
+Applying Pr\"ufer's algorithm to this tree produces the following output:
+
+\begin{table}[ht]
+  \centering
+  \caption{Pr\"ufer's algorithm on a six-node tree.}
+  \label{tab:prufers algorithm}
+  \begin{tabular}{c | l | l}
+   Step & Largest leaf ($\ell_i'$)  to delete & Neighbor ($w_i$)\\
+   \hline
+   1 & 5 & 6\\
+   2 & 6 & 3\\
+   3 & 2 & 3\\
+   4 & 3 & 4\\
+   5 & Stop (only two vertices left). & -- \\
+  \end{tabular}
+\end{table}
+
+\noindent Thus, the Pr\"ufer sequence for the tree given above is
+$6\,3\,3\,4$.\\
+
+Having established that $f:\mathcal{T}\to P([n],n-2)$, we define 
+$g:P([n],n-2)\to \mathcal{T}$ as the inverse of the Pr\"ufer algorithm. So,
+starting with a Pr\"ufer sequence, $g$ constructs a tree $T'$ whose first $n-2$
+edges are $\{\ell_i, w_i\}$ for all $i=\{1,\ldots,n-2\}$, where 
+\[
+  \ell_i = \max \{[n]\setminus
+  \{\ell_1,\ell_2,\ldots,\ell_{i-1},w_i,w_{i+1},\ldots,w_{n-2}\}\},
+\]
+and $w_i$ is the $i$th vertex in the Pr\"ufer sequence. The last edge of $T'$
+is found by connecting the two remaining vertices found in $\{[n]\setminus
+\{\ell_1,\ldots,\ell_{n-2}\}\}$. In other words, $g$ forms a tree from a
+Pr\"ufer sequence by sequentially picking the largest \textit{available} vertex
+(found by taking the list of all vertices and excluding from consideration all
+the vertices already used and those remaining in the sequence) and paring it
+with the current vertex in the Pr\"ufer sequence. The final edge consists of the
+two vertices that were never deleted as leaves by $f$ in the original process.
+
+We can see how this works by applying the reverse algorithm to the Pr\"ufer
+sequence from our example:
+
+\begin{table}[h]
+  \centering
+  \caption{Inverse Pr\"ufer algorithm on the sequence 6\,3\,3\,4 }
+  \label{tab:inverse prufer algorithm}
+  \begin{tabular}{c | l | l | l}
+    Step & Largest leaf $(\ell_i)$ to pick & $w_i$ & Edge\\
+    \hline
+    1 & $\ell_1 = \{[6]\setminus \{6,3,3,4\}\} = 5$ & 6 & $\{5,6\}$\\
+    2 & $\ell_2 = \{[6]\setminus \{5,3,3,4\}\} = 6$ & 3 & $\{6,3\}$\\
+    3 & $\ell_3 = \{[6]\setminus \{5,6,3,4\}\} = 2$ & 3 & $\{2,3\}$\\
+    4 & $\ell_4 = \{[6]\setminus \{5,6,2,4\}\} = 3$ & 4 & $\{3,4\}$\\
+  \end{tabular}
+\end{table}
+
+Continuing with the proof, we claim that $g=f^{-1}$. Notice that $f$ enumerated
+the edges of $T$ to be
+\[
+  \{\{\ell_1',w_1\},\{\ell_2',w_2\},\ldots,\{\ell_{n-2}',w_{n-2}\}\}\cup
+  \{[n]\setminus \{\ell_1',\ell_2',\ldots,\ell_{n-2}'\}\},
+\]
+while $g$ enumerated the edges of $T'$ as 
+\[
+  \{\{\ell_1,w_1\},\{\ell_2,w_2\},\ldots,\{\ell_{n-2},w_{n-2}\}\}\cup
+  \{[n]\setminus \{\ell_1,\ell_2,\ldots,\ell_{n-2}\}\}.
+\]
+Therefore, we need to show that $\ell_i'=\ell_i$ for all
+$i=\{1,2,\ldots,n-2\}$. To see why this is so, recognize that when we go to pick
+$\ell_i'$ we start with original set of $[n]$ vertices. But the vertices
+$\ell_1',\ell_2',\ldots,\ell_{i-1}'$ have already been picked (so the algorithm
+cannot pick them again), and furthermore, we can't pick $w_i,w_{i+1},\ldots,w_{n-2}$
+since they have degree  $\ge 2$ because they are neighbors of ``future''
+leaves. Thus we have, 
+\[
+  \ell_i' = \max \{[n]\setminus \{\ell_1',\ell_2',\ldots,\ell_{i-1},w_i,w_{i+1},\ldots,w_{n-2}\}\}.
+\]
+Since this is exactly the set that defines $\ell_i$ for all $i=\{1,\ldots,n-2\}$, the $\ell_i'$'s and $\ell_i$'s match. 
+This establishes that $f$ is bijection between the set of all trees on $n$ vertices $\mathcal{T}$ and the set $P([n],n-2)$ of all strings of length $n-2$ that can be formed from an alphabet of $n$ symbols. 
+Therefore, since  $|P([n],n-2)|=n^{n-2}$, then $|\mathcal{T}|=n^{n-2}$ which proves the claim.
+\end{proof}
+The count in Theorem~\ref{theorem: main} is Cayley's formula (check out \href{https://oeis.org/A000272}{OEIS A000272}).
+
+
+\end{document}
