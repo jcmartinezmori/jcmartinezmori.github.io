@@ -341,7 +341,7 @@ Now, we will prove Theorem~\ref{theorem: main}.
     $$e \in \displaystyle 
 \operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}} 
  c_{e}$$
-    by the definition of the algorithm and thus proof is immediate.
+    by the definition of the algorithm and thus the proof is more immediate.
 \end{proof}
 
 \textbf{\underline{Observations:}}
