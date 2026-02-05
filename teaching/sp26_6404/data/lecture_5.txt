@@ -1,0 +1,379 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$5$}
+\newcommand{\lecturetitle}{The Greedy Algorithm}
+\newcommand{\scribename}{Lily Renneker}
+\newcommand{\lecturedate}{February 4, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\vspace{0.5cm}
+
+For today's lecture, we take a brief but important detour into the world of algorithms. 
+While our recent focus has been on the structural properties of objects, particularly trees, and on various combinatorial proof techniques, understanding the algorithmic side of combinatorics is equally essential.
+
+\section{The Optimization Problem}
+Let $G = (V, E)$ be a \textbf{connected} graph:
+\begin{itemize}
+    \item There is a cost function $c : E \rightarrow \mathbb{R}_{>0}$.
+    \item We denote the cost of $e \in E$ as $c_e$.
+    \item For a subset $T \subseteq E$, let $C(T) = \displaystyle \sum_{e \in T}c_e$
+\end{itemize}
+
+\textbf{\underline{Problem:}} Find a minimum cost \textbf{connected} subgraph of G. More formally, find:
+
+\[
+T^* \in \operatorname*{arg\,min}_{\substack{T \subseteq E \\ T \text{ is connected}}} C(T)
+\]
+
+\textbf{\underline{Goal:}} The goal of this lecture is to highlight a few different combinatorial arguments:
+\begin{enumerate}
+    \item Algorithmic invariant
+    \item Characterizing optimal solutions via exchange arguments
+\end{enumerate}
+    
+\begin{lemma}
+    Let $G = (V,E)$ and $C:E \rightarrow \mathbb{R}_{>0}$. Then, a minimum cost $T^* \subseteq E$ that is connected is a tree
+\end{lemma}
+
+\begin{proof}
+Supposed $T^*$ contains a cycle C. Pick any $e \in C$. Note that $(V, T^*-e)$ is still connected. That is, any {$u, v$}-path in $T^*$ that uses e can be rerouted:
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, thick]
+
+\node[circle, fill=black, inner sep=2pt, label=left:$u$] (u) at (-3,0) {};
+\node[circle, fill=black, inner sep=2pt, label=right:$v$] (v) at (3,0) {};
+
+\node[circle, fill=black, inner sep=2pt] (A) at (-1.2,1.2) {};
+\node[circle, fill=black, inner sep=2pt] (B) at (1.2,1.2) {};
+\node[circle, fill=black, inner sep=2pt] (C) at (1.2,-1.2) {};
+\node[circle, fill=black, inner sep=2pt] (D) at (-1.2,-1.2) {};
+
+\draw (u) -- (D);
+\draw(B) -- (C);
+\draw(A) -- (B);
+\draw(D) -- (A);
+\draw (v) -- (C);
+
+% Cycle edges with arrows
+\draw[->] (u) -- (D);
+\draw[->] (C) -- (v);
+
+% Highlight edge e (thick red)
+\draw[ultra thick, red, ->] (D) -- node[left] {$e$} (C);
+
+\end{tikzpicture}
+
+\textit{A connected graph containing a cycle; the edge $e$ is highlighted.}
+
+\vspace{0.5cm}
+\begin{tikzpicture}[>=Stealth, thick]
+
+\node[circle, fill=black, inner sep=2pt, label=left:$u$] (u) at (-3,0) {};
+\node[circle, fill=black, inner sep=2pt, label=right:$v$] (v) at (3,0) {};
+
+\node[circle, fill=black, inner sep=2pt] (A) at (-1.2,1.2) {};
+\node[circle, fill=black, inner sep=2pt] (B) at (1.2,1.2) {};
+\node[circle, fill=black, inner sep=2pt] (C) at (1.2,-1.2) {};
+\node[circle, fill=black, inner sep=2pt] (D) at (-1.2,-1.2) {};
+
+\draw[->](B) -- (C);
+\draw [->](A) -- (B);
+\draw [->](D) -- (A);
+\draw[->] (u) -- (D);
+\draw[->] (C) -- (v);
+
+\end{tikzpicture}
+
+\textit{the edge $e$ is removed, cycle is rerouted.}
+\end{center}
+
+But, $C(T^* -e)<C(T^*)$ and we have found a contradiction. Thus, $T^*$ can be limited to trees.
+\end{proof}
+\vspace{0.5cm}
+\textbf{\underline{Recall:}} $| \{ T\subseteq E:T \textrm{ is a tree} \}| \leq n^{n-2}$ cam be incredibly large
+
+\begin{itemize}
+    \item Combinatorial optimization is about navigating search spaces with incredibly large (but finite) size
+    \item
+    How can we ``efficiently'' find a solution when search space is as large as $n^{n-2}$?
+\end{itemize}
+
+Before introducing the greedy algorithms, we ask the question, \textbf{what does it mean to be a greedy algorithm?}
+The main idea is to what looks "best" here and now, and hope for the best in the long run.
+\begin{itemize}
+    \item i.e. we have a problem, and make decisions sequentially based on the decision at the moment, without consideration of quality of the final solution.
+\end{itemize}
+
+\section{Algorithms}
+To exemplify the optimization problem, we will consider two different greedy algorithms:
+
+\begin{algorithm}
+\caption{Kruskal's Algorithm}
+\begin{algorithmic}[1]
+    \STATE Sort $E$ in increasing order of cost $c_e$
+    \STATE $T \gets \emptyset$
+    \FOR{each $e \in E$}
+        \IF{$T + e$ has no cycle}
+            \STATE $T \gets T +e$
+        \ENDIF
+    \ENDFOR
+    \RETURN $T$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Prim's Algorithm}
+\begin{algorithmic}[1]
+    \STATE Pick arbitrary $s \in V$ as a root
+    \STATE $T \gets \emptyset$
+    \STATE $S = \{s\}$
+    \WHILE{$S \neq V$}
+        \STATE{Let 
+$e^* \in \displaystyle 
+\operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}} 
+ c_{e}$}
+        \STATE $T \gets T+e$
+        \STATE $S \gets S \cup e $
+    \ENDWHILE
+    \RETURN $T$
+\end{algorithmic}
+\end{algorithm}
+Here, for any $\emptyset \neq S \subset V$, we let $\delta(S) \coloneqq \{e \in E: |e \cap S| = 1\}$.
+To illustrate the execution of these algorithms, consider the following instance:
+\newpage
+
+\noindent
+\begin{minipage}{0.48\textwidth}
+\centering
+\textbf{\underline{Kruskal's}}\\[0.5cm]
+\begin{tikzpicture}[>=Stealth, thick]
+\node[circle, fill=black, inner sep=3pt] (u) at (-3,-1) {};
+\node[circle, fill=black, inner sep=3pt] (A) at (-2,1) {};
+\node[circle, fill=black, inner sep=3pt] (B) at (2,1.2) {};
+\node[circle, fill=black, inner sep=3pt] (C) at (2.4, 0.5) {};
+\node[circle, fill=black, inner sep=3pt] (D) at (-0.5, 0.25) {};
+\draw[-] (B) -- node[midway, above, sloped] {$1$} (C); 
+\draw[-] (D) -- node[midway, above, sloped] {$3$} (B);
+\draw[-] (u) -- node[midway, above, sloped] {$4$} (D);
+\draw[-] (D) -- node[midway, above, sloped] {$2$} (A);
+\end{tikzpicture}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\textbf{\underline{Prim's}}\\[0.5cm]
+\begin{tikzpicture}[>=Stealth, thick]
+\node[circle, fill=black, inner sep=3pt] (u) at (-3,-1) {};
+\node[circle, fill=black, inner sep=3pt] (A) at (-2,1) {};
+\node[circle, fill=black, inner sep=3pt] (B) at (2,1.2) {};
+\node[circle, fill=black, inner sep=3pt] (C) at (2.4, 0.5) {};
+\node[circle, fill=black, inner sep=3pt] (D) at (-0.5, 0.25) {};
+\draw[-] (B) -- node[midway, above, sloped] {$4$} (C); 
+\draw[-] (D) -- node[midway, above, sloped] {$3$} (B);
+\draw[-] (u) -- node[midway, above, sloped] {$1$} (D);
+\draw[-] (D) -- node[midway, above, sloped] {$2$} (A);
+\end{tikzpicture}
+\end{minipage}
+
+\vspace{0.5cm}
+The cost, in this case, is the euclidean distance between nodes. For these two algorithms, the same tree is recovered, but the order in which you return the edges is different (as denoted  by the numbers next to the edges).
+
+\begin{theorem}
+\label{theorem: main}
+    Prim's and Kruskal's algorithms are \textbf{optimal}, in the sense that they return a minimum cost spanning tree
+\end{theorem}
+
+Some other ideas of "optimal" for algorithms include (although not covered in this course):
+\begin{itemize}
+    \item time efficiency (time complexity)
+    \item storage/memory space
+\end{itemize}
+
+Before we prove Theorem~\ref{theorem: main}, we will first define a structural property of optimal solutions:
+
+\begin{lemma}
+Suppose the costs $c_e$ for $e \in E$ are pairwise distinct.
+Let $\emptyset \neq S \subset V$ and let
+\begin{equation*}
+    e^* \in \displaystyle 
+\operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}} 
+ c_{e}.
+\end{equation*}
+Then, $e^*$ belongs to every minimum spanning tree.
+\end{lemma}
+
+\begin{proof}
+    Fix any such $S$ and let $T$ be some tree such that $e^* \notin T$. 
+    We need to show that $C(T) > C(T^*)$, where $T^*$ is a minimum spanning tree. 
+    Let $e^* = \{u, w\}$. 
+    Since $T$ is connected (by definition of tree), there exists a unique $\{u, w\}$-path in $T$. 
+    Without loss of generality, suppose $u \in S$ and $w \notin S$. 
+    Let $u'$ be the last node in the path from $u$ to $w$ such that $u' \in S$. 
+    Let $w'$ be the next node along this path, and note that $w' \notin S$ (by our choice of $u'$).
+
+The following figure illustrates the situation.
+    \begin{center}
+\begin{tikzpicture}[>=Stealth, thick]
+
+% Draw the circle S
+\draw[thick, blue] (0,0) circle (1.5cm);
+\node at (0,1.8) {$S$};
+
+% Nodes inside S
+\node[circle, fill=black, inner sep=2.5pt, label=left:$u$] (u) at (0.3,0.85) {};
+\node[circle, fill=black, inner sep=2.5pt, label=below:$u'$] (u*) at (1,0.4) {};
+
+% Nodes outside S
+\node[circle, fill=black, inner sep=2.5pt, label=right:$w'$] (w*) at (1.9,0.5) {};
+\node[circle, fill=black, inner sep=2.5pt, label=right:$w$] (w) at (3,1.5) {};
+
+% Path from u to w in T
+\draw[-, thick] (u) -- node[midway, above left] {} (u*);
+\draw[-, thick] (u*) -- node[midway, above] {} (w*);
+\draw[-, thick] (w*) -- node[midway, above right] {} (w);
+
+% Highlight e* = {u, w} with a dashed red line
+\draw[red, ultra thick, dashed] (u) -- node[midway, below] {$e^*$} (w);
+
+\end{tikzpicture}
+\end{center}
+
+Let $T' = T - e' + e^*$ where $e' = \{u', w'\}$. We note that:
+
+\begin{enumerate}
+    \item $T'$ is connected (this follows as in the proof of Lemma 1.1, in which paths are re-routed.)
+    \item 
+    $T'$ is acyclic (since $T$ was acyclic to begin with, and the only cycle created by adding $e^*$ is broken by removing $e'$).
+    \item 
+    $C(T') < C(T)$
+\end{enumerate}
+Therefore, if $e^* \notin T$, then $T$ cannot be an optimal solution.
+\end{proof}
+
+Now, we will prove Theorem~\ref{theorem: main}.
+\begin{proof}
+    We want to show that the algorithms maintain the invariant that only edges meeting property:
+    $$e^* \in \displaystyle 
+\operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}} 
+ c_{e}$$
+    are picked, and that a spanning tree is returned.
+    \vspace{0.5cm}
+    
+    First we will prove thereom 2.1 for Kruskal's algorithm. Suppose the algorithm adds some edge $e = \{v, w\}$. 
+    Let $S$ be the component of $v$ right before $e$ is brought into the solution. 
+    That is, $S$ is some connected component containing $v$. 
+    Thus, $w \notin S$ since $e$ does not create a cycle (by the definition of the algorithm).
+
+    This means that $\emptyset \neq S \subset V$. Also, $e$ is the first edge in $\delta(S)$ to be considered for bringing into solution $T$, since any previous edges in $\delta(S)$ could have been added without creating a cycle. 
+    This means that,
+    $$e \in \displaystyle 
+\operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}},
+ c_{e}$$
+    since we evaluate edges from $\delta(S)$ in increasing order of cost. 
+
+    Finally, algorithm returns $T$ that is acyclic by the definition of the algorithm and connected, for otherwise, there is an edge that can be added. 
+    \vspace{0.5cm}
+    
+    Next, proving Prim's algorithm, we see that the choice of edges is precisely: 
+    $$e \in \displaystyle 
+\operatorname*{arg\,min}\limits_{\substack{e \in \delta(S)}} 
+ c_{e}$$
+    by the definition of the algorithm and thus proof is immediate.
+\end{proof}
+
+\textbf{\underline{Observations:}}
+\begin{enumerate}
+    \item 
+    These algorithms also work if the objective function is to maximize: $c_e'=-c_e$
+    \item 
+    We can relax the assumption that the $c_e$ are all distinct, by adding extremely small perturbations so that you can distinguish between edges that the same and the property of being optimal or not is preserved.
+\end{enumerate}
+
+\section{Project Ideas}
+\begin{enumerate}
+    \item 
+    These algorithms have a nice interpretation and analysis in terms of linear programming duality and primal-dual pairs.
+    \item 
+    Our study of trees is a special case of the study of certain objects called ``matroids,'' which generalize linear independence (from linear algebra). 
+    \begin{itemize}
+        \item A matroid is a set system $M = (X, \mathcal{I})$, where $X$ is a finite set and $\mathcal{I}$ is a collection of subsets of $X$ such that:
+        \begin{enumerate}
+            \item 
+            if $I \in \mathcal{I}$ and $J \subseteq I$, then $J \in \mathcal{I}$, and
+            \item 
+            if $I,J \in \mathcal{I}$ are such that $|I| < |J|$, then there exists $z \in J \setminus I$ such that $I + z \in \mathcal{I}$.
+        \end{enumerate}
+    \end{itemize}
+    In the language of trees and spanning trees:
+    \begin{itemize}
+        \item $X$ is the set of edges
+        \item $\mathcal{I}$ is the set of acyclic subsets of edges
+    \end{itemize}
+    The second property is equivalent to the ``exchange'' argument we used today.
+    It can be shown that greedy algorithms are optimal if and only if you are optimizing over a matroid.
+    Matroids are a more advanced topic in combinatorics; you are likely to encounter them again in a more advanced course in combinatorial optimization.
+\end{enumerate}
+\end{document}
