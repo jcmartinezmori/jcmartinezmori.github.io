@@ -1,0 +1,524 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{float} 
+\usetikzlibrary{decorations.pathreplacing,calc}
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$\mathbb{N}$}
+\newcommand{\lecturetitle}{Lecture Title}
+\newcommand{\scribename}{Scribe Name}
+\newcommand{\lecturedate}{Lecture Date}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{7}{Counting Lattice Paths}{February 11th, 2026}{Baihan Liu}
+
+\section{Definition of Lattice Paths}
+
+Let $P$ be a lattice path:
+\[
+P:\ (x_0,y_0),(x_1,y_1),\dots,(x_n,y_n),
+\]
+where $x_i,y_i\in\mathbb{Z}$ for all $i\in [n]_0$.
+
+
+A step is the vector
+\[
+[x_i-x_{i-1},\,y_i-y_{i-1}].
+\]
+A north step, denoted $N$, is the vector $[0,1]$. 
+An east step, denoted $E$, is the vector $[1,0]$.
+
+We will focus on lattice paths that involve only $N$ and $E$ steps.
+
+
+\vspace{0.5cm}
+
+
+
+\begin{figure}[H]
+\center
+\begin{tikzpicture}[scale=0.85, every node/.style={font=\small}];
+
+  % Grid (black): fits the endpoint of NEEENENNE, which is (5,4)
+  \draw[step=1, black, line width=0.4pt] (0,0) grid (5,4);
+
+  % Optional lattice points (comment out if you don't want dots)
+  \foreach \x in {0,...,5}
+    \foreach \y in {0,...,4}
+      \fill[black] (\x,\y) circle (1.1pt);
+
+  % Path P in blue following NEEENENNE, starting at (0,0)
+  \draw[blue, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (0,0) -- (0,1) -- (1,1) -- (2,1) -- (3,1) -- (3,2) -- (4,2) -- (4,3) -- (4,4) -- (5,4);
+
+  % Optional start/end labels
+  \node[below left] at (0,0) {$(0,0)$};
+  \node[above right] at (5,4) {$(5,4)$};
+\end{tikzpicture}
+\caption{A lattice path $P:\ \texttt{NEEENENNE}$.}
+\label{fig:lattice-path-P}
+\end{figure}
+
+\section{Catalan Numbers and Dyck Paths}
+A Dyck path of semilength n is a lattice path from $(0,0)$ to $(n,n)$ such that it never goes below the main diagonal $y=x$. 
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.0]
+
+  % Grid (3 by 3)
+  \draw[step=1, black, line width=0.4pt] (0,0) grid (3,3);
+
+  % Diagonal y=x (red)
+  \draw[red, line width=1.2pt] (0,0) -- (3,3);
+
+  % Blue path: NENNEE  (from (0,0) to (3,3))
+  \draw[blue, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (0,0) -- (0,1) -- (1,1) -- (1,2) -- (1,3) -- (2,3) -- (3,3);
+
+  % Green path: NNEEEN (from (0,0) to (3,3))
+  \draw[green!70!black, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (0,0) -- (0,1) -- (0,2) -- (1,2) -- (2,2) -- (3,2) -- (3,3);
+  \node[below left] at (0,0) {$(0,0)$};
+  \node[above right] at (3,3) {$(3,3)$};
+
+\end{tikzpicture}
+\caption{Dyck path (Blue, NENNEE), a path that is not a Dyck path (Green, NNEEEN), diagonal $y=x$ (red).}
+\label{fig:dyck-vs-not}
+\end{figure}
+
+\noindent
+\textbf{Question.} Let $D(n)$ be the set of Dyck paths of semilength $n$. What is $|D(n)|$?
+
+\noindent
+We let $C_n := |D(n)|$, where $C_n$ is the $n$th Catalan number, with the convention that $C_0=1$.
+
+\subsection{Recurrence Relation}
+
+\begin{lemma}
+    For $n \ge 1, C_n = \displaystyle\sum_{j = 1}^n C_{j-1} C_{n-j}.$
+\end{lemma}
+
+\begin{proof}
+Let \(P: v_0, v_1, \dots, v_{2n}\in D(n)\), where $v_0=(0,0)$ and $v_{2n}=(n,n).$ While the endpoint is fixed on the diagonal, \(P\) may also touch the diagonal \(y=x\) several times along the way. Let \(j\) be the first return of \(P\) to the diagonal, i.e., $j$ is the smallest $j>0$ such that $v_{2j} = (j,j)$. This is an example of extremality. For example, in Figure 3, $j = 3$ is the smallest $j>0$ with $v_6 = (3,3)$.
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85, every node/.style={font=\small}]
+
+  % Grid for NNENEENENE ends at (5,5)
+  \draw[step=1, black, line width=0.4pt] (0,0) grid (5,5);
+
+  % Diagonal (red): y=x
+  \draw[red, line width=1.2pt] (0,0) -- (5,5);
+
+  % Optional lattice points
+  \foreach \x in {0,...,5}
+    \foreach \y in {0,...,5}
+      \fill[black] (\x,\y) circle (1.1pt);
+
+  % Path P in blue: NNENEENENE
+  \draw[blue, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (0,0) -- (0,1) -- (0,2) -- (1,2) -- (1,3) -- (2,3) -- (3,3) -- (3,4) -- (4,4) -- (4,5) -- (5,5);
+
+  % Start/end labels
+  \node[below left] at (0,0) {$(0,0)$};
+  \node[above right] at (5,5) {$(n,n)$};
+
+  % Mark points
+  \fill[orange] (0,1) circle (2.2pt);
+  \fill[orange] (2,3) circle (2.2pt);
+  \fill[orange] (3,3) circle (2.2pt);
+
+  % Smaller point labels
+  \node[left=2pt, fill=white, inner sep=1pt, font=\scriptsize] at (0,1) {$(0,1)$};
+  \node[above right=2pt, fill=white, inner sep=1pt, font=\scriptsize] at (2,3) {$(2,3)$};
+  \node[below right=2pt, fill=white, inner sep=1pt, font=\scriptsize] at (3,3) {$(3,3)$};
+
+\end{tikzpicture}
+\caption{A Dyck path $P:\ \texttt{NNENEENENE}$ (blue).}
+\label{fig:lattice-path-NNENEENENE-marked}
+\end{figure}
+
+
+P can be decomposed as $P = P_1+P_2$, where $P_1$ is a Dyck path from $(0,1)$ to $(j-1,j)$ and $P_2$ is a Dyck path from $(j,j)$ to $(n,n)$.
+
+To see why \(P_1\) is a Dyck path, observe that the first step in \(P\) must be \((0,1)\), and the last step before the first return is \((1,0)\).
+Moreover, by our extreme choice of \(j\), from \((0,1)\) to $(j-1,j)$ the path does not touch the line \(y=x\).
+
+Thus, $P_1 \in D(j-1)$, and $P_2 \in D(n-j)$.
+For a fixed $j$, there are $|D(j-1)||D(n-j)| = C_{j-1} C_{n-j}$ different ways of building $P$.
+
+$j$ can be anywhere in $j \in \{1,2,\dots, n\}$.
+These options for first return are mutually exclusive and collectively exhaustive, so we can use sum principle over choice of $j$.
+Thus,
+\[
+C_n = \sum_{j = 1}^n C_{j-1} C_{n-j}, \qquad n \ge 1.
+\]
+\end{proof}
+
+
+
+
+\subsection{Closed-form Formula}
+\begin{lemma}
+For $n \ge 1, C_n = \displaystyle\frac{1}{n+1}$ $\displaystyle\binom{2n}{n}$.
+\end{lemma}
+
+
+\begin{proof}
+There are $\displaystyle\binom{2n}{n}$ different lattice paths from $(0,0)$ to $(n,n)$.
+Some of these are Dyck paths, which we called ``good paths''.
+Some of these are not Dyck paths, which we called ``bad paths''.
+
+The total number of paths is equal to the number of good paths plus the number of bad paths:
+
+\[\binom{2n}{n} = |G| + |B|.\]
+ \[C_n = |G|= \binom{2n}{n} - |B|.\]
+
+Thus, to find the number of ``good paths'', we only need to find the number of ``bad paths''.
+
+A path $P$ is bad, i.e., $P \in B$, if it crosses below the diagonal $y=x$ at least once. Thus, it touches the off-diagonal $y = x-1$ at least once, as shown in Figure 4. 
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85, every node/.style={font=\small}]
+
+  % Grid 6 by 6
+  \draw[step=1, black, line width=0.4pt] (0,0) grid (6,6);
+
+  % Lattice points (optional)
+  \foreach \x in {0,...,6}
+    \foreach \y in {0,...,6}
+      \fill[black] (\x,\y) circle (1.1pt);
+
+  % Diagonal y=x (red), extended a bit outside the grid
+  \draw[red, line width=1.2pt] (-0.4,-0.4) -- (6.4,6.4);
+
+  % Dotted line y=x-1 (orange), extended a bit outside the grid
+  \draw[orange, dotted, line width=1.4pt] (-0.4,-1.4) -- (7.4,6.4);
+
+  % ------------------------------------------------------------
+  % Shared part of both paths (draw once in a mixed color)
+  % (0,0) -> (4,3)
+  \draw[blue!55!green!60!black, line width=2.2pt]
+    (0,0) -- (0,1) -- (0,2) -- (1,2) -- (2,2) -- (3,2) -- (4,2) -- (4,3);
+
+  % Blue tail only: (4,3) -> (6,6)
+  \draw[blue, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (4,3) -- (4,4) -- (4,5) -- (5,5) -- (5,6) -- (6,6);
+
+  % Green tail only: (4,3) -> (7,5)
+  \draw[green!60!black, line width=1.8pt, -{Latex[length=2.2mm]}]
+    (4,3) -- (5,3) -- (6,3) -- (6,4) -- (7,4) -- (7,5);
+  % ------------------------------------------------------------
+
+  % Corner labels
+  \node[below left] at (0,0) {$(0,0)$};
+  \node[above right] at (6,6) {$(6,6)$};
+
+  % Mark and label the outside point (7,5)
+  \fill[black] (7,5) circle (1.3pt);
+  \node[above right=1pt, font=\scriptsize, fill=white, inner sep=1pt] at (7,5) {$(7,5)$};
+
+\end{tikzpicture}
+\caption{Bad path $P$(blue, NNEEEENNNENE), $\phi(P)$ (green, NNEEEENEENEN),  diagonal $y=x$ (red), offset line $y=x-1$ (orange dotted).}
+\label{fig:lattice-paths-6x6}
+\end{figure}
+
+
+The reflection of $(n,n)$ across $y = x-1$ is $(n+1, n-1)$. Let $(i+1, i)$ be the last lattice point of $P$ on $y = x-1$, where $i \in \{0,1,2,\dots, n\}$. The subpath of $P$ from $(i+1, i)$ to $(n,n)$ is the final portion of $P$. 
+
+Let $\phi: B \longrightarrow \mathcal{P}((0,0), (n+1, n-1))$ by reflecting the final portion of $P \in B$ after final intersection with $y = x-1$. For example, in Figure 4, the green path is the image of the blue path under $\phi$. In the step encoding, the final portion 
+NNENE is reflected to EENEN.
+
+$\phi$ turns $P \in B$, which touches $y = x-1$, into a $(0,0)$ to $(n+1, n-1)$ path that touches $y=x-1$ at the same points. 
+
+Conversely, every path from $(0,0)$ to $(n+1, n-1)$ crosses the off-diagonal $y = x-1$, since $(0,0)$ and $(n+1,n-1)$ are on different sides of it. 
+Reflecting the final portion of the path produces a path from $(0,0)$ to $(n,n)$ that intersects $y=x-1$, hence lies in $B$.
+
+
+Reflecting the final portion twice returns it to its original position. Thus, $B$ and paths from $(0,0)$ to $(n+1, n-1)$ are in bijection.
+In fact, $\phi$ is an involution on $B \cup \mathcal{P}((0,0), (n+1, n-1))$.
+Therefore,
+
+\[|B| = |\mathcal{P}((0,0), (n+1, n-1))| = \binom{n+1+n-1}{n+1} = \binom{2n}{n+1}\]
+
+\[C_n = \binom{2n}{n} -|B| = \binom{2n}{n} -\binom{2n}{n+1} = \frac{(2n)!}{n!n!} - \frac{(2n)!}{(n+1)!(n-1)!} = (1-\frac{n}{n+1}) \binom{2n}{n} = \frac{1}{n+1} \binom{2n}{n}\]
+
+\end{proof}
+
+
+\subsection{Final Project}
+One final project idea is to explore more Catalan objects. 
+Stanley’s book is a useful reference.
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3} % taller rows
+\setlength{\tabcolsep}{10pt}      % wider columns
+
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+n & 0 & 1 & 2 & 3 & 4 & 5 & \dots \\
+\hline
+$C_n$ & 1 & 1 & 2 & 5 & 14 & 42 & \dots \\
+\hline
+\end{tabular}
+
+\caption{Catalan numbers}
+\label{tab:two_by_seven}
+\end{table}
+
+\section{Fibonacci Number}
+Let $F_0 = F_1 = 1$, and $F_n = F_{n-1} + F_{n-2}$, for all $n \ge 2$. 
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.3} % taller rows
+\setlength{\tabcolsep}{10pt}      % wider columns
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+n & 0 & 1 & 2 & 3 & 4 & \dots \\
+\hline
+$F_n$ & 1 & 1 & 2 & 3 & 5 & \dots \\
+\hline
+\end{tabular}
+
+\caption{Fibonacci Number}
+\label{tab:two_by_seven}
+\end{table}
+
+\noindent
+A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the set of all possible ``matchings" (ways of pairing/not pairing adjacent nodes) in $P_n$.
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.00, transform shape]
+\tikzset{
+  VertexStyle/.style={circle,draw,inner sep=0.6pt,minimum size=4mm},
+  EdgeStyle/.style={line width=0.6pt}
+}
+
+% common x-coordinates
+\def\xA{0}\def\xB{1.2}\def\xC{2.4}\def\xD{3.6}\def\xE{4.8}
+
+% (1)
+\node[font=\normalsize] at (-0.6, 0) {(1)};
+\node[VertexStyle] (a1) at (\xA,0) {};
+\node[VertexStyle] (a2) at (\xB,0) {};
+\node[VertexStyle] (a3) at (\xC,0) {};
+\node[VertexStyle] (a4) at (\xD,0) {};
+\node[VertexStyle] (a5) at (\xE,0) {};
+\draw[EdgeStyle] (a1) -- (a2);
+\draw[EdgeStyle] (a3) -- (a4);
+
+% (2)
+\node[font=\normalsize] at (-0.6, -1.2) {(2)};
+\node[VertexStyle] (b1) at (\xA,-1.2) {};
+\node[VertexStyle] (b2) at (\xB,-1.2) {};
+\node[VertexStyle] (b3) at (\xC,-1.2) {};
+\node[VertexStyle] (b4) at (\xD,-1.2) {};
+\node[VertexStyle] (b5) at (\xE,-1.2) {};
+\draw[EdgeStyle] (b1) -- (b2) -- (b3) -- (b4) -- (b5);
+
+% (3)
+\node[font=\normalsize] at (-0.6, -2.4) {(3)};
+\node[VertexStyle] (c1) at (\xA,-2.4) {};
+\node[VertexStyle] (c2) at (\xB,-2.4) {};
+\node[VertexStyle] (c3) at (\xC,-2.4) {};
+\node[VertexStyle] (c4) at (\xD,-2.4) {};
+\node[VertexStyle] (c5) at (\xE,-2.4) {};
+\draw[EdgeStyle] (c1) -- (c2) -- (c3);
+\draw[EdgeStyle] (c4) -- (c5);
+
+\end{tikzpicture}
+\caption{Some possible ``matchings'' in $P_4$.}
+\end{figure}
+
+
+\noindent
+\textbf{Claim}: $F_n$ is the number of different matchings in $P_n$, $n \ge 2$.
+
+\begin{proof}
+
+
+
+
+
+
+
+For $n \ge 2$,
+
+1. If we match $\{n-1,n\}$, then $n-1$ cannot be matched again. There are $F_{n-2}$ matching options for nodes $0, 1,2,\dots, n-2$. 
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.05, transform shape]
+\usetikzlibrary{decorations.pathreplacing,calc}
+\tikzset{
+  VertexStyle/.style={circle,draw,inner sep=0.6pt,minimum size=4mm},
+  EdgeStyle/.style={line width=0.6pt}
+}
+
+% x-positions for 6 displayed vertices
+\def\xA{0}\def\xB{1.2}\def\xC{2.4}\def\xD{3.6}\def\xE{4.8}\def\xF{6.0}
+\def\y{0}
+
+% vertices (a path on n vertices)
+\node[VertexStyle, label=above:$0$]      (v1) at (\xA,\y) {};
+\node[VertexStyle, label=above:$1$]      (v2) at (\xB,\y) {};
+\node[VertexStyle, label=above:$2$]      (v3) at (\xC,\y) {};
+\node[VertexStyle, label=above:$\cdots$] (v4) at (\xD,\y) {};
+
+% put n-2 and n-1 labels OUTSIDE the circles
+\node[VertexStyle] (v5) at (\xE,\y) {};
+\node[above=2pt] at (v5.north) {$n-2$};
+
+\node[VertexStyle] (v6) at (\xF,\y) {};
+\node[above=2pt] at (v6.north) {$n-1$};
+
+% (optional) show the final n as text to the right, if you want to indicate continuation
+\node[VertexStyle] (v7) at (\xF+1.2,\y) {};
+\node[above=2pt] at (v7.north) {$n$};
+
+% edges
+\draw[EdgeStyle] (v1) -- (v2) -- (v3) -- (v4) -- (v5);
+
+\draw[EdgeStyle, blue, line width=1.2pt] (v6) -- (v7)
+  node[midway,below=5pt,font=\scriptsize] {matched};
+
+% brace for the first n-2 positions: 1 through n-2
+\draw[decorate,decoration={brace,mirror,raise=3pt}]
+  (v1.south) -- (v5.south)
+  node[midway,below=8pt] {$n-2$ edges};
+
+\end{tikzpicture}
+\end{figure}
+
+
+
+
+
+
+
+
+2. If we do not match $n$ with $n-1$. $n-1$ is free to be matched with $n-2$. There are $F_{n-1}$ matchings options for nodes $0, 1,2,\dots, n-1$.
+
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.05, transform shape]
+%\usetikzlibrary{decorations.pathreplacing,calc}
+\tikzset{
+  VertexStyle/.style={circle,draw,inner sep=0.6pt,minimum size=4mm},
+  EdgeStyle/.style={line width=0.6pt}
+}
+
+% x-positions for 6 displayed vertices
+\def\xA{0}\def\xB{1.2}\def\xC{2.4}\def\xD{3.6}\def\xE{4.8}\def\xF{6.0}
+\def\y{0}
+
+% vertices (a path on n vertices)
+\node[VertexStyle, label=above:$0$]      (v1) at (\xA,\y) {};
+\node[VertexStyle, label=above:$1$]      (v2) at (\xB,\y) {};
+\node[VertexStyle, label=above:$2$]      (v3) at (\xC,\y) {};
+\node[VertexStyle, label=above:$\cdots$] (v4) at (\xD,\y) {};
+
+% put n-2 and n-1 labels OUTSIDE the circles
+\node[VertexStyle] (v5) at (\xE,\y) {};
+\node[above=2pt] at (v5.north) {$n-2$};
+
+\node[VertexStyle] (v6) at (\xF,\y) {};
+\node[above=2pt] at (v6.north) {$n-1$};
+
+% (optional) show the final n as text to the right, if you want to indicate continuation
+\node[VertexStyle] (v7) at (\xF+1.2,\y) {};
+\node[above=2pt] at (v7.north) {$n$};
+
+% edges
+\draw[EdgeStyle] (v1) -- (v2) -- (v3) -- (v4) -- (v5) -- (v6);
+
+\draw[EdgeStyle, white, line width=1.2pt] (v6) -- (v7)
+  node[midway,below=5pt,font=\scriptsize] {unmatched};
+
+% brace for the first n-2 positions: 1 through n-2
+\draw[decorate,decoration={brace,mirror,raise=3pt}]
+  (v1.south) -- (v6.south)
+  node[midway,below=8pt] {$n-1$ edges};
+
+\end{tikzpicture}
+\end{figure}
+
+
+
+By assumptions, $F_n = F_{n-1} + F_{n-2}$. Proof holds inductively.
+
+\end{proof}
+
+\begin{remark}
+    The answer so far for $F_n$ is a recursion formula, which is less nice than our best answer for $C_n$, which is a closed-form formula.
+\end{remark} 
+
+
+\end{document}
