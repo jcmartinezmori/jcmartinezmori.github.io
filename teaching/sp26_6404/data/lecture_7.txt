@@ -328,7 +328,7 @@ $C_n$ & 1 & 1 & 2 & 5 & 14 & 42 & \dots \\
 \label{tab:two_by_seven}
 \end{table}
 
-\section{Fibonacci Number}
+\section{Fibonacci Numbers}
 Let $F_0 = F_1 = 1$, and $F_n = F_{n-1} + F_{n-2}$, for all $n \ge 2$. 
 
 \begin{table}[H]
@@ -348,7 +348,7 @@ $F_n$ & 1 & 1 & 2 & 3 & 5 & \dots \\
 \end{table}
 
 \noindent
-A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the set of all possible ``matchings" (ways of pairing/not pairing adjacent nodes) in $P_n$.
+A combinatorial interpretation: Let $P_n$ be a path with $n$ nodes. Consider the set of all possible ``matchings" (ways of pairing/not pairing adjacent nodes) in $P_n$.
 
 
 \begin{figure}[H]
@@ -368,7 +368,6 @@ A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the 
 \node[VertexStyle] (a2) at (\xB,0) {};
 \node[VertexStyle] (a3) at (\xC,0) {};
 \node[VertexStyle] (a4) at (\xD,0) {};
-\node[VertexStyle] (a5) at (\xE,0) {};
 \draw[EdgeStyle] (a1) -- (a2);
 \draw[EdgeStyle] (a3) -- (a4);
 
@@ -378,8 +377,7 @@ A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the 
 \node[VertexStyle] (b2) at (\xB,-1.2) {};
 \node[VertexStyle] (b3) at (\xC,-1.2) {};
 \node[VertexStyle] (b4) at (\xD,-1.2) {};
-\node[VertexStyle] (b5) at (\xE,-1.2) {};
-\draw[EdgeStyle] (b1) -- (b2) -- (b3) -- (b4) -- (b5);
+
 
 % (3)
 \node[font=\normalsize] at (-0.6, -2.4) {(3)};
@@ -387,9 +385,7 @@ A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the 
 \node[VertexStyle] (c2) at (\xB,-2.4) {};
 \node[VertexStyle] (c3) at (\xC,-2.4) {};
 \node[VertexStyle] (c4) at (\xD,-2.4) {};
-\node[VertexStyle] (c5) at (\xE,-2.4) {};
-\draw[EdgeStyle] (c1) -- (c2) -- (c3);
-\draw[EdgeStyle] (c4) -- (c5);
+\draw[EdgeStyle] (c3) -- (c4);
 
 \end{tikzpicture}
 \caption{Some possible ``matchings'' in $P_4$.}
@@ -397,7 +393,7 @@ A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the 
 
 
 \noindent
-\textbf{Claim}: $F_n$ is the number of different matchings in $P_n$, $n \ge 2$.
+\textbf{Claim}: $F_n$ is the number of different matchings in $P_n$.
 
 \begin{proof}
 
@@ -409,7 +405,7 @@ A combinatorial interpretation: Let $P_n$ be a path of length $n$. Consider the 
 
 For $n \ge 2$,
 
-1. If we match $\{n-1,n\}$, then $n-1$ cannot be matched again. There are $F_{n-2}$ matching options for nodes $0, 1,2,\dots, n-2$. 
+1. If we match $\{n-1,n\}$, then $n-1$ cannot be matched again. There are $F_{n-2}$ matching options for nodes $1,2,\dots, n-2$. 
 
 \begin{figure}[H]
 \centering
@@ -425,9 +421,9 @@ For $n \ge 2$,
 \def\y{0}
 
 % vertices (a path on n vertices)
-\node[VertexStyle, label=above:$0$]      (v1) at (\xA,\y) {};
-\node[VertexStyle, label=above:$1$]      (v2) at (\xB,\y) {};
-\node[VertexStyle, label=above:$2$]      (v3) at (\xC,\y) {};
+\node[VertexStyle, label=above:$1$]      (v1) at (\xA,\y) {};
+\node[VertexStyle, label=above:$2$]      (v2) at (\xB,\y) {};
+\node[VertexStyle, label=above:$3$]      (v3) at (\xC,\y) {};
 \node[VertexStyle, label=above:$\cdots$] (v4) at (\xD,\y) {};
 
 % put n-2 and n-1 labels OUTSIDE the circles
@@ -450,7 +446,7 @@ For $n \ge 2$,
 % brace for the first n-2 positions: 1 through n-2
 \draw[decorate,decoration={brace,mirror,raise=3pt}]
   (v1.south) -- (v5.south)
-  node[midway,below=8pt] {$n-2$ edges};
+  node[midway,below=8pt] {$n-2$ nodes};
 
 \end{tikzpicture}
 \end{figure}
@@ -462,7 +458,7 @@ For $n \ge 2$,
 
 
 
-2. If we do not match $n$ with $n-1$. $n-1$ is free to be matched with $n-2$. There are $F_{n-1}$ matchings options for nodes $0, 1,2,\dots, n-1$.
+2. If we do not match $n$ with $n-1$. $n-1$ is free to be matched with $n-2$. There are $F_{n-1}$ matchings options for nodes $1,2,\dots, n-1$.
 
 
 
@@ -480,9 +476,9 @@ For $n \ge 2$,
 \def\y{0}
 
 % vertices (a path on n vertices)
-\node[VertexStyle, label=above:$0$]      (v1) at (\xA,\y) {};
-\node[VertexStyle, label=above:$1$]      (v2) at (\xB,\y) {};
-\node[VertexStyle, label=above:$2$]      (v3) at (\xC,\y) {};
+\node[VertexStyle, label=above:$1$]      (v1) at (\xA,\y) {};
+\node[VertexStyle, label=above:$2$]      (v2) at (\xB,\y) {};
+\node[VertexStyle, label=above:$3$]      (v3) at (\xC,\y) {};
 \node[VertexStyle, label=above:$\cdots$] (v4) at (\xD,\y) {};
 
 % put n-2 and n-1 labels OUTSIDE the circles
@@ -505,7 +501,7 @@ For $n \ge 2$,
 % brace for the first n-2 positions: 1 through n-2
 \draw[decorate,decoration={brace,mirror,raise=3pt}]
   (v1.south) -- (v6.south)
-  node[midway,below=8pt] {$n-1$ edges};
+  node[midway,below=8pt] {$n-1$ nodes};
 
 \end{tikzpicture}
 \end{figure}
@@ -519,6 +515,8 @@ By assumptions, $F_n = F_{n-1} + F_{n-2}$. Proof holds inductively.
 \begin{remark}
     The answer so far for $F_n$ is a recursion formula, which is less nice than our best answer for $C_n$, which is a closed-form formula.
 \end{remark} 
+
+
 
 
 \end{document}
