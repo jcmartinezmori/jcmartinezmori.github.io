@@ -1,0 +1,258 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{8}
+\newcommand{\lecturetitle}{Formal Power Series and Generating Functions}
+\newcommand{\scribename}{Hanbyul (Han) Lee}
+\newcommand{\lecturedate}{Feb 16, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Generating Polynomials}
+
+\begin{definition}[Generating polynomial]
+A finite sequence $a_0,a_1,a_2,\dots,a_n$ has the \emph{generating polynomial}
+\[
+f(x)=a_0+a_1x+a_2x^2+\cdots+a_nx^n=\sum_{i=0}^{n} a_i x^i.
+\]
+\end{definition}
+
+\begin{example}[Binomial coefficients]
+Let $a_k=\binom{n}{k}$ for $k=0,1,\dots,n$ (note: Pascal's triangle). The corresponding generating polynomial is
+\[
+f(x)=\binom{n}{0}+\binom{n}{1}x+\binom{n}{2}x^2+\cdots+\binom{n}{n}x^n
+=\sum_{k=0}^{n}\binom{n}{k}x^k.
+\]
+\end{example}
+
+\begin{theorem}[Binomial theorem]
+For $n\in \mathbb{N}_0$,
+\[
+\sum_{k=0}^{n}\binom{n}{k}x^k=(1+x)^n.
+\]
+In particular, this says that $f(x)=\sum_{k=0}^{n}\binom{n}{k}x^k$ has a ``nice'' factorization.
+\end{theorem}
+
+\begin{proof}
+We prove the identity by induction on $n$.
+
+\noindent\textbf{Base case.} For $n=0$,
+\[
+\binom{0}{0}x^0 = 1\cdot 1 = (1+x)^0 = 1.
+\]
+
+\noindent\textbf{Inductive step.} We use the convention that $\binom{n}{k}=0$ when $k<0$ or $k>n$, so that
+\[
+\sum_{k=0}^{n}\binom{n}{k}x^k=\sum_{k=-\infty}^{\infty}\binom{n}{k}x^k.
+\]
+Using the identity $\binom{n}{k}=\binom{n-1}{k-1}+\binom{n-1}{k}$, we compute
+\begin{align*}
+\sum_{k}\binom{n}{k}x^k
+&= \sum_{k}\left(\binom{n-1}{k-1}+\binom{n-1}{k}\right)x^k \\
+&= \sum_{k}\binom{n-1}{k-1}x^k + \sum_{k}\binom{n-1}{k}x^k \\
+&= x\sum_{k}\binom{n-1}{k-1}x^{k-1} + \sum_{k}\binom{n-1}{k}x^k \\
+&= x\sum_{k}\binom{n-1}{k}x^{k} + \sum_{k}\binom{n-1}{k}x^k \qquad\text{(re-indexing)}\\
+&= x(1+x)^{n-1} + (1+x)^{n-1} \\
+&= (1+x)^{n-1}(1+x) \\
+&= (1+x)^n,
+\end{align*}
+where we used the inductive hypothesis to replace $\sum_{k}\binom{n-1}{k}x^{k}$ by $(1+x)^{n-1}$.
+\end{proof}
+
+\begin{proof}[Combinatorial proof]
+Expanding
+\[
+(1+x)^n=(1+x)(1+x)\cdots(1+x) \qquad (n\ \text{times}),
+\]
+the coefficient of $x^k$ counts the number of ways to pick $k$ of the factors from which we choose the $x$ term (and from the remaining factors we choose $1$). Hence there are $\binom{n}{k}$ ways, so the coefficient of $x^k$ is $\binom{n}{k}$.
+\end{proof}
+
+\begin{remark}[Some quick consequences]
+Evaluating at $x=1$ gives
+\[
+\sum_{k=0}^{n}\binom{n}{k} = (1+1)^n = 2^n.
+\]
+Evaluating at $x=-1$ gives
+\[
+\sum_{k=0}^{n}\binom{n}{k}(-1)^k = 0 \qquad \text{for } n\ge 1.
+\]
+In particular,
+\[
+\sum_{\substack{0\le k\le n\\ k\ \mathrm{even}}}\binom{n}{k}
+=
+\sum_{\substack{0\le k\le n\\ k\ \mathrm{odd}}}\binom{n}{k}.
+\]
+\end{remark}
+
+\section{Generating Functions}
+
+\begin{definition}[Generating function]
+An infinite countable sequence $a_0,a_1,a_2,a_3,\dots$ has the \emph{generating function}
+\[
+f(x)=a_0+a_1x+a_2x^2+a_3x^3+\cdots=\sum_{k=0}^{\infty} a_k x^k.
+\]
+We view $f(x)$ as a \emph{formal power series}: the powers of $x$ are placeholders, and (unlike the generating polynomial case) we do not substitute numerical values for $x$.
+\end{definition}
+
+\begin{example}[The all-ones sequence]
+Consider $a_0=1,1,1,1,\dots$ (all ones). Its generating function is
+\[
+f(x)=\sum_{k\ge 0} x^k = 1+x+x^2+x^3+\cdots.
+\]
+This has a ``nice'' representation as
+\[
+f(x)=\frac{1}{1-x}.
+\]
+Indeed, $f(x)$ is the inverse of $(1-x)$ since
+\[
+f(x)(1-x)=(1+x+x^2+x^3+\cdots)(1-x)=1.
+\]
+\end{example}
+
+\begin{definition}[Coefficient extraction]
+If $A(x)$ is a generating function, we denote
+\[
+a_n=\left[x^n\right]A(x),
+\]
+to mean: \emph{extract the coefficient of $x^n$ in $A(x)$.}
+\end{definition}
+
+\begin{example}
+\[
+\left[x^n\right]\left(\sum_{k\ge 0} x^k\right)=1
+\qquad\text{for all } n\ge 0.
+\]
+\end{example}
+
+\begin{remark}
+Sometimes, a precise closed-form formula for
+\[
+a_n=\left[x^n\right]A(x)
+\]
+can be easily extracted from the form of $A(x)$.
+\end{remark}
+
+\begin{remark}[Taylor series and coefficient extraction]
+In general, we can extract $\left[x^n\right]A(x)$ using a Taylor series expansion of $A(x)$ around $x=0$:
+\[
+a_n=\frac{A^{(n)}(0)}{n!}.
+\]
+This gives the numerical value of $a_n$ (which can be obtained computationally).
+\end{remark}
+
+\section{The Algebra of Formal Power Series}
+
+Before going any further, we make the formal setting explicit.
+
+\begin{definition}[Formal power series over $\mathbb{C}$]
+\[
+\mathbb{C}[[x]]=\left\{\sum_{n\ge 0} a_n x^n : a_n\in \mathbb{C}\ \text{for all } n\ge 0\right\}.
+\]
+We refer to $\mathbb{C}[[x]]$ as the ``algebra of formal power series.'' (Note: $A(x)\in \mathbb{C}[[x]]$.)
+\end{definition}
+
+\begin{remark}[Ring operations]
+Let
+\[
+A(x)=\sum_{n\ge 0} a_n x^n,
+\qquad
+B(x)=\sum_{n\ge 0} b_n x^n.
+\]
+\begin{itemize}
+\item \textbf{Addition:}
+\[
+A(x)+B(x)=\sum_{n\ge 0}(a_n+b_n)x^n.
+\]
+\item \textbf{Scalar multiplication:} for $c\in \mathbb{C}$,
+\[
+cA(x)=c\left(\sum_{n\ge 0} a_n x^n\right)=\sum_{n\ge 0}(c\,a_n)x^n.
+\]
+\item \textbf{Multiplication (convolution):}
+\[
+A(x)\cdot B(x)=\left(\sum_{n\ge 0} a_n x^n\right)\left(\sum_{n\ge 0} b_n x^n\right)
+= \sum_{n\ge 0} c_n x^n =: C(x),
+\]
+where
+\[
+c_n=\sum_{k=0}^{n} a_k\,b_{n-k}.
+\]
+\end{itemize}
+\end{remark}
+
+\begin{remark}[Inverses and a word of caution]
+Recall that an inverse means $S(x)S^{-1}(x)=1$ (by definition of the convolution product).
+
+Some statements that are true \emph{analytically} about a power series (in the sense seen in calculus) may not be true as statements in $\mathbb{C}[[x]]$. For example, $\frac{1}{x}$ makes sense analytically as the inverse of $x$ (since $x\cdot \frac{1}{x}=1$), but it does not make sense in $\mathbb{C}[[x]]$ since the formal power series
+\[
+x = 0 + x + 0x^2 + 0x^3 + \cdots
+\]
+has no inverse in $\mathbb{C}[[x]]$.
+
+Indeed, if $x f(x)=1$, then $x f(x)$ has $0$ as its constant term, but the right-hand side of $x f(x)=1$ is $1$.
+\end{remark}
+
+\begin{fact}
+One can show that $f(x)\in \mathbb{C}[[x]]$ has an inverse if and only if
+\[
+\left[x^0\right]f(x)\neq 0.
+\]
+\end{fact}
+
+\end{document}
