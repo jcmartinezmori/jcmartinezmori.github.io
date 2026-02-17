@@ -66,7 +66,7 @@
 \begin{document}
 
 \thispagestyle{firstpage}
-\scribebox{7}{Counting Lattice Paths}{February 11th, 2026}{Baihan Liu}
+\scribebox{7}{Counting Lattice Paths}{February 11, 2026}{Baihan Liu}
 
 \section{Definition of Lattice Paths}
 
@@ -214,6 +214,7 @@ C_n = \sum_{j = 1}^n C_{j-1} C_{n-j}, \qquad n \ge 1.
 \]
 \end{proof}
 
+This is \href{https://oeis.org/A000108}{OEIS A000108}.
 
 
 
@@ -346,6 +347,7 @@ $F_n$ & 1 & 1 & 2 & 3 & 5 & \dots \\
 \caption{Fibonacci Number}
 \label{tab:two_by_seven}
 \end{table}
+This is \href{https://oeis.org/A000045}{OEIS A000045}.
 
 \noindent
 A combinatorial interpretation: Let $P_n$ be a path with $n$ nodes. Consider the set of all possible ``matchings" (ways of pairing/not pairing adjacent nodes) in $P_n$.
