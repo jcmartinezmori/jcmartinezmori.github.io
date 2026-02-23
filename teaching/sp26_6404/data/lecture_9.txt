@@ -1,0 +1,240 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{enumitem}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{9}
+\newcommand{\lecturetitle}{Solving Recurrence Relations}
+\newcommand{\scribename}{Noura Allugmani}
+\newcommand{\lecturedate}{February 18, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+\section{Algorithm}
+
+Given $a_0, a_1, a_2 \ldots$ defined by a recurrence relation with some boundary conditions:
+\begin{enumerate}
+\item  Multiply the r.r by $x^n$ on both sides, and some over all $n \geqslant d$ where $d$ is the smallest index for which r.r. is valid.
+\item  Define $A(x)=\displaystyle\sum_{n>0} a_n x^n$, and replace it in (1).
+\item  Solve for $A(x)$.
+\item  Find $a_n=\left[x^n\right] A(x)$ (ideally in closed-form by partial fraction expansion, and if not computationally).
+\end{enumerate}
+\begin{example}
+
+$a_0=2$, and $a_n=3 a_{n-1}$ for $n \geq 1$.
+we know from visual inspection that
+$$
+a_n=2 \cdot 3^n, \quad n \geqslant 0 .
+$$
+Goal: Recover this using the algorithm.
+\begin{enumerate}
+\item  $$\Rightarrow a_n x^n=3 a_{n-1} x^n$$
+
+$$
+\Rightarrow \displaystyle\sum_{n \geqslant 1} a_n x^n=\displaystyle\sum_{n \geqslant1} 3 a_{n-1} x^n
+$$
+\item
+$$
+A(x)= \displaystyle\sum_{n\geq0} a_n x^n
+$$
+
+Note:
+\begin{itemize}
+\item $$\displaystyle \sum_{n \geqslant 1} a_n x^n=A(x)-a_0= A(x)-2$$  
+
+\item  $$ \begin{aligned}
+\sum_{n \geqslant 1} 3 a_{n-1} x^n  & =3 x \sum_{n \geqslant 1} a_{n-1} x^{n-1} \\
+& =3 x \sum_{n \geqslant 0} a_n x^n  \\
+& =3 x A(x) 
+\end{aligned}$$
+\end{itemize}
+
+$\Rightarrow A(x)-2=3 x A (x).$
+    \item 
+    $$\begin{aligned} & A(x)-3 x A(x)=2 \\ & A(x)(1-3 x)=2 \\ & A(x)=\frac{2}{1-3 x} .\end{aligned}$$
+    \item Extract $a_n=\left[x^n\right] A(x)$ by expanding $\cfrac{2}{1-3 x}$ as a "geometric series".
+We can substitute $3 x$ for $x$ in $\cfrac{1
+}{1-x}$ to obtain $A(x)=\displaystyle \sum_{n \geqslant 0} 2 \cdot 3^n x^n$. 
+$1 - 3x$ is shorthand for $\quad 1-3 x+0 \cdot x^2+0 \cdot x^3+\cdots$, and $\cfrac{1}{1-3 x} = 1+3 x+3^2 x^2+\cdots$ is the inverse of $1-3 x+0 \cdot x^2+0 \cdot x^3+\ldots.$ You should convince yourself that $
+\left(1+3 x+3^2 x^2+\cdots\right)\left(1-3 x+0 x^2+0 x^3+\cdots\right)=1,
+$ where 1 is shorthand for $1+0 \cdot x+0 \cdot x^2+\cdots$
+
+$$
+\begin{aligned}
+& c_0=1 \cdot 1=1 ~\checkmark\\
+& c_1=1(-3)+(3)(1)=0 ~\checkmark \\
+& c_n=(1 \cdot 0)+(3)(-3)+3^2(1)=0 ~\checkmark
+\end{aligned}
+$$
+\end{enumerate}
+    
+\end{example}
+%
+
+\begin{example}
+$a_0=1, a_1=-4$, and $a_n=4 a_{n-1}-4 a_{n-2}, \forall n \geq 2$.
+\begin{enumerate}
+ \item
+ $$\begin{aligned} &  \Rightarrow a_n x^n=\left(4 a_{n-1}-4 a_{n-2}\right) x^n \\ & \Rightarrow \sum_{n \geqslant 2} a_n x^n=\sum_{n \geqslant 2}\left(4 a_{n-1}-4 a_{n-2}\right) x^n .\end{aligned}$$
+ 
+ \item $$A(x)=\displaystyle \sum_{n \geqslant 0} a_n x^n$$
+
+LHS.
+
+$$
+\begin{aligned}
+\sum_{n \geqslant 2} a_n x^n & =A(x)-a_0-a_1 x . \\
+& =A(x)-1+4 x .
+\end{aligned}
+$$
+
+
+RHS.
+
+$$
+\begin{aligned}
+& \sum_{n \geqslant 2}\left(4 a_{n-1}-4 a_{n-2}\right) x^n \\
+= & 4 \sum_{n \geqslant 2} a_{n-1} x^n-4 \sum_{n \geqslant 2} a_{n-2} x^n \\
+= & 4 x \sum_{n \geqslant 2} a_{n-1} x^{n-1}-4 x^2 \sum_{n \geqslant 2} a_{n-2} x^{n-2} \\
+= & 4 x \sum_{n \geqslant 1} a_n x^n-4 x^2 \sum_{n \geqslant 0} a_n x^n \\
+= & 4 x\left(A(x)-a_0\right)-4 x^2 A(x) =  4 x\left(A(x)-1\right)-4 x^2 A(x) \\
+\Rightarrow & A(x)-1+4x=4 x(A(x)-1)-4 x^2 A(x) .
+\end{aligned}
+$$
+ \item  $\quad A(x)=\cfrac{1-8 x}{1-4 x+4 x^2}$
+\item Note that: \\
+$A(x)=\cfrac{4}{1-2 x}-\cfrac{3}{(1-2 x)^2}$ by partial fraction expansion.
+$\cfrac{1}{1-2 x}$ looks like something we already know how to deal with. 
+$\cfrac{1}{1-x}=\displaystyle\sum_{n \geqslant 0} x^n$, by replacing $2 x$ for $x$ we have
+
+$$
+\begin{aligned}
+& \frac{1}{1-2 x}=\sum_{n \geqslant 0} 2^n x^n \\
+& \Rightarrow \frac{4}{1-2 x}=\sum_{n \geqslant 0} 4 \cdot 2^n x^n
+\end{aligned}
+$$
+
+we will not prove this, but it is a fact that
+
+$$
+\frac{1}{(1-x)^k}=\sum_{n \geq 0}\left(\binom{k}{n}\right) x^n .
+$$
+$\Rightarrow$ we follow same strategy of replacing $2 x$ for $x$ in expansion above to find
+
+$$
+\begin{aligned}
+\frac{3}{(1-2 x)^2} & =\sum_{n \geqslant 0} 3\binom{n+1}{1} 2^n x^n . \\
+& =A(x)=\sum_{n \geqslant 0} \left(4 \cdot 2^n-3\binom{n+1}{1} 2^n\right) x^n .
+\end{aligned}
+$$
+ \end{enumerate} 
+ \end{example}
+  Without proof: the ability of getting a closed form solution as a linear combination of the reciprocals of the roots of the denominator of the corresponding generating function is possible if and only if your recurrence relation is linear of fixed number of terms $d$.
+  (This is to have a rational generating function.)
+
+$$
+ a_{n+d}=c_1 a_{n+d-1}+c_2 a_{n+d-2}+\ldots+c_d a_n \\
+\text { with } c_d \neq 0 \text {. }
+$$
+ %
+\begin{example}
+The Fibonacci numbers.
+
+$$
+f_0=0,  f_1=1, \text { and } f_n=f_{n-1}+f_{n-2}, n \geqslant 2 .
+$$
+\begin{enumerate}
+ \item $$\begin{aligned}  \Rightarrow & f_n x^n=\left(f_{n-1}+f_{n-2}\right) x^n . \\ & \sum_{n \geqslant 2} f_n x^n=\sum_{n \geqslant 2}\left(f_{n-1}+f_{n-2}\right) x^n .\end{aligned}$$
+ 
+ \item 
+ $$F(x)=\sum_{n \geqslant 0} f_n x^n$$
+ LHS.
+$$
+\begin{aligned}
+\sum_{n \geq 2} f_n x^n & =F(x)-f_0-f_1 x  \\
+& =F(x)-x
+\end{aligned}
+$$
+
+
+RHS.
+
+$$
+\begin{aligned}
+& \sum_{n \geqslant 2}\left(f_{n-1}+f_{n-2}\right) x^n=\sum_{n \geqslant 2} f_{n-1} x^n+\sum_{n \geqslant 2}  f_{n-2} x^n \\
+& =x \sum_{n \geqslant 2} f_{n-1} x^{n-1}+x^2 \sum_{n \geqslant 2} f_{n-2} x^{n-2} \\
+& =x \sum_{n \geqslant 1} f_n x^n+x^2 \sum_{n \geqslant 0} f_n x^n \\
+& =x\left(F(x)-f_0\right)+x^2 F(x) \\
+& =x F(x)+x^2 F(x) . \\
+\Rightarrow F(x) & -x=x F(x)+x^2 F(x)
+\end{aligned}
+$$
+ \item Solve for $F(x)$ to find $F(x)=\cfrac{x}{1-x-x^2}$.
+
+ \item Find $f_n=\left[x^n\right] F(x)$ as
+
+$$
+f_n=\frac{1}{\sqrt{5}}\left(\frac{1+\sqrt{5}}{2}\right)^n-\frac{1}{\sqrt{5}}\left(\frac{1-\sqrt{5}}{2}\right)^n .$$
+
+
+ \end{enumerate}
+\end{example}
+We will find $f_n$ next time, but for now be amazed that it turns out to be always an integer.
+
+
+\end{document}
