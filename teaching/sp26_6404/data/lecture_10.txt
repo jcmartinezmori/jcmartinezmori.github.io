@@ -1,0 +1,289 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{10}
+\newcommand{\lecturetitle}{Power Series Continued and Graph Coloring}
+\newcommand{\scribename}{Hunter Pearson}
+\newcommand{\lecturedate}{February 23, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Review of Last Lecture}
+Last time we saw $$F(x) = \sum_{n \geq 0} f_nx^n$$ where $f_0 = 0$, $f_1 = 1$, and $f_n = f_{n-1} + f_{n-2}$
+
+We obtained $$F(x) = \frac{x}{1-x-x^2}$$
+
+\section{Closed-form Formula for Fibonacci Numbers}
+
+If we use partial fractions, we need to factor the denominator of $F(x)$.
+
+Recall: $$ax^2 + bx+c = 0 \implies x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+
+Thus for $1-x-x^2$, its two roots are $$r_1 = \frac{-1 + \sqrt{5}}{2} \hspace{1 cm} r_2 = \frac{-1 -\sqrt{5}}{2}$$
+
+Note that $r_1 \cdot r_2 = -1$
+
+Then we get \begin{align*}
+    1 - x - x^2 &= -(x - r_1)(x-r_2)\\
+    &= -\frac{-1}{r_1 \cdot r_2}(x - r_1)(x-r_2)\\
+    &= \frac{(x - r_1)}{r_1}\frac{(x-r_2)}{r_2}\\
+    &= (\frac{x}{r_1}-1)(\frac{x}{r_2}-1)\\
+    &= (1-\frac{x}{r_1})(1-\frac{x}{r_2})\\
+\end{align*}
+
+This implies $$F(x) = \frac{x}{(1-\frac{x}{r_1})(1-\frac{x}{r_2})} = 
+\frac{A}{1-
+\frac{x}{r_1}} + \frac{B}{1-\frac{x}{r_2}}$$
+
+We need to find A and B. First, we can see that this this is equivalent to $$x = A(1-\frac{x}{r_2}) + B(1-\frac{x}{r_1})$$
+
+Now there are two cases:
+
+Case $x = r_1$: \begin{align*}
+    r_1 &= A(1-\frac{r_1}{r_2}) + B(1-\frac{r_1}{r_1})\\
+    &= A(1-\frac{r_1}{r_2}) + B(0)\\
+    &= A(1-\frac{r_1}{r_2})\\
+    \implies A &= \frac{r_1}{1-\frac{r_1}{r_2}}\\
+    &= \frac{1}{\sqrt{5}}
+\end{align*}
+
+Case $x = r_2$: \begin{align*}
+    r_2 &= A(1-\frac{r_2}{r_2}) + B(1-\frac{r_2}{r_1})\\
+    &= B(1-\frac{r_2}{r_1}\\
+    \implies B &= \frac{r_2}{1-\frac{r_2}{r_1}}\\
+    &= \frac{-1}{\sqrt{5}}
+\end{align*}
+
+Together these imply that $$F(x) = \frac{1}{\sqrt{5}} \left( \sum_{n \geq 0} \frac{1}{r_1^n}x^n \right) - \frac{1}{\sqrt{5}} \left(\sum_{n \geq 0} \frac{1}{r_2^n}x^n \right)$$
+
+One can check that $$\frac{1}{r_1} = \frac{1}{\frac{-1+\sqrt{5}}{2}} = \frac{2}{-1 + \sqrt{5}} \cdot \frac{1 + \sqrt{5}}{1 + \sqrt{5}} = \frac{1+\sqrt{5}}{2}$$
+and $$\frac{1}{r_2} = \dots = \frac{1-\sqrt{5}}{2}$$
+
+This gives us $$F(x) = \frac{1}{\sqrt{5}} \left( \sum_{n \geq 0} \left(\frac{1+\sqrt{5}}{2}\right)^nx^n \right) - \frac{1}{\sqrt{5}} \left(\sum_{n \geq 0} \left( \frac{1-\sqrt{5}}{2} \right)^nx^n \right)$$
+
+Recall that $F(x) = f_0 + f_1x + f_2x^2 + f_3x^3 + \dots$, which implies $$f_n = \frac{1}{\sqrt{5}} \left( \frac{1 + \sqrt{5}}{2} \right)^n - \frac{1}{\sqrt{5}} \left( \frac{1-\sqrt{5}}{2} \right)^n$$
+
+This is an integer!
+
+\section{Catalan Generating Function}
+
+Recall $c_0 = 1$ and $c_n = \sum_{j=1}^n c_{j-1}c_{n-j}$ for $n \geq 1$.
+
+\subsection*{Step 1} The above implies that $$c_nx^n = \left( \sum_{j=1}^n c_{j-1}c_{n-j} \right) x^n$$
+
+Which implies $$\sum_{n \geq 1} c_nx^n = \sum_{n \geq 1} \left( \sum_{j=1}^n c_{j-1}c_{n-j} \right) x^n$$
+
+\subsection*{Step 2}
+
+Let $C(x) = \sum\limits_{n \geq 0} c_nx^n$
+
+The left hand side of the equation from step one gives us $$\sum_{n \geq 1} c_nx^n = C(x) - c_1 = C(x)-1$$
+
+The right hand side of the equation from step one gives us \begin{align*}
+    \sum_{n \geq 1} \left( \sum_{j=1}^n c_{j-1}c_{n-j} \right) x^n &= x\left(\sum_{n \geq 1} \left( \sum_{j=1}^n c_{j-1}c_{n-j} \right) x^{n-1}\right)\\
+    &= x\left(\sum_{n \geq 1} \left( \sum_{j=0}^{n-1} c_{j}c_{n-j-1} \right) x^{n-1}\right)\\
+    &= x\left(\sum_{n \geq 0} \left( \sum_{j=0}^{n} c_{j}c_{n-j} \right) x^{n}\right)\\
+    &= xC(x)C(x)
+\end{align*}
+
+\subsection*{Step 3}
+
+So $C(x)-1 = xC(x)^2$.
+
+Solving for $C(x)$ using the quadratic formula gives us $C(x) = \frac{1 \pm \sqrt{1-4x}}{2x}$
+
+\vspace{.5 cm}
+
+{\color{vermillion}There are two issues: \begin{itemize}
+    \item There seems to be two generating functions, and this cannot be.
+    \item $\frac{1}{x}$ does not make sense as a formal power series, as $x$ has no inverse.
+\end{itemize}}
+
+This raises a question: Which sign should we use, $+$ or $-$?
+
+Idea: Choose the sign such that the whole numerator $1 \pm \sqrt{1 - 4x}$ has no constant term. In other words, we want $1 \pm \sqrt{1 - 4x} = w_0 + w_1x + w_2x^2 + w_3x^3 + \dots$ where $w_0 = 0$.
+
+If we can do this, then we shift the sequence one step to the left, i.e. $\frac{1 \pm \sqrt{1 - 4x}}{x} = w_1 + w_2x + w_3x^2 + w_4x^3 + \dots$.
+This will take care of both problems.
+
+There is a generalization of the binomial theorem where for any $n \in \mathbb{Q}$, we have \begin{equation}(1+x)^n = \sum_{k \geq 0} \binom{n}{k}x^k,\end{equation}
+where the binomial coefficient is again generalized to work when $n$ is rational.
+We will not cover this generalization, but note that $\binom{n}{0} = 1$, even if $n = \frac{1}{2}$, $k = 0$.
+
+Since $\sqrt{1 - 4x} = (1-4x)^{\frac{1}{2}}$, we can use this generalization to find that $(1 - 4x)^{\frac{1}{2}} = 1 + w_1x + w_2x^2 + \dots$. Then $1-(1-4x)^\frac{1}{2}= 0-w_1x - w_2x^2 - w_3x^3 - \dots$, which is what we needed.
+
+This implies that we should choose the minus sign in order to solve our issues.
+
+Thus $C(x) = \frac{1-\sqrt{1-4x}}{2x}$
+
+\subsection*{Step 4}
+
+One can recover $c_n = \frac{1}{n+1}\binom{2n}{n}$ by using $C(x)$ and equation (1)
+
+\section{Graph Coloring and Chromatic Polynomials}
+
+Let $G=(V,E)$ be a graph.
+
+A vertex coloring of $G$ is a mapping $c:V \rightarrow S$, where $S$ is a finite set of colors.
+
+For example, $S = \{\text{red, black, blue}\}$. Sometimes it is easier to label these colors as numbers instead. i.e let $S = \{1,2,3\}$.
+
+A coloring is proper if for all $e = \{u , v\} \in E$, it holds that $c(u) \not = c(v)$.
+
+\subsection*{Some Examples}
+\begin{figure}[h]
+    \centering
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{.333\textwidth}
+    \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle] (m) at (0,.75) {$u$};
+            \node [draw, shape = circle] (x) at (0,0) {$x$};
+            \node [draw, shape = circle] (v) at (1,.75) {$v$};
+            \node [draw, shape = circle] (w) at (1,0) {$w$};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{Original Graph}
+        \label{fig:Orig}
+    \end{minipage}%
+    \begin{minipage}{.333\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle, fill = skyblue] (m) at (0,.75) {$u$};
+            \node [draw, shape = circle, fill = reddishpurple] (x) at (0,0) {$x$};
+            \node [draw, shape = circle, fill = yellow] (v) at (1,.75) {$v$};
+            \node [draw, shape = circle, fill = reddishpurple] (w) at (1,0) {$w$};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{A Proper Coloring}
+        \label{fig:Proper}
+    \end{minipage}%
+    \begin{minipage}{.333\textwidth}
+      \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle, fill = skyblue] (m) at (0,.75) {$u$};
+            \node [draw, shape = circle, fill = reddishpurple] (x) at (0,0) {$x$};
+            \node [draw, shape = circle, fill = reddishpurple] (v) at (1,.75) {$v$};
+            \node [draw, shape = circle, fill = yellow] (w) at (1,0) {$w$};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{Not A Proper Coloring}
+        \label{fig:non Proper}
+    \end{minipage}
+\end{figure}
+
+\subsection*{Chromatic Number}
+
+The chromatic number of $G$, denoted $\chi(G)$ is the minimum cardinality of the set of colors $S$ such that a proper coloring exists.
+
+i.e. in $c:V \rightarrow S$, what is the minimum $|S|$ such that a proper coloring is possible.
+
+\subsubsection*{From Our Example}
+\begin{enumerate}
+    \item $\chi (G)  \leq 3$ as we produced a proper coloring with $|S| = 3$ different colors.
+    \item Also, we have the 3 cycle $u - v - x -u$. Any 3 cycle needs at least 3 colors. Thus $\chi(G) \geq 3$
+\end{enumerate}
+
+Thus since $3 \leq \chi(G) \leq 3$, we have $\chi(G) = 3$.
+
+Note: In general, for any $k \in \mathbb{N}$, $\chi(K_n) = n$, where $K_n$ is the complete graph on n nodes.
+
+\subsection*{Counting Proper Colorings}
+
+How many proper colorings of $G$ with $t$ colors are there?
+
+We write $P(G,t)$ to denote the number of proper colorings on $V$ using t colors.
+
+$P(G.t) = |\{c:V \rightarrow [t]|\text{ $c$ is proper}\}|$
+
+Note: By definition of $\chi(G)$, $P(G,t) = 0$ for $0 \leq t < \chi(G)$ and $P(G,t) > 0$ for $t \geq \chi(G)$
+
+\subsubsection*{From Our Example}
+
+\begin{itemize}
+    \item $u$ has t options
+    \item $v$ has $t-1$ options (color must be different than the color of $u$)
+    \item $x$ has $t-2$ options (color must be different than the color of $v$ and $u$, which are themselves different)
+    \item $w$ has $t-1$ options (color must be different than color of $v$)
+\end{itemize}
+
+So $P(G,t) = t(t-1)(t-2)(t-1) = t^4 - 4t^3 + 5t^2 - 2t$
+
+\subsection{Next Time}
+\begin{itemize}
+    \item We will show $P(G,t)$ is indeed a polynomial no matter what $G$ is.
+    \item We will see what graph theoretic information about $G$ is embedded in $P(G,t)$.
+\end{itemize}
+
+
+
+
+\end{document}
