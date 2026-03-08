@@ -1,0 +1,495 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usetikzlibrary{decorations.pathmorphing, calc, arrows.meta}
+\usetikzlibrary{patterns}
+\usepackage{enumitem}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{13}
+\newcommand{\lecturetitle}{The Bipartite Maximum Matching problem.}
+\newcommand{\scribename}{Noura Allugmani}
+\newcommand{\lecturedate}{March 4, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\noindent Given: a bipartite graph $G=(L, R, E)$. \\
+Find: a matching $M \subseteq E$ of maximum size.
+\section{Some Terminology}
+Given a matching $M$ and some $u \in V \Rightarrow u$ is "matched" if it belongs to some $e \in M$. Otherwise, $u$ is "free".
+An augmenting path (with respect to $M$ ) is a path $P$ such that:
+\begin{enumerate}
+    \item the endpoints of $P$ are free w.r.t $M$
+    \item each other $u \in P$ is matched w.r.t. $M$.
+\end{enumerate}
+%%
+
+\begin{example}
+\end{example}
+\begin{center}
+\begin{tikzpicture}[
+  nodeStyle/.style={circle, draw=black, line width=1pt, minimum size=9mm, inner sep=0pt}, 
+  solidEdge/.style={black, line width=1pt},
+  spring/.style={red, line width=1.2pt, decorate, decoration={snake, amplitude=1.2mm, segment length=3mm}}
+]
+% helper: one row with 6 nodes, and choose which edges are red-spring
+% edges are between (1-2), (2-3), (3-4), (4-5), (5-6)
+
+% ---------------- Row 1 ----------------
+\def\y{0}
+\foreach \i in {1,...,6}{
+  \node[nodeStyle] (r1-\i) at (2.0*\i, \y) {};
+}
+% edges: black except (2-3) and (4-5) are springs
+\draw[solidEdge] (r1-1) -- (r1-2);
+\draw[spring]    (r1-2) -- (r1-3);
+\draw[solidEdge] (r1-3) -- (r1-4);
+\draw[spring]    (r1-4) -- (r1-5);
+\draw[solidEdge] (r1-5) -- (r1-6); 
+\node[right] at (13,0) {An augmenting path};
+% ---------------- Row 2 ----------------
+\def\y{-2.0}
+\foreach \i in {1,...,6}{
+  \node[nodeStyle] (r2-\i) at (2.0*\i, \y) {};
+}
+% edges: springs at (1-2), (3-4), (5-6)
+\draw[spring]    (r2-1) -- (r2-2);
+\draw[solidEdge] (r2-2) -- (r2-3);
+\draw[spring]    (r2-3) -- (r2-4);
+\draw[solidEdge] (r2-4) -- (r2-5);
+\draw[spring]    (r2-5) -- (r2-6);
+\node[right] at (13,-2) {Not an aug path};
+% ---------------- Row 3 ----------------
+\def\y{-4.0}
+\foreach \i in {1,...,6}{
+  \node[nodeStyle] (r3-\i) at (2.0*\i, \y) {};
+}
+% edges: only (3-4) is spring
+\draw[solidEdge] (r3-1) -- (r3-2);
+\draw[solidEdge] (r3-2) -- (r3-3);
+\draw[spring]    (r3-3) -- (r3-4);
+\draw[solidEdge] (r3-4) -- (r3-5);
+\draw[solidEdge] (r3-5) -- (r3-6);
+\node[right] at (13,-4) {Not an aug path};
+\end{tikzpicture} 
+\end{center}
+
+
+%%
+Given tow sets $A, B$, let their symmetric difference be
+$$
+A \Delta B=(A \mid B) \cup(B \backslash A) .
+$$
+%%
+
+
+
+\begin{center}
+\begin{tikzpicture}[line width=1pt]
+
+% --- Universe box ---
+\draw[blue!70!black, line width=1.2pt] (-4,-2.4) rectangle (4,2.4);
+
+% --- Circle centers and radius ---
+\def\r{1.6}
+\coordinate (A) at (-1.0,0);
+\coordinate (B) at ( 1.0,0);
+
+% --- Shade A and B (then remove intersection to get A \Delta B) ---
+\begin{scope}
+  \fill[pattern=north east lines] (A) circle (\r);
+  \fill[pattern=north east lines] (B) circle (\r);
+\end{scope}
+
+% Remove the overlap (make it white)
+\begin{scope}
+  \clip (A) circle (\r);
+  \clip (B) circle (\r);
+  \fill[white] (-5,-5) rectangle (5,5);
+\end{scope}
+
+% --- Draw circle boundaries on top ---
+\draw (A) circle (\r);
+\draw (B) circle (\r);
+
+% --- Labels inside circles ---
+\node at ($(A)+(0,1.9)$) {\Large $A$};
+\node at ($(B)+(0,1.9)$) {\Large $B$};
+
+% --- A \Delta B label + arrows to both shaded parts ---
+\node[anchor=west] at (2.2,2.0) {\Large $A\Delta B$};
+\draw[-stealth, line width=1pt] (3.0,1.85) -- (-1.9,0.9);
+\draw[-stealth, line width=1pt] (3.0,1.85) -- ( 1.9,0.9);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%%
+\begin{lemma} If $M$ is a matchiny and $P$ is an augmenting path w.r.t. $M$, the $M^{\prime}=P \Delta M$ is a matching with $\left|M^{\prime}\right|=|M|+1$. 
+\end{lemma}
+\begin{proof}
+  Note that $P$ has an odd \# of edges, and its edges alternate between $e$ s.t. $e\notin M$ and $e$ s.t. $e \in M$. Its first and last edges, $e_0, e_k$ are s.t. $e_0, e_k \notin M$. \\
+$\Rightarrow M^{\prime}=M \Delta P$ is s.t. $|M^{\prime}|=|M|+1.$ \\
+$\Rightarrow M^{\prime}$ is a matching since:
+\begin{itemize}
+\item  any $a \in V\setminus P$ has the same match in M as in $M^{\prime}$.
+\item  each $u \in P$ has exactly one neighbor in $M^\prime$.  
+\end{itemize}
+\end{proof}
+%%
+\begin{center}
+\begin{tikzpicture}[
+  vertex/.style={circle,draw,minimum size=7mm,inner sep=0pt},
+  edge/.style={line width=1pt},
+  match/.style={
+    blue,
+    line width=1.3pt,
+    decorate,
+    decoration={snake,amplitude=1mm,segment length=3mm}
+  },
+  augment/.style={red,line width=1.8pt}
+]
+
+% ================= LEFT GRAPH M =================
+\begin{scope}
+
+\node[vertex] (v1) at (0,2) {};
+\node[vertex] (v2) at (1.2,3) {};
+\node[vertex] (v3) at (2.4,2.3) {};
+\node[vertex] (v4) at (3.8,2.5) {};
+\node[vertex] (v5) at (3.8,0.8) {};
+\node[vertex] (v6) at (2.4,1.2) {};
+\node[vertex] (v7) at (1.0,1.1) {};
+\node[vertex] (v8) at (2.0,-0.3) {};
+
+\draw[match] (v1)--(v2);
+\draw[edge]  (v1)--(v7);
+\draw[edge]  (v2)--(v3);
+\draw[match] (v3)--(v6);
+\draw[edge]  (v3)--(v4);
+\draw[edge]  (v4)--(v5);
+\draw[edge]  (v5)--(v8);
+\draw[match] (v7)--(v8);
+\draw[edge]  (v7)--(v6);
+
+\draw[augment]
+(1.78,2.62)
+.. controls (2.00,2.92) and (2.95,2.95) .. (4.18,2.98)
+.. controls (4.55,2.88) and (4.55,2.28) .. (4.18,2.08)
+.. controls (3.75,1.98) and (3.15,1.95) .. (2.78,1.92)
+.. controls (2.40,1.88) and (2.18,1.72) .. (2.16,1.42)
+.. controls (2.14,1.12) and (2.28,0.95) .. (2.58,0.93)
+.. controls (2.95,0.92) and (3.25,1.00) .. (3.62,1.08)
+.. controls (4.02,1.22) and (4.38,1.08) .. (4.40,0.76)
+.. controls (4.30,0.36) and (3.86,-0.02) .. (3.35,-0.42)
+.. controls (2.95,-0.72) and (2.38,-0.84) .. (2.05,-0.66)
+.. controls (1.62,-0.46) and (1.30,-0.04) .. (0.98,0.22)
+.. controls (0.60,0.52) and (0.22,0.95) .. (0.36,1.26)
+.. controls (0.52,1.58) and (0.98,1.62) .. (1.38,1.58)
+.. controls (1.74,1.55) and (2.00,1.58) .. (2.12,1.70)
+.. controls (2.18,1.86) and (2.02,2.16) .. (1.78,2.62)
+-- cycle;
+
+\node at (2,-1.15) {$M$};
+
+\end{scope}
+
+% ================= RIGHT GRAPH M' =================
+\begin{scope}[xshift=7cm]
+
+\node[vertex] (u1) at (0,2) {};
+\node[vertex] (u2) at (1.2,3) {};
+\node[vertex] (u3) at (2.4,2.3) {};
+\node[vertex] (u4) at (3.8,2.5) {};
+\node[vertex] (u5) at (3.8,0.8) {};
+\node[vertex] (u6) at (2.4,1.2) {};
+\node[vertex] (u7) at (1.0,1.1) {};
+\node[vertex] (u8) at (2.0,-0.3) {};
+
+\draw[edge]  (u1)--(u2);
+\draw[edge]  (u1)--(u7);
+\draw[match] (u2)--(u3);
+\draw[edge]  (u3)--(u6);
+\draw[match] (u3)--(u4);
+\draw[edge]  (u4)--(u5);
+\draw[match] (u5)--(u8);
+\draw[edge]  (u7)--(u8);
+\draw[match] (u7)--(u6);
+
+\draw[augment]
+(1.78,2.62)
+.. controls (2.00,2.92) and (2.95,2.95) .. (4.18,2.98)
+.. controls (4.55,2.88) and (4.55,2.28) .. (4.18,2.08)
+.. controls (3.75,1.98) and (3.15,1.95) .. (2.78,1.92)
+.. controls (2.40,1.88) and (2.18,1.72) .. (2.16,1.42)
+.. controls (2.14,1.12) and (2.28,0.95) .. (2.58,0.93)
+.. controls (2.95,0.92) and (3.25,1.00) .. (3.62,1.08)
+.. controls (4.02,1.22) and (4.38,1.08) .. (4.40,0.76)
+.. controls (4.30,0.36) and (3.86,-0.02) .. (3.35,-0.42)
+.. controls (2.95,-0.72) and (2.38,-0.84) .. (2.05,-0.66)
+.. controls (1.62,-0.46) and (1.30,-0.04) .. (0.98,0.22)
+.. controls (0.60,0.52) and (0.22,0.95) .. (0.36,1.26)
+.. controls (0.52,1.58) and (0.98,1.62) .. (1.38,1.58)
+.. controls (1.74,1.55) and (2.00,1.58) .. (2.12,1.70)
+.. controls (2.18,1.86) and (2.02,2.16) .. (1.78,2.62)
+-- cycle;
+
+\node at (2,-1.15) {$M'$};
+
+\end{scope}
+\end{tikzpicture}
+\end{center}
+\begin{lemma}
+ A matching $M$ is a maximum matching if and only if it contains no augmenting path.   
+\end{lemma}
+\begin{proof}
+ $ \Leftarrow$ we proved the contrapositive. If $M$ has an augmenting path, then by Lemma1.2 $M$ can not be a maximum matching.\\
+$\Rightarrow$ Suppose $M^{*}$ is a maximum matching but $M$ is not, $\Rightarrow \quad|M|<\left|M^*\right|.$
+WTS that $M$ has an augmenting path (we will use $M$ and $M^{*}$to build an augments path w.r.t. $M$).
+Consider $M \Delta M^{*}$, and the induced subgraph
+$G^{\prime}=\left(V, M\Delta M^{*}\right).$ \\
+\textbf{Claim:} Each $u \in V$ had $\operatorname{deg}_{G^{\prime}}(u) \leqslant 2$.
+\begin{itemize}
+\item  if $u$ is free in both $M$ and $M^*$, deg $(u)=0$.
+\item  if $u$ is matched in $M$ but free in $M^*$, $\operatorname{deg}(u)=1$.
+\begin{itemize}
+\item $
+ M \Delta M^\prime=\left(M \setminus M^\prime\right) \cup\left(M^* \backslash M\right)
+$
+\end{itemize}
+\item  if $u$ is free in $M$ but matched in $M^{*}$, similarly $\operatorname{deg}(u)=1$.
+\item  if $u$ is matched in both $M$ and $M^*$.
+\begin{itemize}
+\item  $u$ is matched to the same node in both $M$ and $M^*$ $\Rightarrow \operatorname{deg}(u)=0$
+\end{itemize}
+\item  $u$ is matched to different nodes in $M$ and $
+M^* \Rightarrow \operatorname{deg}(u)=2$.
+\end{itemize}
+%%
+Given the claim we just showed, $G^\prime$ can be decomposed into isolated nodes, cycles, and paths (similar to a proof we have seen a few lectures ago). Since $|M|<\left|M^*\right|$, there must exist at least on component of $G^{\prime}$ with more edges from $M^*$ than from $M$.
+%%
+\begin{itemize}
+\item  Can not be the isolated nodes.
+\item  Can not be the cycles (these have edges that alternative $M$ and $M^*$)\\ %(counts from each of $M$ and $M^*$ must be same).
+\end{itemize}
+$\Rightarrow$ the component must be a path.
+\begin{itemize}
+\item  Can not have an even \# edges (because
+same counting argument as for cycle).
+\item  must have an odd \# of edges.
+\begin{itemize}
+\item  can not start / end with edges from $M$ (opposite of what we are looking for, these have more edges from $M$ than from $M^*$).
+\item  path must start with edges from $M^*$
+$\Rightarrow P$ must be an augmenting path w.r.t. $M$.
+\end{itemize}
+\end{itemize}
+\end{proof}
+%%
+\section{Algorithm}  
+
+\begin{enumerate}
+\item $M \leftarrow \varnothing$
+\item while $M$ has an augmenting path do
+\begin{enumerate}
+\renewcommand{\labelenumii}{2\alph{enumii}}
+\item Find an augmenting path $P$ w.r.t.\ $M$
+\item $M \leftarrow M \Delta P$
+\end{enumerate}
+\end{enumerate}
+
+return $M$
+
+
+%%
+
+\section{Feasibility}
+By lemma1.2, ALG maintains the invariant that $M$ is a matching.
+
+%%
+\section{Termination}
+On each it iteration, $|M|$ increase by $1$ (by lemma1.2).
+The size of a matching can not exceed $n / 2$ where $n=|V|$, so ALG must terminate after $\leq \frac{n}{2}$ iterations.
+
+\section{Optimality}
+At some point, it exists the while loop
+$\Rightarrow$ find $M$ has augmenting path. By lemma1.3, $M$ must be a maximum matching. \\
+
+\noindent \textbf{Note:} ALG is under specified since we have not described how to do step $(*)$ 2a.\\
+
+\noindent If $G$ is bipartite, $(*)$ is fairly easy. Given $G=(L, R, E)$ and an incumbent matching $M$, turn $G$ into a directed graph $D$ by orienting each edge $e=\{l, r\} \in E$ as:\\
+$\rightarrow (l,r)$ if $\{l, r\} \notin M$.\\
+$\rightarrow(r, l)$ if $\{l, r\} \in M$.
+%%
+
+
+
+
+
+
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}[
+v/.style={circle,draw,minimum size=8mm,inner sep=0pt},
+e/.style={black,line width=1pt},
+match/.style={blue,line width=1.4pt,decorate,
+  decoration={snake,amplitude=1mm,segment length=3mm}},
+dedge/.style={->,black,line width=1pt,>=Stealth},
+dmatch/.style={->,red,line width=1.4pt,decorate,
+  decoration={snake,amplitude=1mm,segment length=3mm},>=Stealth},
+lbl/.style={font=\large}
+]
+
+%==================== LEFT: G ====================%
+\begin{scope}
+
+% vertices
+\node[v] (L1) at (0,3) {};
+\node[v] (R1) at (2,3) {};
+
+\node[v] (L2) at (0,2) {};
+\node[v] (R2) at (2,2) {};
+
+\node[v] (L3) at (0,1) {};
+\node[v] (R3) at (2,1) {};
+
+\node[v] (L4) at (0,0) {};
+\node[v] (R4) at (2,0) {};
+
+% corrected edges
+\draw[e]     (L1) -- (R1);
+\draw[match] (L2) -- (R1);
+
+\draw[e]     (L1) -- (R2);
+\draw[e]     (L2) -- (R2);
+
+\draw[e]     (L2) -- (R3);
+\draw[e]     (L3) -- (R3);
+
+\draw[e]     (L2) -- (R4);
+\draw[match] (L4) -- (R3);
+
+\node[lbl,blue!70!black] at (1,-0.75) {$G$};
+
+\end{scope}
+
+%==================== RIGHT: D ====================%
+\begin{scope}[xshift=8cm]
+
+% vertices
+\node[v] (A1) at (0,3.2) {};
+\node[v] (B1) at (2,3.2) {};
+
+\node[v] (A2) at (0,2.1) {};
+\node[v] (B2) at (2,2.0) {};
+
+\node[v] (A3) at (0,1.0) {};
+\node[v] (B3) at (2,1.0) {};
+
+\node[v] (A4) at (0,0.0) {};
+\node[v] (B4) at (2,0.0) {};
+
+% directed edges as in sketch
+\draw[dmatch] (A1) -- (B1);
+\draw[dmatch] (A2) -- (B2);
+\draw[dmatch] (B1) -- (A2);
+
+\draw[dedge]  (A1) -- (B2);
+\draw[dedge]  (A2) -- (B3);
+\draw[dedge]  (A3) -- (B3);
+\draw[dedge]  (B3) -- (A4);
+\draw[dedge]  (A2) -- (B4);
+
+% red circles + labels
+\draw[red,line width=1.2pt] (A1) circle (0.48);
+\node[red,font=\large] at (0.55,3.9) {$\in F\cap R$};
+
+\draw[red,line width=1.2pt] (B2) circle (0.48);
+\node[red,font=\large] at (3.0,2.2) {$\in F\cap R$};
+
+\node[lbl,blue!70!black] at (1,-0.8) {$D$};
+
+\end{scope}
+\end{tikzpicture}
+\end{center}
+\end{figure}
+\noindent If $F$ is the set of free nodes w.r.t. $M$, follow any directed path starting in $F \cap L$ and ending in $F \cap R$.\\
+\noindent In step $(*)$, if $G$ is bipartite, one can use standard graph traversal algorithm in $D$ to find augmenting paths.
+
+\section{Running time (w.r.t. size of $G$, i.e. $n=|V|$ and $m=|E|$)}
+Given $f, g: \mathbb{N} \longrightarrow \mathbb{N}$, we say $f=O(g)$ if $\exists ~k \in \mathbb{N}$ and $C \in \mathbb{R}_{>0}$ s.t. $f(n) \leq C g(n), \quad \forall n \geqslant k$.\\
+
+\noindent Building D takes $O(n+m)$. Traversing  $D$ to find augmenting path takes $O(n+m)$. We may assume $m \geq\frac{n}{2}$. Otherwise $\exists$ isolated nodes that we can remove
+$
+\Rightarrow O(n+m)=O(m) .
+$\\
+
+\noindent We saw ALG terminates after $\leq \frac{n}{2}=O(n)$ iterations. Each iteration takes $O(m)$ time. Overall, ALG terminates in $O(m n)$ time. \\
+
+\noindent Can ALG be generalized to run faster or work in non-bipartite graphs?
+\begin{itemize}
+\item If you augment various augmenting paths at the same time, there is an algorithm that runs in time $O(m\sqrt{n})$ (Hopcroft–Karp algorithm ).
+\item For non-bipartite graphs, $(*)$ is still possible but much more subtle. Edmonds' (1965) " Paths,
+Trees, and Flowers" that works in $O(nm^2)$ time overall. (Final project idea.)
+
+\end{itemize}
+
+
+\end{document}
