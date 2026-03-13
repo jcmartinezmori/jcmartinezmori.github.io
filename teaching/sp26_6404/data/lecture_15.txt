@@ -1,0 +1,437 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{tikz}
+\usetikzlibrary{decorations}
+\usetikzlibrary{arrows.meta, shapes}
+
+% Set line spacing
+\setstretch{1.3}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied Combinatorics and Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill      \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$15$}
+\newcommand{\lecturetitle}{Connectivity}
+\newcommand{\scribename}{Parsa S. Farahani}
+\newcommand{\lecturedate}{March 11, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Motivation}
+We have looked at connected graphs, but some graphs are better connected than others. For example, trees are very fragile because removing any one node/edge breaks connectivity. On the other hand, a complete graph is very well connected. 
+
+\noindent Formalize ``how well connected a graph is'':
+
+\begin{definition}
+A \textbf{vertex cut} (also known as a separating set) of a connected graph $G=(V,E)$ is a subset $S \subseteq V$ such that $G-S$ has more than one component.
+\end{definition}
+
+\begin{definition}
+We say $G$ is $k$-vertex-connected if:
+\begin{enumerate}
+\renewcommand{\labelenumi}{\roman{enumi})}
+    \item $|V| > k$.
+    \item Every vertex cut of $G$ has size at least $k$.
+\end{enumerate}
+\end{definition}
+
+
+\begin{definition}
+The \textbf{vertex connectivity} of $G$ is:
+\[ \kappa(G) = \max \{ k \in \mathbb{N} : G \text{ is } k\text{-vertex-connected} \} \]
+i.e., $\kappa(G)$ is the smallest size of a vertex cut (assuming one exists).
+\end{definition}
+
+\noindent \textbf{For example:}
+\begin{itemize}
+    \item If $G$ is a tree, then $\kappa(G) = 1$.
+    \item If $G$ is a cycle (with $|V| \ge 3$), then $\kappa(G) = 2$.
+    \item If $G = K_n$ is the complete graph on $n$ nodes, then $\nexists$ vertex cuts so the second requirement of $k$-vertex-connectivity holds vacuously. But by requirement i) in which $|V| > k$, we have that $\kappa(K_n) = n-1$.
+\end{itemize}
+
+\newpage
+
+\section{Edge Connectivity}
+
+\begin{definition}
+A \textbf{disconnecting set} of edges of a connected multigraph $G=(V,E)$ is a subset $F \subseteq E$ such that $G-F$ is disconnected.
+\end{definition}
+
+\noindent We say $G$ is \textbf{$k$-edge-connected} if every disconnecting set has size at least $k$.
+
+\begin{definition}
+The \textbf{edge connectivity} of $G$ is:
+\[ \kappa'(G) = \max \{ k \in \mathbb{N} : G \text{ is } k\text{-edge-connected} \} \]
+i.e., $\kappa'(G)$ is the smallest size of a disconnecting set.
+\end{definition}
+
+\noindent For $\emptyset \neq S \subsetneq V$, let $\delta(S) \subseteq E$ be the subset of edges with one endpoint in $S$ and the other in $V \setminus S$. We say $\delta(S)$ is an \textbf{edge cut}. Note that $\delta(S)$ is a disconnecting set. 
+
+\begin{definition}
+A \textbf{minimal} set of edges whose deletion increases the number of components is a \textbf{bond}.
+\end{definition}
+
+\begin{proposition}
+For any graph $G=(V,E)$, any minimal disconnecting set is an edge cut.
+\end{proposition}
+
+\begin{proof}
+Suppose $G-F$ is disconnected. Let $T \subseteq V$ be the nodes of one of the components of $G-F$. Then $\delta(T) \subseteq F$. Since $\delta(T)$ is a disconnecting set, $F$ is not minimal unless $\delta(T) = F$.
+\end{proof}
+
+\newpage
+
+\begin{proposition}
+If $G$ is connected, then $\delta(S)$ is a \textbf{bond} (minimal disconnecting set) if and only if the induced subgraphs $G[S]$ and $G[V \setminus S]$ are themselves connected.
+\end{proposition}
+
+\begin{proof}
+($\Rightarrow$) If $G$, $G[S]$, and $G[V \setminus S]$ are themselves connected, then no proper subset of $\delta(S)$ disconnects $S$ and $V \setminus S$, so $\delta(S)$ is a bond.
+
+\noindent ($\Leftarrow$) Conversely, suppose without loss of generality that $G[S]$ is not connected. Let $T \subsetneq S$ be the nodes in one of its components. Then, $\delta(T) \subsetneq \delta(S)$ since
+\[ \delta(T, S \setminus T) = \{ e = \{u, v\} \in E : u \in T, v \in S \setminus T \} = \emptyset. \]
+
+\begin{center}
+\begin{tikzpicture}[line width=0.7pt, >=stealth]
+
+    % --- Set S (Left side) ---
+    % Main boundary of S
+    \draw (0,0) ellipse (2.2cm and 2.5cm);
+    \node at (-1.8, 2.3) {$S$};
+
+    % Subset T (Top-ish inside S)
+    \draw (0, 0.8) ellipse (0.7cm and 0.5cm);
+    \node at (-0.8, 0.8) {$T$};
+
+    % Subset S\T (Bottom-ish inside S)
+    \draw (0, -1.2) ellipse (0.7cm and 0.5cm);
+    \node at (-1.1, -1.5) {$S \setminus T$};
+
+    % --- Set V/S (Right side) ---
+    \draw (5,0) ellipse (1.8cm and 2.5cm);
+    \node at (6.3, 2.6) {$V/S$};
+
+    % --- Connecting Lines (Mappings) ---
+    
+    % Lines from top boundary of S to V/S
+    \draw (0.3, 2.45) to [out=15, in=140] (4.2, 2.2);
+    \draw (0.8, 2.3) to [out=10, in=150] (4.5, 1.8);
+
+    % Lines from T to V/S (Straight/Parallel middle section)
+    \draw (0.7, 1.0) -- (4.1, 1.0);
+    \draw (0.7, 0.7) -- (4.1, 0.7);
+
+    % Lines from S\T to V/S
+    \draw (0.6, -1.0) to [out=10, in=170] (4.2, -0.6);
+    \draw (0.4, -1.6) to [out=-10, in=190] (4.5, -1.2);
+
+\end{tikzpicture}
+\end{center}
+
+$\delta(T)$ is a disconnecting set, so $\delta(S)$ is not a bond.
+\end{proof}
+
+\newpage
+
+\begin{example}
+Consider $K_n$. Every edge cut in $K_n$ has size $k(n-k)$ for some $1 \le k \le n-1$. 
+For $n=4$:
+
+\begin{center}
+\begin{tikzpicture}[scale=1.5]
+    % --- TOP DIAGRAM (k=1) ---
+    \begin{scope}[yshift=0cm]
+        \node[draw, circle, inner sep=2pt] (v1) at (0,1) {};
+        \node[draw, circle, inner sep=2pt] (v2) at (1,1) {};
+        \node[draw, circle, inner sep=2pt] (v3) at (0,0) {};
+        \node[draw, circle, inner sep=2pt] (v4) at (1,0) {};
+        
+        \draw (v2) -- (v4);
+        \draw (v3) -- (v4);
+        \draw (v2) -- (v3);
+        
+        \draw[red, thick, decorate] (v1) -- (v2);
+        \draw[red, thick, decorate] (v1) -- (v3);
+        \draw[red, thick, decorate] (v1) -- (v4);
+        
+        \draw[red, thin] (-0.15, 1.15) circle (0.35cm);
+        \node[red, font=\Large] at (-0.7, 1.4) {$S$};
+        
+        \node[anchor=west, font=\Large] at (1.8, 0.5) {$|\delta(S)| = 3 = 1 . (4-1).$};
+    \end{scope}
+
+    % --- MIDDLE DIAGRAM (k=2) ---
+    \begin{scope}[yshift=-2.5cm]
+        \node[draw, circle, inner sep=2pt] (v1) at (0,1) {};
+        \node[draw, circle, inner sep=2pt] (v2) at (1,1) {};
+        \node[draw, circle, inner sep=2pt] (v3) at (0,0) {};
+        \node[draw, circle, inner sep=2pt] (v4) at (1,0) {};
+        
+        \draw (v1) -- (v2);
+        \draw (v3) -- (v4);
+        
+        \draw[red, thick, decorate] (v1) -- (v3);
+        \draw[red, thick, decorate] (v1) -- (v4);
+        \draw[red, thick, decorate] (v2) -- (v3);
+        \draw[red, thick, decorate] (v2) -- (v4);
+        
+        \draw[red, thin] (0.5, 1.1) ellipse (0.8cm and 0.4cm);
+        \node[red, font=\Large] at (-0.4, 1.4) {$S$};
+        
+        \node[anchor=west, font=\Large] at (1.8, 0.5) {$|\delta(S)| = 4 = 2 . (4-2)$};
+    \end{scope}
+
+    % --- BOTTOM DIAGRAM (k=3) ---
+    \begin{scope}[yshift=-5cm]
+        \node[draw, circle, inner sep=2pt] (v1) at (0,1) {}; % Top Left
+        \node[draw, circle, inner sep=2pt] (v2) at (1,1) {}; % Top Right
+        \node[draw, circle, inner sep=2pt] (v3) at (0,0) {}; % Bottom Left
+        \node[draw, circle, inner sep=2pt] (v4) at (1,0) {}; % Bottom Right
+        
+        % Standard edges (inside S)
+        \draw (v1) -- (v2);
+        \draw (v1) -- (v3);
+        \draw (v2) -- (v3);
+        
+        % Red squiggly edges (the cut: edges connecting v4 to S)
+        \draw[red, thick, decorate] (v4) -- (v1);
+        \draw[red, thick, decorate] (v4) -- (v2);
+        \draw[red, thick, decorate] (v4) -- (v3);
+        
+        % S Lasso enclosing Top-Left, Top-Right, and Bottom-Left
+        \draw[red, thin] (0.2, 0.5) [rotate=30] ellipse (1.6cm and 0.7cm);
+        \node[red, font=\Large] at (-0.7, 0.5) {$S$};
+        
+        \node[anchor=west, font=\Large] at (1.5, 0.5) {$|\delta(S)| = 3 = 3(4-1)$};
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+\end{example}
+
+\newpage
+
+\section{Whitney's Theorem}
+Let $\text{deg}(G) = \min_{u \in V} \{ \text{deg}(u) \}$.
+
+\begin{theorem}[Whitney]
+For graph $G=(V,E)$, we have that
+\[ \kappa(G) \le \kappa'(G) \le \text{deg}(G). \]
+\end{theorem}
+
+\begin{proof}
+Note that edges in $\delta(u)$ for any $u \in V$ is a disconnecting set.
+\[ \kappa'(G) \le |\delta(u)|, \quad \forall u \in V \]
+\[ \Rightarrow \kappa'(G) \le \min_{u \in V} \{ |\delta(u)| \} = \text{deg}(G). \]
+
+To prove that $\kappa(G) \le \kappa'(G)$, let
+\[ S^* \in \text{argmin}_{\emptyset \neq S \subsetneq V} |\delta(S)|. \]
+
+First, suppose that all of $S^*$ is adjacent to all of $V \setminus S^*$. In this case,
+\[ 
+\underbrace{\kappa'(G) = |\delta(S^*)|}_{\substack{\uparrow \\ \text{by def of } \kappa'(G) \\ \text{and first proposition of} \\ \text{today}}} 
+= 
+\underbrace{|S^*| \cdot |V \setminus S^*| \ge |V| - 1}_{\substack{\uparrow \\ \text{arithmetic fact}}} 
+\ge 
+\underbrace{\kappa(G)}_{\substack{\uparrow \\ \text{requirement of } k\text{-vertex} \\ \text{connectivity requiring } |V| > k}}
+\]
+
+\vspace{0.5em}
+\noindent This proves $\kappa'(G) \ge \kappa(G)$ under our assumption. 
+
+Otherwise, $\exists x \in S^*$ and $y \in V \setminus S^*$ s.t. $\{x,y\} \notin E$.
+\vspace{0.5em}
+
+Let $T = N(S^*) \cap N(x) \cup N (V \setminus S^*)$.
+
+\begin{center}
+\begin{tikzpicture}[x=1cm, y=1cm]
+
+    % --- The Two Main Regions ---
+    % Left Ellipse
+    \draw[thick, gray!80] (-3,0) ellipse (1.2 and 1.8);
+    % Right Ellipse
+    \draw[thick, gray!80] (3,0) ellipse (1.0 and 1.6);
+
+    % --- Labels for Regions ---
+    \node at (-3.8, 2.1) {\Large $S^*$};
+    \node at (3.8, 2.1) {\Large $V \setminus S^*$};
+
+
+    % --- Style for Vertices and Labels ---
+    \tikzset{
+        dot/.style={circle, fill=red!80!black, inner sep=1.2pt},
+        t_label/.style={blue!60!black, font=\small}
+    }
+
+    % --- Vertices in Left Region (S*) ---
+    \node[dot] (x) at (-2.8, 0.9) {};
+    \node[anchor=south] at (x.north) {$x$};
+    
+    \node[dot] (dot_left_mid) at (-3.1, -0.4) {};
+    \node[t_label, anchor=south] at (dot_left_mid.north) {$\in T$};
+    
+    \node[dot] (dot_left_bot) at (-3.4, -1.2) {};
+    \node[t_label, anchor=east] at (dot_left_bot.west) {$\in T$};
+    
+    \node[dot] at (-3.6, 0.1) {}; % Unlabeled isolated dot
+
+    % --- Vertices in Right Region ---
+    % Top Group (all labeled ET)
+    \node[dot] (r1) at (3.2, 1.3) {};
+    \node[t_label, anchor=west] at (r1.east) {$\in T$};
+    
+    \node[dot] (r2) at (3.1, 0.8) {};
+    \node[t_label, anchor=west] at (r2.east) {$\in T$};
+    
+    \node[dot] (r3) at (3.0, 0.4) {};
+    \node[t_label, anchor=west] at (r3.east) {$\in T$};
+    
+    % Bottom Group
+    \node[dot] (r4) at (2.6, -0.2) {};
+    
+    \node[dot] (r5) at (3.0, -0.7) {};
+    \node[blue!60!black, anchor=west] at (r5.east) {\Large $y$}; % Large blue y
+    
+    \node[dot] (r6) at (2.5, -1.0) {};
+
+    % --- Connecting Lines (Edges) ---
+    % From x to top cluster
+    \draw[thick, black!80] (x) -- (r1);
+    \draw[thick, black!80] (x) -- (r2);
+    \draw[thick, black!80] (x) -- (r3);
+    
+    % From mid ET to bottom cluster
+    \draw[thick, black!80] (dot_left_mid) -- (r4);
+    \draw[thick, black!80] (dot_left_mid) -- (r6);
+    
+    % From bottom ET to y
+    \draw[thick, black!80] (dot_left_bot) -- (r5);
+
+\end{tikzpicture}
+\end{center}
+\vspace{0.5em}
+
+Note that $|T| \le \kappa'(G)$, and $x$ and $y$ are in different components of $G-T$, so $\kappa(G) \le |T|$.
+We put these inequalities together to obtain $\kappa(G) \leq \kappa'(G)$.
+\end{proof}
+
+\vspace{2em}
+
+\section{Edge Cut Size and Node Isolation}
+
+\begin{proposition}
+For any $\emptyset \neq S \subsetneq V$,
+\[ |\delta(S)| = \sum_{u \in S} \text{deg}(u) - 2|E(G[S])|. \]
+\end{proposition}
+
+Proof by picture:
+\begin{center}
+\begin{tikzpicture}[scale=1.5]
+
+    % --- The Main Gray Ellipse ---
+    \draw[thick, gray!70] (0,0) ellipse (3.5 and 1.2);
+
+    % --- The Blue Cut Line ---
+    \draw[blue, thick] (0.2, 1.8) .. controls (-0.3, 0) .. (0.1, -1.8);
+
+    % --- Labels ---
+    \node at (-3.2, 1.4) {\Large $S$};
+    \node at (3.2, 1.4) {\Large $V \setminus S$};
+
+    % --- Style Definitions ---
+    \tikzset{
+        v/.style={circle, fill=red, inner sep=1.8pt}, % Red vertex dots
+        e/.style={red, thick}                         % Red edge lines
+    }
+
+    % --- Edges within S (Left Side) ---
+    % Top-most left
+    \draw[e] (-3.1, 0.3) node[v] {} to[bend left=60] (-2.5, 0.7) node[v] {};
+    % Middle left
+    \draw[e] (-3, -0.3) node[v] {} to[bend left=60] (-2.4, 0.1) node[v] {};
+    % Top right of S
+    \draw[e] (-2.2, 0.8) node[v] {} to[bend left=60] (-1.5, 1) node[v] {};
+    % Bottom right of S
+    \draw[e] (-2, -0.4) node[v] {} to[bend left=60] (-1.4, -0.1) node[v] {};
+
+    % --- Crossing Edges (Middle) ---
+    % These cross the blue line from left to right
+    \draw[e] (-0.8, 0.8) node[v] {} to[bend left=10] (1.1, 0.9) node[v] {};
+    \draw[e] (-0.7, 0.2) node[v] {} to[bend left=5] (1.3, 0.2) node[v] {};
+    \draw[e] (-0.3, -0.3) node[v] {} to[bend left=-10] (1.5, -0.3) node[v] {};
+
+    % --- Long Bottom Crossing Edge ---
+    % Starts in S, curves outside the ellipse boundary, ends in V \ S
+    \draw[e] (-1.7, -0.8) node[v] {} .. controls (-0.5, -2) and (2.2, -2) .. (3.1, -0.2) node[v] {};
+
+\end{tikzpicture}
+\end{center}
+
+More formally:
+\begin{proof}
+$\sum_{u \in S} \text{deg}(u)$ counts edges in $\delta(S)$ once and edges in $E(G[S])$ twice.
+\end{proof}
+
+
+\vspace{5em}
+
+\noindent If $\kappa'(G) < \text{deg}(G)$ then no smallest edge cut isolates a node.
+For example, removing the middle edge in this graph does not produce isolated nodes.
+\begin{center}
+\begin{tikzpicture}
+    \node[draw, circle] (a) at (0,0.5) {};
+    \node[draw, circle] (b) at (0,-0.5) {};
+    \node[draw, circle] (c) at (1,0) {};
+    \node[draw, circle] (d) at (2.5,0) {};
+    \node[draw, circle] (e) at (3.5,0.5) {};
+    \node[draw, circle] (f) at (3.5,-0.5) {};
+    \draw (a)--(b)--(c)--(a);
+    \draw (c)--(d);
+    \draw (e)--(d)--(f)--(e);
+    \node at (1.75, 0.5) {$\text{deg}(G) = 2$};
+\end{tikzpicture}
+\end{center}
+
+\noindent In fact, you can use the last proposition to show that if $\delta(S) < \text{deg}(G)$, then $ |S| > \text{deg}(G)$.
+
+\end{document}
