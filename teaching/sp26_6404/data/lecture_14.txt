@@ -1,0 +1,232 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+\DeclareMathOperator{\df}{\text{df}}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{14}
+\newcommand{\lecturetitle}{Matchings Continued}
+\newcommand{\scribename}{Hunter Pearson}
+\newcommand{\lecturedate}{March 9, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\setcounter{section}{1}
+
+\section*{Brief Detour Into Carlos' View of the world}
+
+Acronym: A.C.O: Algorithms, Combinatorial, and Optimization. (The Barriers between these are blurred.
+    Algorithms: Combinatorial algorithms like the augmenting path algorithm we saw last time. Common from a computer science lens.
+    Combinatorics: graph theoretic properties, like Halls theorem, common from math lens.
+    Optimization: "polyhedral approach" uses linear algebra and "math programming" for modeling and optimization. Common from operations research lens.
+        Polyhedral approach: Idea is to associate to a set $\mathcal{C}$ of combinatorial objects you care about to points in space and use geometry of these points to find the "best".
+
+        For example, consider matchings of a graph $G=(V,E)$. For each edge $e \in E$, associate to it a binary decision variable $x_e \in \{0,1\}$. Then finding a maximum in $G$ is the same as the following linear program: \begin{align*}
+            \text{Maximize: }& \sum_{e \in E}x_e\\
+            \text{Such That: }& \sum_{e \in \delta(\mu)} x_e \leq 1 \forall \mu \in V\\
+            & x_e \in \{0,1\} \forall e \in E
+        \end{align*}
+
+        So a matching $M$ is a point $X_M \in \{0,1\}^E$. $X_{M_e} = 1 \iff e \in M$.
+
+        \begin{itemize}
+            \item Note: There are specialized computer software to solve problems like IP
+            \item In this sense, it give you lots of modeling flexibility
+            \item In general, problems with 0,1 variables are "Hard"
+            \item If $G$ happens to be bipartite, you can replace $x_e \in \{0,1\}$ for $0 \leq x_e \leq 1$ to obtain a linear programming relaxation that happens to produce integer solutions. It is really special when this happens because LP's are "easy".
+            \item If $G$ is not bipartite, the story is more complicate but still an exact LP formulation is possible. 
+            \item Combinatorial optimization/mathematical programming study how to leverage LP's/IP's to get "good" solutions
+        \end{itemize}
+
+        \section*{What if Halls Condition Doesn't Hold?}
+
+        Recall Halls Condition: \begin{equation*}
+            |N(S)| \geq |S|, \forall S \subseteq X \tag{$\star$}
+        \end{equation*}
+
+        Halls Theorem tells us that if $(\star)$ holds for all $S \subseteq X$, then there exists a matching of size $|X|$.
+
+        Question: What if the condition doesn't hold for some $S \subseteq X$? How large of a matching exists?
+
+        For $\emptyset \not = S \subseteq X$, let the defect of $S$ be $$\df(S) \coloneqq |S| - |N(S)|$$.
+
+        Halls condition becomes $\df(S) \leq 0 \forall S \subseteq X$.
+
+        To answer our question, it is natural to think about the worst case, i.e. the largest defect.
+
+        Define $$d^* = \max_{\emptyset \not = S \subseteq X} \df(S)$$
+
+        Also, let $\alpha (G) $ be the size of the largest matching in $G = (X \sqcup Y,E)$.
+
+        \begin{corollary}
+            (Ore's Defect Formula) Let $G=(X \sqcup Y,E)$ be bipartite. Then $\alpha (G) = |X|-d^*$
+        \end{corollary}
+
+        \begin{proof}
+            Every matching misses to match $\df(S)$ nodes from $S \subseteq X$. This implies $$|\alpha(G)| \leq |X|-\df(S) \forall S \subseteq X$$ Then 
+            \begin{align*}
+                \alpha(G) &\leq \min_{\emptyset \not = S \subseteq X}\{|X|-\df(S)\}\\
+                &= |X|-\max_S \df(S)\\
+                &= |x|-d^*
+            \end{align*}
+
+            Thus we have $$\alpha(G) \leq |x|-d^*$$
+
+            Now we want to show that $\alpha(G) \geq |x|-d^*$. It suffices to produce a matching of $G$ of size $|x|-d^*$.
+
+            Idea: Produce a new graph $G'$ by adding $d^*$ dummy nodes to $Y$, each of which is  connected to all of $x$.
+
+            Claim: $G'$ meets Halls Condition $\forall S \subseteq X$.
+
+            This holds since for each $S \subseteq X$, $N(S)$ increased by $d^*$ and $\df(s) \leq d^*$.
+
+            The new defect of $S$ is less than or equal to 0.
+
+            Then $G'$ has a matching $M$ of size $|X|$ (by Hall's Theorem)
+
+            Now $M= M_1 \sqcup M_2$, where $M_2$ is the subset of edges of $M$ that connect to dummy nodes, and $M_1$ is the rest. Then $|M_2| \leq d^*$ since there are only $d^*$ dummy nodes.
+
+            Finally, $M_1$ is a matching in $G$ (the original graph)
+
+            Since it does not use dummy nodes, we know $$|M_1| = |M| - |M_2| = |X|-|M_2| \geq |X|-d^*$$
+            
+        \end{proof}
+
+        \section*{The Minimum Vertex Cover Problem}
+
+        A new problem: the minimum vertex cover problem.
+
+        A vertex cover (i.e. a cover made up of vertices) of a graph $G=(V,E)$ is a subset of the nodes such that every edge  has at least one endpoint in $S$.
+
+        Thus $e \cap S \not = \emptyset \forall e \in E$.
+
+        \begin{figure}[h]
+    \centering
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{.333\textwidth}
+    \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle, fill = skyblue] (m) at (0,.75) {};
+            \node [draw, shape = circle] (x) at (0,0) {};
+            \node [draw, shape = circle, fill = skyblue] (v) at (1,.75) {};
+            \node [draw, shape = circle] (w) at (1,0) {};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{A Vertex Cover}
+        \label{fig:Orig}
+    \end{minipage}%
+    \begin{minipage}{.333\textwidth}
+        \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle, fill = skyblue] (m) at (0,.75) {};
+            \node [draw, shape = circle, fill = skyblue] (x) at (0,0) {};
+            \node [draw, shape = circle, fill = skyblue] (v) at (1,.75) {};
+            \node [draw, shape = circle, fill = skyblue] (w) at (1,0) {};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{Another Vertex Cover}
+        \label{fig:Proper}
+    \end{minipage}%
+    \begin{minipage}{.333\textwidth}
+      \centering
+        \begin{tikzpicture}[scale = 2]
+            \node [draw, shape = circle] (m) at (0,.75) {};
+            \node [draw, shape = circle] (x) at (0,0) {};
+            \node [draw, shape = circle, fill = skyblue] (v) at (1,.75) {};
+            \node [draw, shape = circle] (w) at (1,0) {};
+            \draw[-, thick] (m) to (v);
+            \draw[-, thick] (m) to (x);
+            \draw[-, thick] (x) to (v);
+            \draw[-, thick] (w) to (v);
+        \end{tikzpicture}
+        \caption{Not A Vertex Cover}
+        \label{fig:non Proper}
+    \end{minipage}
+\end{figure}
+
+The goal is to find a vertex cover that is as small as possible. Let $\beta(G)$ be the minimum size of a vertex cover in $G$.
+
+\begin{theorem}
+    (K\"{o}nig-Egerv\'{a}ry) If $G$ is a bipartite graph, then $\alpha(G) = \beta(G)$
+\end{theorem}
+
+\begin{proof}
+    $\alpha(G) \leq \beta(G)$: Let $M^*$  be a maximum matching. No node in a vertex cover can cover more than 1 edge in $M^*$ because the edges in $M^*$ are non adjacent. So you need at least $m^* = \alpha(G)$ nodes to cover $G$
+
+    $\alpha(G) \geq \beta(G)$: It suffices to produce a vertex cover $S \subseteq X$ such that $|S| = \alpha(G)$. Since by definition of $\beta(G)$, we will have $\alpha(G) = |S| \geq \beta(G)$. By Ore's defect formula, we have that $$\alpha(G) = |x|-\df(T) = |X|-|T|+|N(T)|$$ for some $T \subseteq X$ with $\df(T) = d^*$. Note that $N(T) \sqcup (X-T)$ is a vertex cover.
+
+    Finally, the size of $N(T) \sqcup (X-T)$ is $|N(T)| + |X|-|T| = \alpha(G)$.
+\end{proof}
+
+This theorem gives you a min-max relation. Thus it allows us a certificate of optimality.
+
+For bipartite graphs, say $M^*$ is a matching and I claim it is a maximum matching. I can convince you of this by producing a vertex cover $S$ of size $|S|=|M^*|$, and vice versa. This kind of relation is in some ways akin to LP duality.
+
+
+
+
+\end{document}
