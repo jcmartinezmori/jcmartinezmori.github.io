@@ -281,7 +281,7 @@ First, suppose that all of $S^*$ is adjacent to all of $V \setminus S^*$. In thi
 Otherwise, $\exists x \in S^*$ and $y \in V \setminus S^*$ s.t. $\{x,y\} \notin E$.
 \vspace{0.5em}
 
-Let $T = N(S^*) \cap N(x) \cup N (V \setminus S^*)$.
+Let $T = \left(N(S^*) \cap N(x) \right) \cup \left(N (V \setminus S^*) - x \right)$.
 
 \begin{center}
 \begin{tikzpicture}[x=1cm, y=1cm]
