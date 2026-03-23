@@ -58,7 +58,7 @@
 \newcommand{\lecturenumber}{8}
 \newcommand{\lecturetitle}{Formal Power Series and Generating Functions}
 \newcommand{\scribename}{Hanbyul (Han) Lee}
-\newcommand{\lecturedate}{Feb 16, 2026}
+\newcommand{\lecturedate}{February 16, 2026}
 
 \begin{document}
 
