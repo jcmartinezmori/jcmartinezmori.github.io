@@ -1,0 +1,623 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{bbm}
+\usepackage{float}
+
+\usetikzlibrary{arrows.meta,positioning,bending}
+\usetikzlibrary{decorations.pathmorphing,calc}
+
+\usepackage{setspace}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$\mathbb{N}$}
+\newcommand{\lecturetitle}{Lecture Title}
+\newcommand{\scribename}{Scribe Name}
+\newcommand{\lecturedate}{Lecture Date}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{16}{Maximum Flow}{March 16}{Baihan Liu}
+
+
+\onehalfspacing
+In today's lecture, we will start working toward the ``max flow - min cut theorem", which is a min-max relation with many applications and corollaries in combinatorics.
+\section{Flows}
+
+
+
+\begin{definition}[Flow]
+Let $G=(V,E)$ be a directed multigraph, with source $s \in V$ and target $t \in V$. A flow is an assignment
+\(
+f_e \in \mathbb{R}_{\ge 0} \text{ to each } e \in E  \text{ }  (f:E \rightarrow \mathbb{R}_{\ge 0})
+\)
+such that
+\[
+\sum_{e \in \delta^{-}(u)} f_e
+=
+\sum_{e \in \delta^{+}(u)} f_e,
+\qquad \forall\, u \in V,\; u \neq s,t.
+\]
+\end{definition}
+
+That is, ``mass conservation" holds at every vertex other than the source and sink.
+
+The value of a flow $f$ is denoted by $|f|$ and given by
+\[
+|f|
+=
+\sum_{e \in \delta^{+}(s)} f_e - \sum_{e \in \delta^{-}(s)} f_e.
+\]
+
+\subsection{Linear Algebra Formulation of Flows}
+You can also think of flows through linear algebra (as a vector). 
+
+
+Let $B \in \mathbb{R}^{V \times E}$ be the incidence matrix of $G$, where
+\[
+B_{we}
+=
+\begin{cases}
+1, & \text{if } e=(u,v) \text{ and } v=w,\\
+-1, & \text{if } e=(u,v) \text{ and } u=w,\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+
+For example, consider the following directed graph:
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    scale=1.2,
+    every node/.style={font=\small},
+    vertex/.style={
+        draw,
+        circle,
+        minimum size=9mm,
+        inner sep=0pt,
+        line width=1.2pt,
+        fill=skyblue!20
+    },
+    edge/.style={
+        ->,
+        line width=1.05pt
+    }
+]
+    % vertices
+    \node[vertex] (v1) at (0,1.8) {$1$};
+    \node[vertex] (v2) at (3,1.8) {$2$};
+    \node[vertex] (v3) at (0,0) {$3$};
+    \node[vertex] (v4) at (3,0) {$4$};
+
+    % edges
+    \draw[edge] (v1) -- node[above=2pt] {$b$} (v2);
+    \draw[edge] (v1) -- node[left=2pt] {$a$} (v3);
+    \draw[edge] (v2) -- node[pos=0.48, sloped, below=2pt] {$c$} (v3);
+
+    \draw[edge] (v4) to[bend right=18] node[right=2pt] {$d$} (v2);
+    \draw[edge] (v2) to[bend right=18] node[left=2pt] {$e$} (v4);
+\end{tikzpicture}
+\caption{A directed graph with edge set \(E=\{a,b,c,d,e\}\).}
+\end{figure}
+
+
+Its incidence matrix is
+\[
+B=
+\begin{array}{c}
+\\[-1.5ex]
+1\\
+2\\
+3\\
+4
+\end{array}
+\left[
+\begin{array}{ccccc}
+a & b & c & d & e\\
+-1 & -1 & 0 & 0 & 0\\
+0 & 1 & -1 & 1 & -1\\
+1 & 0 & 1 & 0 & 0\\
+0 & 0 & 0 & -1 & 1
+\end{array}
+\right].
+\]
+
+For $v \in V$, let $\mathbbm{1}_v \in \{0,1\}^{V}$ be its indicator vector. That is,
+\[
+(\mathbbm{1}_v)_w
+=
+\begin{cases}
+1, & \text{if } w=v,\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+
+Then, $f \in \mathbb{R}_{\ge 0}^{E}$ is a flow if and only if
+\[
+Bf=\lambda(\mathbbm{1}_t-\mathbbm{1}_s)
+\qquad \text{for some } \lambda \in \mathbb{R}.
+\]
+
+In this case,
+\[
+|f|=\lambda.
+\]
+
+This is equivalent to ``mass conservation". The vector \(Bf\) represents the net inflow at each vertex. In particular,
+\[
+(Bf)_u = 0 \qquad \forall\, u\in V\setminus\{s,t\},
+\]
+and
+\[
+(Bf)_s = -\lambda, \qquad (Bf)_t = \lambda.
+\]
+
+
+\subsection{Flow Decomposition}
+
+Flows can be decomposed as a weighted sum of \(s\)-\(t\) paths, \(t\)-\(s\) paths and directed cycles.
+
+For \(S \subseteq E\), let \(\mathbbm{1}_S \in \{0,1\}^E\) be the indicator vector of \(S\), i.e.,
+\[
+(\mathbbm{1}_S)_e =
+\begin{cases}
+1, & \text{if } e \in S,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\begin{lemma}\label{first lemma}
+A vector \(f \in \mathbb{R}_{\ge 0}^E\) is an \(s\)-\(t\) flow if and only if
+\[
+f = \sum_{i=1}^k \lambda_i \mathbbm{1}_{S_i},
+\]
+where \(S_1,S_2,\dots,S_k \subseteq E\) is a collection of \(s\)-\(t\) paths, \(t\)-\(s\) paths, and directed cycles.
+\end{lemma}
+
+\begin{proof}
+If \(S\) is an \(s\)-\(t\) path, a \(t\)-\(s\) path, or a directed cycle, then
+\[
+B\mathbbm{1}_S = \lambda(\mathbbm{1}_t-\mathbbm{1}_s),
+\]
+where
+\[
+\lambda =
+\begin{cases}
+0, & \text{if } S \text{ is a directed cycle},\\
+1, & \text{if } S \text{ is an } s\text{-}t \text{ path},\\
+-1, & \text{if } S \text{ is a } t\text{-}s \text{ path}.
+\end{cases}
+\]
+Hence, the weighted sum
+\[
+\sum_{i=1}^k \lambda_i \mathbbm{1}_{S_i}
+\]
+preserves the identity and, therefore, defines a flow $f$.
+
+Conversely, if \(f\) is a flow, and let
+\[
+E_+(f)=\{e\in E : f_e>0\}.
+\]
+We can show that \(E_+(f)\) contains at least one directed cycle, \(s\)-\(t\) path, or \(t\)-\(s\) path, by mass conservation. 
+
+
+For any such \(S \subseteq E_+(f)\), let
+\[
+\omega=\min_{e\in S} f_e,
+\]
+and 
+\[
+g = f-\omega \cdot \mathbbm{1}_S.
+\]
+Then \(g\) is again a flow, and moreover
+\[
+E_+(g)\subsetneq E_+(f).
+\] So the statement holds inductively. 
+Indeed, since \(\omega=\min_{e\in S} f_e\), there exists at least one edge \(e_0\in S\) such that
+\[
+g_{e_0}=f_{e_0}-\omega=0,
+\]
+so at least one positive edge is removed from the support  \(E_+(f)\). Therefore the statement follows by induction on \(|E_+(f)|\).
+\end{proof}
+
+\medskip
+
+\section{Maximum Flows}
+
+\subsection{Capacitated Directed Multigraphs and Valid Flows}
+
+Now, consider \(G=(V,E,c)\) be a capacitated directed multigraph, where
+\[
+c:E\to\mathbb{R}_{\ge 0}
+\]
+is a capacity function.
+
+A \emph{valid flow} with source \(s\) and sink \(t\) is a flow \(f\) such that
+\[
+f_e \le c(e) \qquad \forall e\in E.
+\]
+That is, the capacity constraints are satisfied on every edge.
+
+A \emph{maximum flow} is a valid flow of maximum value.
+\medskip
+
+
+\subsection{Residual Graphs and Augmenting Paths}
+\noindent\textbf{Question:} How do we find a maximum flow?
+
+\smallskip
+
+\noindent\textbf{Idea:} Similar to maximum matching, we find augmenting paths.
+
+\medskip
+
+Let \(G=(V,E,c)\) be a capacitated directed multigraph, and let \(f\) be a valid flow.
+
+Let 
+\(
+G_f=(V_f,E_f,c_f),
+\)
+be the \emph{residual graph} 
+where
+
+
+\begin{itemize}
+    \item \(V_f = V\).
+    
+    \item \(E_f = E \cup \overline{E}\), where
+    \(
+    \overline{E}
+    =
+    \left\{
+    \bar e=(v,u)\;:\; e=(u,v)\in E
+    \right\}.
+    \)
+    
+    \item The residual capacity function \(c_f\) is given by
+    \[
+    c_f(e)=c(e)-f_e
+    \qquad \text{for } e\in E,
+    \]
+    and
+    \[
+    c_f(\bar e)=f_e
+    \qquad \text{for } \bar e\in \overline{E}.
+    \]
+\end{itemize}
+
+An \emph{augmenting path} is a valid \(s\)-\(t\) path in \(G_f\). 
+Valid means that no arcs with zero capacity are used. 
+The flow value can be increased by augmenting along an $s$-$t$ path in the residual graph.
+\begin{example}
+\end{example}
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\[
+\begin{tikzpicture}[
+    >=Stealth,
+    scale=1.1,
+    every node/.style={font=\small},
+    vertex/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt,
+        line width=1.2pt,
+        fill=skyblue!20
+    },
+    edge/.style={
+        ->,
+        line width=1.05pt
+    }
+]
+    \node[vertex] (s) at (0,2) {$s$};
+    \node[vertex] (u) at (3.4,2) {};
+    \node[vertex] (v) at (0,0) {};
+    \node[vertex] (t) at (3.4,0) {$t$};
+
+    \node at (1.75,2.9) {\textcolor{blue!70!black}{flow}/\textcolor{vermillion}{capacity}};
+
+    \draw[edge] (s) --
+        node[above=2.5pt] {$\textcolor{blue!70!black}{1}/\textcolor{vermillion}{2}$}
+        (u);
+    \draw[edge] (s) -- node[left=2pt] {$\textcolor{blue!70!black}{1}/\textcolor{vermillion}{1}$} (v);
+    \draw[edge] (v) -- node[below=2.5pt] {$\textcolor{blue!70!black}{0}/\textcolor{vermillion}{1}$} (t);
+    \draw[edge] (u) -- node[right=2pt] {$\textcolor{blue!70!black}{2}/\textcolor{vermillion}{2}$} (t);
+    \draw[edge] (v) -- node[pos=0.58, below right=1pt] {$\textcolor{blue!70!black}{1}/\textcolor{vermillion}{1}$} (u);
+\end{tikzpicture}
+\]
+\caption{A valid flow in \(G\).}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\[
+\begin{tikzpicture}[
+    >=Stealth,
+    scale=1.1,
+    every node/.style={font=\small},
+    vertex/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt,
+        line width=1.2pt,
+        fill=skyblue!20
+    },
+    edge/.style={
+        ->,
+        line width=1.05pt
+    },
+    rlabel/.style={text=vermillion}
+]
+
+    \node at (1.75,2.9) {\textcolor{vermillion}{capacity}};
+    \node[vertex] (s) at (0,2) {$s$};
+    \node[vertex] (u) at (3.5,2) {};
+    \node[vertex] (v) at (0,0) {};
+    \node[vertex] (t) at (3.5,0) {$t$};
+
+    %\node[reddishpurple] at (1.75,2.8) {$G_f$};
+
+    \draw[edge] (s) to[bend left=8] node[rlabel, above] {$1$} (u);
+    \draw[edge] (u) to[bend left=8] node[rlabel, below] {$1$} (s);
+
+    \draw[edge] (s) to[bend left=8] node[rlabel, right] {$0$} (v);
+    \draw[edge] (v) to[bend left=8] node[rlabel, left] {$1$} (s);
+
+    \draw[edge] (v) to[bend left=8] node[rlabel, above] {$1$} (t);
+    \draw[edge] (t) to[bend left=8] node[rlabel, below] {$0$} (v);
+
+    \draw[edge] (u) to[bend left=8] node[rlabel, right] {$0$} (t);
+    \draw[edge] (t) to[bend left=8] node[rlabel, left] {$2$} (u);
+
+    \draw[edge] (v) to[bend left=8] node[rlabel, pos=0.4, above] {$0$} (u);
+    \draw[edge] (u) to[bend left=8] node[rlabel, pos=0.4, below] {$1$} (v);
+\end{tikzpicture}
+\]
+\caption{Residual graph \(G_f\).}
+\end{subfigure}
+
+\vspace{0.8em}
+
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\[
+\begin{tikzpicture}[
+    >=Stealth,
+    scale=1.1,
+    every node/.style={font=\small},
+    vertex/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt,
+        line width=1.2pt,
+        fill=skyblue!20
+    },
+    edge/.style={
+        ->,
+        line width=1.05pt
+    },
+    wavepath/.style={
+        draw=bluishgreen,
+        line width=1.5pt,
+        decorate,
+        decoration={snake,amplitude=0.8mm,segment length=3.8mm}
+    },
+    rlabel/.style={text=vermillion}
+]
+    \node[vertex] (s) at (0,2) {$s$};
+    \node[vertex] (u) at (3.5,2) {};
+    \node[vertex] (v) at (0,0) {};
+    \node[vertex] (t) at (3.5,0) {$t$};
+
+    %\node[reddishpurple] at (1.75,2.8) {$G_f$};
+
+    \draw[edge] (s) to[bend left=8] node[above,rlabel] {$1$} (u);
+    \draw[edge] (u) to[bend left=8] node[below,rlabel] {$1$} (s);
+
+    \draw[edge] (s) to[bend left=8] node[right,rlabel] {$0$} (v);
+    \draw[edge] (v) to[bend left=8] node[left,rlabel] {$1$} (s);
+
+    \draw[edge] (v) to[bend left=8] node[above,rlabel] {$1$} (t);
+    \draw[edge] (t) to[bend left=8] node[below,rlabel] {$0$} (v);
+
+    \draw[edge] (u) to[bend left=8] node[right,rlabel] {$0$} (t);
+    \draw[edge] (t) to[bend left=8] node[left,rlabel] {$2$} (u);
+
+    \draw[edge] (v) to[bend left=8] node[pos=0.4, above,rlabel] {$0$} (u);
+    \draw[edge] (u) to[bend left=8] node[pos=0.4, below,rlabel] {$1$} (v);
+
+    \draw[wavepath] ($(s)!0.12!(u)$) to[bend left=8] ($(s)!0.88!(u)$);
+    \draw[wavepath] ($(u)!0.12!(v)$) to[bend left=8] ($(u)!0.88!(v)$);
+    \draw[wavepath] ($(v)!0.12!(t)$) to[bend left=8] ($(v)!0.88!(t)$);
+\end{tikzpicture}
+\]
+\caption{An augmenting path in \(G_f\).}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\[
+\begin{tikzpicture}[
+    >=Stealth,
+    scale=1.1,
+    every node/.style={font=\small},
+    vertex/.style={
+        draw,
+        circle,
+        minimum size=8mm,
+        inner sep=0pt,
+        line width=1.2pt,
+        fill=skyblue!20
+    },
+    edge/.style={
+        ->,
+        line width=1.1pt
+    }
+]
+    \node[vertex] (s) at (0,2) {$s$};
+    \node[vertex] (u) at (3.5,2) {};
+    \node[vertex] (v) at (0,0) {};
+    \node[vertex] (t) at (3.5,0) {$t$};
+
+    \draw[edge] (s) -- node[above] {$\textcolor{blue!70!black}{2}/\textcolor{vermillion}{2}$} (u);
+    \draw[edge] (s) -- node[left] {$\textcolor{blue!70!black}{1}/\textcolor{vermillion}{1}$} (v);
+    \draw[edge] (v) -- node[below] {$\textcolor{blue!70!black}{1}/\textcolor{vermillion}{1}$} (t);
+    \draw[edge] (u) -- node[right] {$\textcolor{blue!70!black}{2}/\textcolor{vermillion}{2}$} (t);
+    \draw[edge] (v) -- node[pos=0.45, below right] {$\textcolor{blue!70!black}{0}/\textcolor{vermillion}{1}$} (u);
+\end{tikzpicture}
+\]
+\caption{Updated flow in \(G\).}
+\end{subfigure}
+
+\caption{Illustration of augmenting a flow: starting from a valid flow in \(G\), constructing the residual graph \(G_f\), finding an augmenting path, and updating the flow accordingly.}
+\label{fig:augmenting-flow-process}
+\end{figure}
+
+
+
+
+
+
+\medskip
+
+Given a valid flow \(h\) in \(G_f\), we can define a transformation
+\[
+\pi(h) \in \mathbb{R}^E,
+\]
+where for each edge \(e \in E\),
+\[
+(\pi(h))_e = h_e - h_{\bar e}.
+\]
+Let \(\bar h\in\mathbb{R}^E\) be defined by
+\(
+(\bar h)_e := h_{\bar e}, \text{ } e\in E.
+\)
+Then, \(
+\pi(h)=h-\bar h.
+\)
+
+\medskip
+
+\noindent
+Interpretation:
+\begin{itemize}
+\item Increase flow in \(e\) by \(h_e\) units.
+\item Decrease flow in \(e\) by \(h_{\bar e}\) units.
+\end{itemize}
+
+
+Here \(h_e\) denotes the flow sent through the forward residual arc \(e\), and \(h_{\bar e}\) denotes the flow sent through the backward residual arc \(\bar e\). Thus, \(\pi(h)\) represents the net change of flow on each original edge \(e\in E\).
+
+
+\medskip
+
+Thus, the different choices of \(h\) (flows in the residual graph) and the corresponding \(\pi(h)\) encode \emph{all} possible ways of modifying the original flow \(f\), while remaining a valid flow.
+
+\begin{lemma}
+    If $f$ is a valid flow in $G$ and $h$ is a valid flow in $G_f$, then $f + \pi(h)$ is a valid flow in $G$. Moreover, every valid flow $\tilde{f}$ in $G$ can be written as
+    \[\tilde{f} = f+\pi(h)\]
+
+    for some valid flow $h$ in $G_f$. 
+\end{lemma}
+
+\begin{proof}
+Note that $
+B_{G_f}h=\lambda(\mathbbm{1}_t-\mathbbm{1}_s) \text{ for some } \lambda \in \mathbb{R}.$ 
+
+
+But also, $B_{G_f}h = B_Gh - B_G\overline{h} = B_G (h-\overline{h}) = B_G \pi(h) = \lambda(\mathbbm{1}_t - \mathbbm{1}_s)$. 
+
+
+Thus, $\pi (h)$ satisfies mass conservation, which implies that $f + \pi(h)$ satisfies mass conservation. In fact, $f +\pi(h)$ is a valid flow in $G$ by our design of $c_f$.
+
+
+Conversely, if $\tilde{f}$ is a valid flow in $G$, let
+\[h_e=\max\{\tilde f_e-f_e,0\}, \qquad e\in E,
+\]
+\[
+h_{\bar e}=\max\{f_e-\tilde f_e,0\}, \qquad e\in E.
+\]
+
+
+One can verify that $h$ defined in this way is a valid flow in $G_f$ and that $\tilde{f} = f + \pi(h)$. 
+\end{proof}
+
+\begin{lemma}
+    If $f$ is a valid flow in $G$, then it is a maximum flow if and only if $G_f$ does not contain a valid augmenting path.
+\end{lemma}
+
+\begin{proof}
+    If $f$ is not a maximum flow, let $f^*$ be a maximum flow. Let $h$ be designed as in previous lemma so that $f^* = f + \pi(h)$, where $|h| >0$ since $f$ is not maximum. By lemma \ref{first lemma}, $h$ can be decomposed as s-t paths, t-s paths, and cycles in $G_f$. At least one part of the decomposition is an s-t path since $|h| >0$.
+    Thus, $G_f$ contains a valid augmenting path. 
+
+    Conversely, if $P$ is an augmenting path, let $\omega = \min_{e \in P} c_f(e)$ and $h = \omega \cdot \mathbbm{1}_P$, $f+\pi(h)$ is a valid flow with value $|f+\pi(h)| = |f| + \omega > |f|$.
+    
+\end{proof}
+
+
+
+
+
+\end{document}
