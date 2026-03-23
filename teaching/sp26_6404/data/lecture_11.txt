@@ -54,7 +54,7 @@
 
 
 %%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
-\newcommand{\lecturenumber}{$3$}
+\newcommand{\lecturenumber}{$11$}
 \newcommand{\lecturetitle}{The Principle of Inclusion-Exclusion (PIE) and Applications}
 \newcommand{\scribename}{Simon Ruland}
 \newcommand{\lecturedate}{February 25, 2026}
