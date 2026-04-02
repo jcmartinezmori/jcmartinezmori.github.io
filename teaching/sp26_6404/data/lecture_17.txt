@@ -1,0 +1,486 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{17}
+\newcommand{\lecturetitle}{The max flow--min cut theorem.}
+\newcommand{\scribename}{Hanbyul (Han) Lee}
+\newcommand{\lecturedate}{March 30, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Review}
+
+Last time:
+\begin{itemize}
+    \item definition of flows and valid flows;
+    \item an algorithm for finding a maximum flow using augmenting paths in the residual graph $G_f$.
+\end{itemize}
+
+Recall:
+\begin{lemma}
+If $f$ is a valid flow in $G$, then $f$ is a maximum flow if and only if $G_f$ contains no augmenting $s$--$t$ path.
+\end{lemma}
+
+Today we show a min--max relation between $s$--$t$ flows and edge cuts separating $s$ from $t$.
+
+We have $G=(V,E,c)$ directed and $s,t\in V$.
+
+\begin{definition}
+An $s$--$t$ cut is a partition
+\[
+V=S\sqcup T
+\]
+such that $s\in S$ and $t\in T$. If $e=(u,v)$ is a directed edge, then
+\[
+e\in \delta(S,T)
+\quad\Longleftrightarrow\quad
+u\in S,\ v\in T.
+\]
+Since $T=V\setminus S$, we also write $\delta(S)$ for $\delta(S,T)$.
+\end{definition}
+
+\begin{remark}
+Since $G$ is directed, in general $\delta(S,T)\neq \delta(T,S)$.
+\end{remark}
+
+\begin{example}
+The two sets $\delta(S,T)$ and $\delta(T,S)$ need not be the same.
+
+\begin{center}
+\begin{minipage}{0.45\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95]
+\Vertex[x=0.1,y=1.05,size=.55,color=white,NoLabel]{u1}
+\Vertex[x=0.55,y=0.00,size=.55,color=white,NoLabel]{u2}
+\Vertex[x=2.05,y=1.15,size=.55,color=white,NoLabel]{v1}
+\Vertex[x=2.55,y=0.10,size=.55,color=white,NoLabel]{v2}
+\Edge[Direct,lw=1.6pt](u1)(v1)
+\Edge[Direct,lw=1.6pt](u2)(v1)
+\Edge[Direct](v2)(u2)
+\draw[blue,line width=1.2pt] plot[smooth cycle,tension=.9] coordinates {(-0.55,1.55) (-0.75,-0.70) (0.95,-0.95) (1.35,0.10) (1.10,1.55)};
+\node at (-0.72,1.30) {$S$};
+\node at (1.60,1.80) {$\delta(S,T)$};
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95]
+\Vertex[x=0.10,y=1.05,size=.55,color=white,NoLabel]{a1}
+\Vertex[x=0.55,y=0.00,size=.55,color=white,NoLabel]{a2}
+\Vertex[x=2.05,y=1.15,size=.55,color=white,NoLabel]{b1}
+\Vertex[x=2.55,y=0.10,size=.55,color=white,NoLabel]{b2}
+\Edge[Direct](a1)(b1)
+\Edge[Direct](a2)(b1)
+\Edge[Direct,lw=1.6pt](b2)(a2)
+\draw[blue,line width=1.2pt] plot[smooth cycle,tension=.9] coordinates {(1.30,1.60) (2.85,1.45) (2.95,-0.70) (1.65,-0.80) (1.35,0.15)};
+\node at (2.90,1.35) {$T$};
+\node at (1.90,-1.10) {$\delta(T,S)$};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+\end{example}
+
+Let
+\[
+c(S,T)=\sum_{e\in\delta(S,T)} c_e,
+\]
+i.e., the total capacity of edges from $S$ to $T$. Also, for a flow $f\in\mathbb{R}^E_{\ge 0}$, let
+\[
+f(S,T)=\sum_{e\in\delta(S,T)} f_e,
+\]
+i.e., the total flow from $S$ to $T$.
+
+\section{The max flow--min cut theorem}
+
+\begin{theorem}[Max flow--min cut]
+For any flow network, the value of any maximum flow is equal to the capacity of any minimum cut.
+\end{theorem}
+
+\begin{proof}
+Let $(S,T)$ be any $s$--$t$ cut. Let $1_T\in\mathbb{R}^V$ be such that
+\[
+(1_T)_u=
+\begin{cases}
+1, & u\in T,\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+Recall the incidence matrix $B\in\mathbb{R}^{V\times E}$. Put
+\[
+x=(1_T)^T B.
+\]
+Then
+\[
+x_e=
+\begin{cases}
+1, & e\in \delta(S,T),\\
+-1, & e\in \delta(T,S),\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+
+We first show that the value of any $s$--$t$ flow is upper bounded by the value of any $s$--$t$ cut. In particular,
+\[
+\text{max flow value} \le \text{min cut capacity}.
+\]
+
+Let $f\in\mathbb{R}^E_{\ge 0}$ be a valid $s$--$t$ flow. Then
+\begin{align*}
+(1_T)^T Bf
+&=x^T f \\
+&=f(S,T)-f(T,S) \\
+&\le f(S,T) \qquad \text{since } f\in\mathbb{R}^E_{\ge 0},\\
+&\le c(S,T) \qquad \text{since } f \text{ is a valid flow.}
+\end{align*}
+Also,
+\[
+(1_T)^T Bf=(1_T)^T(1_t-1_s)\,|f|=|f|.
+\]
+Therefore,
+\[
+|f|\le c(S,T).
+\]
+
+Now note where the two inequalities are tight:
+\begin{itemize}
+    \item $f(S,T)-f(T,S)\le f(S,T)$ is tight if and only if $f(T,S)=0$, i.e. $f_e=0$ for every $e\in\delta(T,S)$;
+    \item $f(S,T)\le c(S,T)$ is tight if and only if $f(S,T)=c(S,T)$, i.e. $f_e=c_e$ for every $e\in\delta(S,T)$.
+\end{itemize}
+
+We now show the converse. Suppose $f$ is a maximum flow. Then there is no $s$--$t$ path with positive residual capacity in $G_f$. Partition
+\[
+V=S\sqcup T
+\]
+where $S$ is the set of vertices reachable from $s$ in $G_f$ and $T=V\setminus S$. Then $s\in S$ and $t\in T$, so $(S,T)$ is an $s$--$t$ cut. Also, $G_f$ contains no edge from $S$ to $T$ with positive residual capacity.
+
+Hence, for every $e=(u,v)\in\delta(S,T)$,
+\[
+c_f(e)=c_e-f_e=0,
+\]
+so $f_e=c_e$. This makes the second inequality tight.
+
+Now take $e=(u,v)\in\delta(T,S)$. Then $u\in T$ and $v\in S$, so the reverse residual edge $(v,u)$ goes from $S$ to $T$. Since no edge from $S$ to $T$ has positive residual capacity in $G_f$, the residual capacity of $(v,u)$ is $0$. But that residual capacity is exactly $f_e$. Hence $f_e=0$, and the first inequality is tight as well.
+
+Therefore, for this choice of maximum flow $f$ and cut $(S,T)$,
+\[
+|f|=c(S,T).
+\]
+Since every flow value is at most every cut capacity, this cut is a minimum cut.
+\end{proof}
+
+\section{Applications with $\infty$-capacity edges}
+
+We now cover applications of the theorem. For this it is useful to consider flow networks where
+\[
+c:E\to \mathbb{R}_{\ge 0}\cup\{\infty\}.
+\]
+
+\begin{fact}
+\leavevmode
+\begin{itemize}
+    \item If $G$ contains an $s$--$t$ path made entirely of $\infty$-capacity edges, then the maximum flow is unbounded.
+    \item Otherwise, the maximum flow value is finite, and the max flow--min cut theorem still applies.
+\end{itemize}
+\end{fact}
+
+So in these applications we may design gadgets with $\infty$-capacity edges as needed, as long as we do not introduce an $\infty$-capacity $s$--$t$ path.
+
+\section{K\"onig--Egerv\'ary}
+
+Let us revisit something old.
+
+\begin{theorem}[K\"onig--Egerv\'ary]
+If $G$ is a bipartite undirected graph, then the cardinality of a maximum matching equals the cardinality of a minimum vertex cover.
+\end{theorem}
+
+\begin{proof}
+Our gadget is a flow network $G'$ with a super-source $s$ and a super-target $t$.
+
+Given $G=(X\sqcup Y,E)$, we let
+\begin{itemize}
+    \item $s$ be connected to all of $X$;
+    \item all edges in $E$ be oriented from $X$ to $Y$;
+    \item all of $Y$ be connected to $t$.
+\end{itemize}
+Set the capacities by
+\[
+c(s,x)=1 \quad (x\in X),
+\qquad
+c(y,t)=1 \quad (y\in Y),
+\qquad
+c(x,y)=\infty \quad ((x,y)\in E).
+\]
+
+\begin{center}
+\begin{minipage}{0.30\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95]
+\node at (0.15,1.85) {$X$};
+\node at (1.95,1.85) {$Y$};
+\Vertex[x=0.20,y=1.15,size=.58,color=white,NoLabel]{lx1}
+\Vertex[x=0.20,y=0.00,size=.58,color=white,NoLabel]{lx2}
+\Vertex[x=1.95,y=1.10,size=.58,color=white,NoLabel]{ly1}
+\Vertex[x=2.15,y=-0.05,size=.58,color=white,NoLabel]{ly2}
+\Edge(lx1)(ly1)
+\Edge(lx2)(ly1)
+\Edge(lx2)(ly2)
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.64\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.92]
+\Vertex[x=0.00,y=0.55,size=.58,color=white,NoLabel]{ss}
+\Vertex[x=1.35,y=1.15,size=.58,color=white,NoLabel]{xx1}
+\Vertex[x=1.35,y=-0.05,size=.58,color=white,NoLabel]{xx2}
+\Vertex[x=3.45,y=1.15,size=.58,color=white,NoLabel]{yy1}
+\Vertex[x=3.45,y=-0.05,size=.58,color=white,NoLabel]{yy2}
+\Vertex[x=4.90,y=0.55,size=.58,color=white,NoLabel]{tt}
+\Edge[Direct](ss)(xx1)
+\Edge[Direct](ss)(xx2)
+\Edge[Direct](xx1)(yy1)
+\Edge[Direct](xx2)(yy1)
+\Edge[Direct](xx2)(yy2)
+\Edge[Direct](yy1)(tt)
+\Edge[Direct](yy2)(tt)
+\node at (-0.25,0.55) {$s$};
+\node at (5.18,0.55) {$t$};
+\node at (0.62,1.07) {$1$};
+\node at (0.62,0.03) {$1$};
+\node at (2.40,1.35) {$\infty$};
+\node at (2.35,0.58) {$\infty$};
+\node at (2.42,-0.28) {$\infty$};
+\node at (4.18,1.07) {$1$};
+\node at (4.18,0.03) {$1$};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+
+If we want only finite capacities, we may replace each $\infty$ by any integer $M>|X|+|Y|$; the same cuts remain optimal. In that version all capacities are integral.
+However, having $\infty$ capacities will make proofs simpler.
+
+Any integer flow $f$ in $G'$ gives a matching $M_f$ in $G$ by
+\[
+\{x,y\}\in M_f
+\quad\Longleftrightarrow\quad
+f(x,y)=1.
+\]
+Similarly, any matching in $G$ gives an integer flow in $G'$ of the same value. So maximum matching size is the same as maximum integer flow value.
+
+At this point we have
+\begin{center}
+\begin{tikzpicture}[scale=1.0]
+\node (flows) at (0,1.15) {integer flows};
+\node at (2.65,1.15) {are to};
+\node (match) at (5.30,1.15) {matchings};
+\node (cuts) at (0,-1.10) {$s$--$t$ cuts};
+\node (cover) at (5.30,-1.10) {vertex covers};
+\draw[<->,line width=.8pt,shorten <=2pt,shorten >=2pt] (flows.south) -- (cuts.north);
+\draw[<->,line width=.8pt,shorten <=2pt,shorten >=2pt] (match.south) -- (cover.north);
+\draw[dotted,line width=.8pt,shorten <=6pt,shorten >=6pt] (cuts.east) -- (cover.west);
+\node at (2.65,-1.42) {missing (yet)};
+\end{tikzpicture}
+\end{center}
+
+Now consider any $s$--$t$ cut $(S,T)=(S,V\setminus S)$ of finite capacity, and let
+\[
+A=(X\cap T)\cup(Y\cap S)
+  =(X\cap(V\setminus S))\cup(Y\cap S).
+\]
+
+\begin{center}
+\begin{minipage}{0.30\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95]
+\node at (0.15,1.85) {$X$};
+\node at (1.95,1.85) {$Y$};
+\Vertex[x=0.20,y=1.15,size=.58,color=white,NoLabel]{clx1}
+\Vertex[x=0.20,y=0.00,size=.58,color=white,NoLabel]{clx2}
+\Vertex[x=1.95,y=1.10,size=.58,color=white,NoLabel]{cly1}
+\Vertex[x=2.15,y=-0.05,size=.58,color=white,NoLabel]{cly2}
+\Edge(clx1)(cly1)
+\Edge(clx2)(cly1)
+\Edge(clx2)(cly2)
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.64\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.92]
+\Vertex[x=0.00,y=0.55,size=.58,color=white,NoLabel]{cs}
+\Vertex[x=1.35,y=1.15,size=.58,color=reddishpurple,NoLabel]{cx1}
+\Vertex[x=1.35,y=-0.05,size=.58,color=white,NoLabel]{cx2}
+\Vertex[x=3.45,y=1.15,size=.58,color=bluishgreen,NoLabel]{cy1}
+\Vertex[x=3.45,y=-0.05,size=.58,color=bluishgreen,NoLabel]{cy2}
+\Vertex[x=4.90,y=0.55,size=.58,color=white,NoLabel]{ct}
+\Edge[Direct](cs)(cx1)
+\Edge[Direct](cs)(cx2)
+\Edge[Direct](cx1)(cy1)
+\Edge[Direct](cx2)(cy1)
+\Edge[Direct](cx2)(cy2)
+\Edge[Direct](cy1)(ct)
+\Edge[Direct](cy2)(ct)
+\node at (-0.25,0.55) {$s$};
+\node at (5.18,0.55) {$t$};
+\node at (0.62,1.07) {$1$};
+\node at (0.62,0.03) {$1$};
+\node at (2.40,1.35) {$\infty$};
+\node at (2.35,0.58) {$\infty$};
+\node at (2.42,-0.28) {$\infty$};
+\node at (4.18,1.07) {$1$};
+\node at (4.18,0.03) {$1$};
+\draw[blue,line width=1.4pt] plot[smooth cycle,tension=.86] coordinates {(-0.55,0.90) (-0.65,-0.45) (1.15,-0.55) (2.75,-0.70) (4.10,-0.70) (4.00,1.70) (2.95,1.82) (1.70,0.65)};
+\node[color=blue] at (3.90,1.95) {$S$};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+
+We claim that $A$ is a vertex cover. Indeed, if $(x,y)\in E$ has no endpoint in $A$, then
+\[
+x\notin X\cap T \quad\text{and}\quad y\notin Y\cap S.
+\]
+Since $x\in X$ and $y\in Y$, this means
+\[
+x\in X\cap S, \qquad y\in Y\cap T.
+\]
+So the edge $(x,y)$ crosses from $S$ to $T$, and in our gadget it has capacity $\infty$. This contradicts the assumption that $(S,T)$ has finite capacity.
+
+Now the cut capacity $c(S,T)$ is exactly the number of edges
+\begin{itemize}
+    \item from $s$ to $X\cap(V\setminus S)$,
+    \item from $Y\cap S$ to $t$.
+\end{itemize}
+Hence
+\[
+c(S,T)=|A|.
+\]
+
+Conversely, any vertex cover $A$ gives an $s$--$t$ cut of capacity $|A|$ by the reverse construction
+\[
+S=\{s\}\cup(X\setminus A)\cup(Y\cap A).
+\]
+
+\begin{center}
+\begin{minipage}{0.30\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.95]
+\node at (0.15,1.85) {$X$};
+\node at (1.95,1.85) {$Y$};
+\Vertex[x=0.20,y=1.15,size=.58,color=white,NoLabel]{rlx1}
+\Vertex[x=0.20,y=0.00,size=.58,color=white,NoLabel]{rlx2}
+\Vertex[x=1.95,y=1.10,size=.58,color=white,NoLabel]{rly1}
+\Vertex[x=2.15,y=-0.05,size=.58,color=white,NoLabel]{rly2}
+\Edge(rlx1)(rly1)
+\Edge(rlx2)(rly1)
+\Edge(rlx2)(rly2)
+\end{tikzpicture}
+\end{minipage}
+\hfill
+\begin{minipage}{0.64\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.92]
+\Vertex[x=0.00,y=0.55,size=.58,color=white,NoLabel]{rs}
+\Vertex[x=1.35,y=1.15,size=.58,color=reddishpurple,NoLabel]{rx1}
+\Vertex[x=1.35,y=-0.05,size=.58,color=white,NoLabel]{rx2}
+\Vertex[x=3.45,y=1.15,size=.58,color=bluishgreen,NoLabel]{ry1}
+\Vertex[x=3.45,y=-0.05,size=.58,color=bluishgreen,NoLabel]{ry2}
+\Vertex[x=4.90,y=0.55,size=.58,color=white,NoLabel]{rt}
+\Edge[Direct](rs)(rx1)
+\Edge[Direct](rs)(rx2)
+\Edge[Direct](rx1)(ry1)
+\Edge[Direct](rx2)(ry1)
+\Edge[Direct](rx2)(ry2)
+\Edge[Direct](ry1)(rt)
+\Edge[Direct](ry2)(rt)
+\node at (-0.25,0.55) {$s$};
+\node at (5.18,0.55) {$t$};
+\node at (0.62,1.07) {$1$};
+\node at (0.62,0.03) {$1$};
+\node at (2.40,1.35) {$\infty$};
+\node at (2.35,0.58) {$\infty$};
+\node at (2.42,-0.28) {$\infty$};
+\node at (4.18,1.07) {$1$};
+\node at (4.18,0.03) {$1$};
+\draw[blue,line width=1.4pt] plot[smooth cycle,tension=.86] coordinates {(-0.55,0.90) (-0.65,-0.45) (1.15,-0.55) (2.75,-0.70) (4.10,-0.70) (4.00,1.70) (2.95,1.82) (1.70,0.65)};
+\node[color=blue] at (3.90,1.95) {$S$};
+\end{tikzpicture}
+\end{minipage}
+\end{center}
+
+So
+\[
+\begin{array}{c}
+\text{max flow value}=\text{max matching size}\\[0.5em]
+\Updownarrow\ \text{max flow--min cut}\\[0.5em]
+\text{min cut value}=\text{min vertex cover size}
+\end{array}
+\]
+Therefore,
+\[
+\text{maximum matching size}=\text{minimum vertex cover size}.
+\]
+\end{proof}
+
+\begin{remark}
+Idea: min--max relation, duality, and the right gadget.
+\end{remark}
+
+\end{document}
