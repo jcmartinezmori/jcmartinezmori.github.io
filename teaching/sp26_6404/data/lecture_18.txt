@@ -1,0 +1,432 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{float}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{18}
+\newcommand{\lecturetitle}{``Applications" of Max Flow-Min Cut Theorem}
+\newcommand{\scribename}{Lily Renneker}
+\newcommand{\lecturedate}{April 1, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\vspace{0.5cm}
+Today we will cover two applications of the Max Flow-Min Cut Theorem introduced last lecture. The first is a mathematical application, specifically using the theorem to prove Menger's Theorem. The second is a practical application, where we will see how the theorem can be used to optimize airline flight planning.
+
+\section{Application 1}
+
+Let $G = (V, E)$ be a directed graph (\textit{although we will see directed or undirected doesn't matter}). Let $s,t \in V$ be distinct. Two paths, $P$ and $P'$ from $s$ to $t$ are:
+
+\begin{enumerate}
+    \item \textbf{edge disjoint} if they do not share an edge
+    \item \textbf{vertex disjoint} if there is no vertex $u$ different from $s$ and $t$ ($u \neq s,t$) such that $u$ is in both $P$ and $P'$. This is also called internally vertex disjoint.
+\end{enumerate}
+
+\vspace{0.25cm}
+
+\begin{definition}
+    an $s$-$t$ \textbf{edge cut} is a subset $C \subseteq E$ such that every $s$-$t$ path contains an edge in $C$
+\end{definition}
+
+\begin{definition}
+an $s$-$t$ \textbf{vertex cut} is a subset $U \subseteq V \setminus \{s,t\}$ such that every $s$-$t$ path contains a node in $U$
+\end{definition}
+
+\vspace{0.25cm}
+Our goal is to prove the min-max relation between disjoint $s$-$t$ paths and $s$-$t$ cuts
+
+\begin{theorem}
+    (Menger's) Let $G = (V, E)$ be a directed graph, and $s,t \in V$ be distinct. Then:
+    \begin{enumerate}
+        \item the maximum number of edge disjoint $s$-$t$ paths is the minimum size of an $s$-$t$ edge cut
+        \item the maximum number of vertex disjoint $s$-$t$ paths is the minimum size of an $s$-$t$ vertex cut
+    \end{enumerate}
+    these also hold if G is undirected
+\end{theorem}
+
+\begin{proof}
+    In (1), the maximum number of edge-disjoint $s$-$t$ paths is less than the minimum cardinality of an $s$-$t$ edge cut since each of these paths must use a distinct edge in the cut. Through a similar argument, in (2), the maximum number of vertex disjoint $s$-$t$ paths must be less than or equal to the minimum cardinality of an $s$-$t$ vertex cut.
+    \newline
+    \newline
+    \indent It remains to prove the opposite directions for both (1) and (2).
+    \newline
+    \newline
+    \indent For (1), let $c_e=1$ $\forall e \in E$, this is our "gadget"
+    \newpage
+    \underline{Idea:}
+
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, text centered, minimum width=3.5cm, minimum height=1cm, text width=3.3cm},
+    iff/.style={draw, double, <->, thick}
+]
+
+% Top row
+\node[box] (A) {Integer flows of value $k$};
+\node[box, right=2.5cm of A] (B) {$k$ edge disjoint $s$-$t$ paths};
+
+% Bottom row
+\node[box, below=2cm of A] (C) {Cuts of capacity $k$};
+\node[box, right=2.5cm of C] (D) {$s$-$t$ edge cuts of size $k$};
+
+% Arrows
+\draw[iff] (A) -- node[above] {$A$} (B);
+\draw[iff] (C) -- node[left] {Max flow/Min cut} (A);
+\draw[iff] (C) -- node[above] {$B$} (D);
+
+\end{tikzpicture}
+
+\vspace{1cm}
+\textbf{A}: an integer flow of value k decomposes as k edge disjoint $s$-$t$ paths: find a unit flow $s$-$t$ path supported in the flow subtracted from the flow and iterate. This works because $c_e=1$.
+
+\vspace{0.5cm}
+
+\textbf{B}: Given an $s$-$t$ edge cut $C$ of size $k$, let $S$ be the set of nodes reachable from source s in the induced graph $G' = (V, E\setminus C)$, and $T = V\setminus S$. Then, $(S,T)$ is an $s$-$t$ cut of capacity k. 
+
+Conversely, if $(S,T)$ is an $s$-$t$ cut with a capacity $C(S,T)=\sum_{e \in \delta(S,T)}{c_e}=\sum_{e \in \delta(S,T)}{1}=\abs{\delta(S,T)}=k$
+
+Then $\delta(S,T)$ is an $s$-$t$ edge cut of size k.
+
+For (2), the gadget is a bit more involved. For each node in the graph, $u \in V$ form two new nodes: $u_{in}$ and $u_{out}$ with $c(u_{in},u_{out})=1$ and $c(u_{out}, u_{in})=0$ $\forall u \in V$.
+
+Additionally, each $e \in (u,v) \in E$ in the original graph becomes an edge $(u_{out}, v_{in})$ in the new graph with capacity, $c(u_{out}, v_{in})= \infty$ \newline
+
+for example:
+
+\begin{tikzpicture}[
+  node distance=2cm,
+  every node/.style={circle, draw, minimum size=0.8cm},
+  arr/.style={-{Stealth[length=6pt]}, thick},
+  bigarr/.style={-{Stealth[length=10pt]}, line width=3pt, draw=gray!60}
+]
+
+  %% Left simple graph
+  \node (A) at (0, 1)  {$A$};
+  \node (B) at (0, -1) {$B$};
+  \draw[arr] (A) -- (B);
+
+  %% Big arrow in the middle
+  \draw[bigarr] (1.2, 0) -- (2.2, 0);
+
+  %% Right expanded graph
+  \node (uin)  at (3.5,  1.5) {$u_{\text{in}}$};
+  \node (uout) at (3.5, -1.5) {$u_{\text{out}}$};
+  \node (vin)  at (6.5,  1.5) {$v_{\text{in}}$};
+  \node (vout) at (6.5, -1.5) {$v_{\text{out}}$};
+
+  %% u_in -> u_out (left curve, label 1)
+  \draw[arr] (uin)  to[bend right=40] node[left, draw=none] {$1$} (uout);
+
+  %% u_out -> u_in (right curve, label 0)
+  \draw[arr] (uout) to[bend right=40] node[right, draw=none] {$0$} (uin);
+
+  %% v_in -> v_out (left curve, label 1)
+  \draw[arr] (vin)  to[bend right=40] node[left, draw=none] {$1$} (vout);
+
+  %% v_out -> v_in (right curve, label 0)
+  \draw[arr] (vout) to[bend right=40] node[right, draw=none] {$0$} (vin);
+
+  %% u_out -> v_in (diagonal, label infinity)
+  \draw[arr] (uout) to[bend left=20] node[above, draw=none] {$\infty$} (vin);
+
+\end{tikzpicture}
+
+Idea:
+\newline
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, text centered, minimum width=3.5cm, minimum height=1cm, text width=3.3cm},
+    iff/.style={draw, double, <->, thick}
+]
+
+% Top row
+\node[box] (A) {Integer $s_{out}$-$t_{in}$ flows of value $k$};
+\node[box, right=2.5cm of A] (B) {$k$ vertex disjoint $s$-$t$ paths (in original graph)};
+
+% Bottom row
+\node[box, below=2cm of A] (C) {$s_{out}$-$t_{in}$ cuts of capacity $k$};
+\node[box, right=2.5cm of C] (D) {$s$-$t$ vertex cuts of size $k$};
+
+% Arrows
+\draw[iff] (A) -- node[above] {$A$} (B);
+\draw[iff] (C) -- node[left] {Max flow/Min cut} (A);
+\draw[iff] (C) -- node[above] {$B$} (D);
+
+\end{tikzpicture}
+
+\vspace{1cm}
+\textbf{A}: Same argument for 1A (edge-disjoint paths case). Only edges from $u_{in}$ is to $u_{out}$ and you use that node.
+
+\vspace{0.5cm}
+
+\textbf{B}: Minimum cuts have finite capacity, meaning we do not use any infinite capacity edges fro the cuts. So, in any finite capacity $s_{out}$-$t_{in}$ cut $(S,T)$, say of capacity k, only edges of the form $(u_{in}, u_{out})$ can appear in $\delta(S,T)$. \newline
+
+$U = \{u \in V: (u_{in},u_{out}) \in \delta(S,T)\}$ forms an $s$-$t$ vertex cut with size k. The reverse construction is the same. \newline
+
+Finally, for the undirected graph case, we can bidirect $G$ and apply the same proof
+\end{proof}
+
+\section{Application 1: Airline Scheduling}
+
+Supposed you want to operate the flights:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l l c l l}
+        \toprule
+        \textbf{Departure city} & \textbf{Departure time} & & \textbf{Arrival city} & \textbf{Arrival time} \\
+        \midrule
+        BOS & 6:00 AM  & $\rightarrow$ & DCA & 7:00 AM  \\
+        DCA & 8:00 AM  & $\rightarrow$ & LAX & 11:00 AM \\
+        PHL & 7:00 AM  & $\rightarrow$ & PIT & 8:00 AM  \\
+        DEN & 5:00 PM  & $\rightarrow$ & SFO & 6:00 PM  \\
+        SFO & 2:15 PM  & $\rightarrow$ & SEA & 3:15 PM  \\
+        PHL & 11:00 AM & $\rightarrow$ & SFO & 2:00 PM  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+There are $m$ flight segments you need to operate, but you only have k planes (presumably $m>k$). More generally, is it possible to operate all of these flights with your fleet size. How do we reuse planes for different flight segments? \newline
+
+We can turn this into a flow problem (sort of, after some complicated gadgets).
+
+\begin{definition}
+    a circulation with demands $\{d_u\}_{u \in G} \in \mathbb{R}_{\geq 0}$, capacities $c:E \rightarrow \mathbb{R}_{ \geq 0}$, and lower bounds $l:E \rightarrow \mathbb{R}$ such that $l_e \leq c_e$ $\forall e \in E$, is a vector $f$ such that:
+    \begin{enumerate}
+        \item $\forall e \in E$, $l_e \leq f_e \leq c_e$
+        \item $f(\delta^{-}(u))-f(\delta^{+}(u)) = d_{u_1}$ $\forall u \in V$
+    \end{enumerate}
+\end{definition}
+
+Circulations generalize flows: \newline
+
+In flows, $l_e =0$ $\forall e \in E$ and 
+\[
+d_u =
+\begin{cases}
+    \lambda  & \text{if } u = t \\
+    -\lambda & \text{if } u = s \\
+    0        & \text{otherwise}
+\end{cases}
+\]
+where $\lambda$ is a flow value.
+
+There are gadgets to cast the existence of a circulation as given as a questions about the existence of flows of a given value.
+So, if you know about flows, you know about circulations.
+
+Idea (and subsequent diagram):
+\begin{enumerate}
+    \item set capacity = 1 and lower bound = 1 for all edges (for each required flight segment
+    \item add flight destination/origin compatibility 
+    \item add a super source $s$ and connect all required flight origins with $l_e = 0$ and $c_e = 1$
+    \item add a super target $t$ and connect it to all required flight destinations with $l_e = 0$ and $c_e = 1$
+    \item add an edge $s,t$ with with $l_{s,t}=0$ and $c_{s,t} = k$
+    \item finally, $d_s = -k$, $d_t = k$, and $d_u = 0$ otherwise.
+\end{enumerate}
+
+\begin{tikzpicture}[
+        every node/.style = {
+        circle, draw, thick,
+        minimum size = 1.0cm,
+        font = \small
+    },
+    arr/.style      = {-{Stealth[length=6pt]}, thick},
+    flight/.style   = {arr, blue},
+    compat/.style   = {arr, dashed, olive, thick},
+    source/.style   = {arr, red, thick},
+    sink/.style     = {arr, teal, thick},
+    st/.style       = {arr, purple, very thick},
+    lbl/.style      = {font=\scriptsize, inner sep=2pt, draw=none},
+]
+ 
+\def\rowsep{2.2}
+ 
+%% ── Origin nodes (left column, x=-3) ────────────────────────────────────────
+%% Flight 1: BOS 6am -> DCA 7am
+%% Flight 2: DCA 8am -> LAX 11am
+%% Flight 3: PHL 7am -> PIT 8am
+%% Flight 4: DEN 5pm -> SFO 6pm
+%% Flight 5: SFO 2:15pm -> SEA 3:15pm
+%% Flight 6: PHL 11am -> SFO 2pm
+\node[fill=blue!10] (O1) at (-3,  0*\rowsep) {\footnotesize BOS};
+\node[fill=blue!10] (O2) at (-3, -1*\rowsep) {\footnotesize DCA};
+\node[fill=blue!10] (O3) at (-3, -2*\rowsep) {\footnotesize PHL};
+\node[fill=blue!10] (O4) at (-3, -3*\rowsep) {\footnotesize DEN};
+\node[fill=blue!10] (O5) at (-3, -4*\rowsep) {\footnotesize SFO};
+\node[fill=blue!10] (O6) at (-3, -5*\rowsep) {\footnotesize PHL};
+ 
+%% ── Destination nodes (right column, x=3) ───────────────────────────────────
+\node[fill=teal!20] (D1) at ( 3,  0*\rowsep) {\footnotesize DCA};
+\node[fill=teal!20] (D2) at ( 3, -1*\rowsep) {\footnotesize LAX};
+\node[fill=teal!20] (D3) at ( 3, -2*\rowsep) {\footnotesize PIT};
+\node[fill=teal!20] (D4) at ( 3, -3*\rowsep) {\footnotesize SFO};
+\node[fill=teal!20] (D5) at ( 3, -4*\rowsep) {\footnotesize SEA};
+\node[fill=teal!20] (D6) at ( 3, -5*\rowsep) {\footnotesize SFO};
+ 
+%% ── Required flight edges (blue, l=1, c=1) ───────────────────────────────────
+\draw[flight] (O1) -- node[above, lbl]{$l{=}1,c{=}1$} (D1);
+\draw[flight] (O2) -- node[above, lbl]{$l{=}1,c{=}1$} (D2);
+\draw[flight] (O3) -- node[above, lbl]{$l{=}1,c{=}1$} (D3);
+\draw[flight] (O4) -- node[above, lbl]{$l{=}1,c{=}1$} (D4);
+\draw[flight] (O5) -- node[above, lbl]{$l{=}1,c{=}1$} (D5);
+\draw[flight] (O6) -- node[above, lbl]{$l{=}1,c{=}1$} (D6);
+ 
+%% ── Compatibility edges (dashed olive, l=0, c=1) ────────────────────────────
+%% Feasibility rule: arr_time <= dep_time of the target flight.
+%%
+%% D1 = DCA arrives 7am:
+%%   -> O2 DCA 8am  (same city, 7am <= 8am)
+%%   -> O6 PHL 11am (reposition DCA->PHL, 7am <= 11am)
+%%
+%% D2 = LAX arrives 11am:
+%%   (no origin departs from LAX or reachable city after 11am in table)
+%%
+%% D3 = PIT arrives 8am:
+%%   -> O6 PHL 11am (reposition PIT->PHL, 8am <= 11am)
+%%
+%% D4 = SFO arrives 6pm:
+%%   (all remaining departures are earlier; no feasible connection)
+%%
+%% D5 = SEA arrives 3:15pm:
+%%   (no departures after 3:15pm in table)
+%%
+%% D6 = SFO arrives 2pm:
+%%   -> O5 SFO 2:15pm (same city, 2pm <= 2:15pm)
+ 
+%% D1 -> O2  (DCA 7am -> DCA 8am, same city)
+\draw[compat] (D1) to[bend left=25]
+    node[right, lbl]{$l{=}0,c{=}1$} (O2);
+ 
+%% D1 -> O6  (DCA 7am -> PHL 11am, reposition)
+\draw[compat] (D1) to[bend left=15]
+    node[right, lbl]{$l{=}0,c{=}1$} (O6);
+ 
+%% D3 -> O6  (PIT 8am -> PHL 11am, reposition)
+\draw[compat] (D3) to[bend left=20]
+    node[right, lbl]{$l{=}0,c{=}1$} (O6);
+ 
+%% D6 -> O5  (SFO 2pm -> SFO 2:15pm, same city)
+\draw[compat] (D6) to[bend right=30]
+    node[right, lbl]{$l{=}0,c{=}1$} (O5);
+ 
+%% ── Super source s ───────────────────────────────────────────────────────────
+\node[fill=red!15] (s) at (-7.5, -2.5*\rowsep) {$s$};
+ 
+\draw[source] (s) to[bend left=12]
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (O1);
+\draw[source] (s) to[bend left=6]
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (O2);
+\draw[source] (s) --
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (O3);
+\draw[source] (s) to[bend right=6]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (O4);
+\draw[source] (s) to[bend right=12]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (O5);
+\draw[source] (s) to[bend right=18]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (O6);
+ 
+%% ── Super sink t ─────────────────────────────────────────────────────────────
+\node[fill=teal!30] (t) at ( 7.5, -2.5*\rowsep) {$t$};
+ 
+\draw[sink] (D1) to[bend right=12]
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (t);
+\draw[sink] (D2) to[bend right=6]
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (t);
+\draw[sink] (D3) --
+    node[above, lbl, sloped]{$l{=}0,c{=}1$} (t);
+\draw[sink] (D4) to[bend left=6]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (t);
+\draw[sink] (D5) to[bend left=12]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (t);
+\draw[sink] (D6) to[bend left=18]
+    node[below, lbl, sloped]{$l{=}0,c{=}1$} (t);
+ 
+%% ── s -> t back edge ─────────────────────────────────────────────────────────
+\draw[st] (s) to[bend right=40]
+    node[below, lbl]{$l{=}0,\;c{=}k$} (t);
+ 
+%% ── d_u annotations ──────────────────────────────────────────────────────────
+\node[draw=none, font=\scriptsize, red,  below=0.2cm of s]{$d_s = -k$};
+\node[draw=none, font=\scriptsize, teal, below=0.2cm of t]{$d_t =  k$};
+\node[draw=none, font=\scriptsize, gray, above=0.2cm of O1]{$d_u = 0$};
+ 
+%% ── Flight time annotations on origin nodes ──────────────────────────────────
+\node[draw=none, font=\tiny, gray, left=0.05cm of O1]{\,6:00a};
+\node[draw=none, font=\tiny, gray, left=0.05cm of O2]{\,8:00a};
+\node[draw=none, font=\tiny, gray, left=0.05cm of O3]{\,7:00a};
+\node[draw=none, font=\tiny, gray, left=0.05cm of O4]{\,5:00p};
+\node[draw=none, font=\tiny, gray, left=0.05cm of O5]{2:15p};
+\node[draw=none, font=\tiny, gray, left=0.05cm of O6]{11:00a};
+ 
+\node[draw=none, font=\tiny, gray, right=0.05cm of D1]{7:00a\,};
+\node[draw=none, font=\tiny, gray, right=0.05cm of D2]{11:00a};
+\node[draw=none, font=\tiny, gray, right=0.05cm of D3]{8:00a\,};
+\node[draw=none, font=\tiny, gray, right=0.05cm of D4]{6:00p\,};
+\node[draw=none, font=\tiny, gray, right=0.05cm of D5]{3:15p\,};
+\node[draw=none, font=\tiny, gray, right=0.05cm of D6]{2:00p\,};
+ 
+\end{tikzpicture}
+
+Once the gadgets are set up, then we can use the algorithms from last class to solve.
+
+
+\end{document}
