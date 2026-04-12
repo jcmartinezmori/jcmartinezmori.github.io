@@ -1,0 +1,633 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{listings}
+\usepackage{float}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\range}{range}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+ % Add course number and course name 
+  \fancyhead[c]{
+  \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph
+  Theory} \hfill CU Denver} \
+    \rule{\textwidth}{0.5pt} \
+ % Add semester and instructor
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$19$}
+\newcommand{\lecturetitle}{Introduction to Planar Graphs}
+\newcommand{\scribename}{Jon Terry}
+\newcommand{\lecturedate}{April 6, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+This lecture introduces the main definitions and
+concepts related to planar graphs.
+
+\section{Motivation}
+We can motivate our investigation of planar graphs by asking whether $K_5$ (the
+complete graph on five nodes) can be drawn in the plane without edge crossings.
+
+Notice that when we say that two edges ``cross'', we mean a situation like this:
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (a) at (-2, -0.5) {};
+        \node[vertex] (b) at (2, -0.5) {};
+        \node[vertex] (c) at (-2, 0.5) {};
+        \node[vertex] (d) at (2, 0.5) {};
+        \draw (a) .. controls (0, 2) .. (d);
+        \draw (c) .. controls (0, -2) .. (b);
+    \end{tikzpicture}
+    \caption{Two edges crossing.}
+    \label{fig:edge-crossing}
+\end{figure}
+
+We will use proof-by-picture to answer this question. First,
+consider the cycle obtained by connecting the five nodes of $K_5$. 
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (1) at (90:2) {};
+        \node[vertex] (2) at (162:2) {};
+        \node[vertex] (3) at (234:2) {};
+        \node[vertex] (4) at (306:2) {};
+        \node[vertex] (5) at (18:2) {};
+        \draw (1) -- (2) -- (3) -- (4) -- (5) -- (1);
+    \end{tikzpicture}
+    \caption{The five-cycle $C_5$ from $K_5$.}
+\end{figure}
+
+Now, the five remaining edges in $K_5$ must each appear either inside or outside
+the boundary curve we just defined. Let's start with the
+interior. Add any interior edge. 
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (1) at (90:2) {};
+        \node[vertex] (2) at (162:2) {};
+        \node[vertex] (3) at (234:2) {};
+        \node[vertex] (4) at (306:2) {};
+        \node[vertex] (5) at (18:2) {};
+        \draw (1) -- (2) -- (3) -- (4) -- (5) -- (1);
+        \draw (1) -- (3);
+    \end{tikzpicture}
+    \caption{$C_5$ with one interior edge.}
+\end{figure}
+
+We see from the picture that given one interior edge, we can add at
+most one more interior edge without creating a crossing. Thus, we can add at
+most two interior edges. Similarly, we can add up to two exterior
+edges without creating a crossing. 
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (1) at (90:2) {};
+        \node[vertex] (2) at (162:2) {};
+        \node[vertex] (3) at (234:2) {};
+        \node[vertex] (4) at (306:2) {};
+        \node[vertex] (5) at (18:2) {};
+        \draw (1) -- (2) -- (3) -- (4) -- (5) -- (1);
+        \draw (1) -- (3);
+        \draw (1) .. controls (3.5, 0.5) .. (4);
+        \draw (2) .. controls (-3.5, -2.5) .. (4);
+    \end{tikzpicture}
+    \caption{$C_5$ with one interior edge and two exterior edges.}
+\end{figure}
+
+Thus, based on this particular example, it appears that a drawing of a graph on
+five nodes can contain up to $5+2+2=9$ edges without creating a crossing. But
+$K_5$ has $\binom{5}{2}=10$ edges. Therefore, at least provisionally, the answer
+to the question ``can you draw $K_5$ in the plane without edge crossings?''
+seems to be ``no''. 
+
+\section{Preliminary Definitions}
+Let's establish some terminology to put this discussion on a more rigorous
+foundation. 
+
+\begin{definition}[Planar curve]
+  A \textit{curve} in the plane is the image of a continuous function
+  $f:[0,1]\to \mathbb{R}^2$. We can adopt this as our definition of how we draw
+  an edge of a graph in the plane, since it gives us the ability to connect
+  nodes using curves.  
+\end{definition}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (a) at (-3, 0) {};
+        \node[vertex] (b) at (3, 0) {};
+        \draw (a) .. controls (-1, 2) and (1, -2) .. (b);
+    \end{tikzpicture}
+    \caption{A planar curve in $\mathbb{R}^2$ connecting two nodes.}
+\end{figure}
+
+\begin{definition}[Closed curve]
+  A curve is closed if it starts and ends at the same point, i.e., $f(0)=f(1)$.
+\end{definition}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+    ]
+        \node[vertex] (a) at (0,0) {};
+        \draw (a) .. controls (0,3) and (3,3.5) .. (4,2)
+                   .. controls (5,0) and (-1,0) .. (0,-2)
+                   .. controls (1,-3.5) and (4,-3) .. (4,-2)
+                   .. controls (3,-1) and (-1,-1) .. (a);
+    \end{tikzpicture}
+    \caption{A closed curve.}
+\end{figure}
+
+\begin{definition}[Simple curve]
+  A curve is \textit{simple} if the only point it revisits is its starting
+  point.  
+\end{definition}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (a) at (-3, 0) {};
+            \node[vertex] (b) at (3, 0) {};
+            \draw (a) .. controls (-1, 2) and (1, -2) .. (b);
+        \end{tikzpicture}
+        \caption{A simple curve.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (a) at (0,0) {};
+            \draw (a) .. controls (0.5,2) and (2,3) .. (3,2.5)
+                       .. controls (4,2) and (4.5,0.5) .. (4,-0.5)
+                       .. controls (3.5,-1.5) and (2.5,-2.5) .. (1,-2)
+                       .. controls (-0.5,-1.5) and (-1,-0.5) .. (a);
+        \end{tikzpicture}
+        \caption{A simple closed curve.}
+    \end{subfigure}
+\end{figure}
+
+\begin{definition}[Edge crossing]
+  A \textit{crossing} of two curves occurs when the two curves share
+  points in common other than their endpoints. We showed an example of an edge
+  crossing in Figure~\ref{fig:edge-crossing}.
+\end{definition}
+
+Importantly, we see from these definitions that a closed curve can intersect
+itself, while, on the other hand, a simple curve can be closed but cannot
+intersect itself.
+  
+\begin{definition}[Graph drawing]
+  A drawing of a multigraph $G=(V,E)$ maps $V$ to points in $\mathbb{R}^2$ and
+  $E$ to simple curves that preserves the incidence relations of $G$. 
+  From here forward, when these notes refer to a graph $G$, assume that $G$ is a
+  multigraph. 
+\end{definition}
+
+
+\begin{definition}[Graph embedding]
+  An \textit{embedding} of a graph in a surface $S$ is a mapping of vertices
+  to points in $S$ and edges to simple curves in $S$ (i.e., without crossings)
+  that preserves incidence. 
+\end{definition}
+
+Thus, an embedding in $\mathbb{R}^2$ is a drawing without crossings. Unless
+otherwise stated, ``embedding'' means an embedding in $\mathbb{R}^2$. We can
+now rephrase the motivating question as: ``Does $K_5$ have an embedding?'' 
+
+\section{Planar Graphs}
+With these definitions in place, we can now state the following.
+
+\begin{definition}[Planar graph]
+  A graph $G=(V,E)$ is \textit{planar} if it has an embedding in $\mathbb{R}^2$.
+\end{definition}
+
+\begin{definition}[Plane graph]
+  A \textit{plane graph} is any particular embedding of a planar graph in
+  $\mathbb{R}^2$. In other words, a plane graph refers to an \textit{embedding}
+  of $G$ in the plane, not $G$ itself.  
+\end{definition}
+
+At this point, we need to add two topological definitions to complete the
+description of the components of plane graphs.
+
+\begin{definition}[Open set]
+  A set $U\subset \mathbb{R}^2$ is \textit{open} in $\mathbb{R}^2$ if, for any
+  point $p\in U$, there is an $r>0$ such that for all points $x\in \mathbb{R}^2$
+  within distance $r$ of $p$, those points are also in $U$.
+\end{definition}
+
+\begin{definition}[Region]
+  A \textit{region} is an open set $U\subsetneq \mathbb{R}^2$ such that every
+  two points in $U$ lie on a curve contained in $U$.  
+\end{definition}
+
+\begin{definition}[Faces of a plane graph]
+  The \textit{faces} of a plane graph are the regions of the plane obtained by
+  removing $G$. In other words, the faces of a plane graph are the regions of
+  $\mathbb{R}^2\setminus G$. 
+\end{definition}
+
+As we proceed with our discussion of planar graphs, it will become important to
+be able to distinguish between the interior and exterior faces of a plane graph.
+We appeal to the Jordan curve theorem (which we state without proof) to make
+this distinction.
+
+\begin{theorem}[Jordan curve theorem]
+  Let $C$ be a simple, closed curve and consider the set
+  $A=\mathbb{R}^2\setminus C$. This set $A$ consists of two regions. One region
+  is bounded, which we call the \emph{interior}, and one region that
+  is unbounded, which we call the \emph{exterior}. Both of these regions share
+  the same boundary, $C$.
+\end{theorem}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw plot[smooth cycle, tension=0.8] coordinates {
+            (0,0) (0.8,1.8) (2,2.5) (3.5,2.8) (4.5,1.5)
+            (5,0.5) (4.8,-1) (3.5,-2.2) (2,-2.5)
+            (0.5,-2) (-0.8,-1.2) (-1,0.5)
+        };
+        \node at (2,0) {Interior};
+        \node at (6.5,3) {Exterior};
+        \node at (4.2,2.8) {$C$};
+    \end{tikzpicture}
+    \caption{The Jordan curve theorem: a simple closed curve $C$ divides
+    $\mathbb{R}^2$ into an interior and an exterior.} 
+\end{figure}
+
+\begin{example}
+  The complete graph $K_4$ is a planar graph. Below are two plane embeddings of
+  $K_4$ with their faces numbered. Note that in the case of finite graphs (which
+  are the only graphs we will consider here), every plane embedding induces an
+  unbounded face, which we have labeled $F_1$ in both drawings.  
+\end{example}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (1) at (0,2.5) {};
+            \node[vertex] (2) at (-2,-1) {};
+            \node[vertex] (3) at (2,-1) {};
+            \node[vertex] (4) at (0,0.5) {};
+            \draw (1) -- (2) -- (3) -- (1);
+            \draw (1) -- (4);
+            \draw (2) -- (4);
+            \draw (3) -- (4);
+            \node at (3,2) {$F_1$};
+            \node at (-0.67,0.67) {$F_2$};
+            \node at (0,-0.5) {$F_3$};
+            \node at (0.67,0.67) {$F_4$};
+        \end{tikzpicture}
+        \caption{Embedding $A$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (1) at (0,2) {};
+            \node[vertex] (2) at (2,0) {};
+            \node[vertex] (3) at (0,-2) {};
+            \node[vertex] (4) at (-2,0) {};
+            \draw (1) -- (2) -- (3) -- (4) -- (1);
+            \draw (1) -- (3);
+            \draw (2) .. controls (1,-4) and (-1,-4) .. (4);
+            \node at (3,2) {$F_1$};
+            \node at (0,-2.8) {$F_2$};
+            \node at (0.7,0) {$F_3$};
+            \node at (-0.7,0) {$F_4$};
+        \end{tikzpicture}
+        \caption{Embedding $B$}
+    \end{subfigure}
+    \caption{Two plane embeddings of $K_4$ with faces labeled.}
+\end{figure}
+
+We can make one further distinction among planar graphs and their embeddings.
+\begin{definition}
+  A planar graph $G=(V,E)$ is \textit{outerplanar} if it has an embedding such
+  that every $v\in V$ is on the boundary of the unbounded face.
+\end{definition}
+
+Finally, since we are only concerned with finite graphs, we can restrict
+ourselves to curves $C$ in the plane that consist of the union of finitely many
+line segments. This leads to the next definition.
+
+\begin{definition}[Polygonal curve]
+  A \textit{polygonal} curve is a curve in the plane that consists of the union
+  of finitely many line segments.
+\end{definition}
+
+When working with polygonal curves, we can use a construction in the plane to
+allow us to distinguish between the interior and exterior regions of the plane
+induced by a planar graph. The construction works like this. Pick a point $x\in
+\mathbb{R}^2$. Draw a ray from $x$ that passes through the curve but does not
+intersect any of its segment endpoints. If the parity of the number of
+intersections of the ray with the curve is even, then the point is in the
+exterior region defined by the curve. If the parity of the number of
+intersections is odd, then the point is in the interior region defined by the
+curve.  
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[scale=0.6,
+        dot/.style={circle,fill=black,minimum size=3pt,inner sep=0pt}
+    ]
+        % Rectangular spiral worm (corridor with interior)
+        \fill[gray!15]
+            (3,4.4) -- (5.4,4.4) -- (5.4,1.6) -- (0.6,1.6)
+            -- (0.6,7.4) -- (7.4,7.4) -- (7.4,-0.4) -- (-1,-0.4)
+            -- (-1,0.4) -- (6.6,0.4) -- (6.6,6.6) -- (1.4,6.6)
+            -- (1.4,2.4) -- (4.6,2.4) -- (4.6,3.6) -- (3,3.6) -- cycle;
+        \draw
+            (3,4.4) -- (5.4,4.4) -- (5.4,1.6) -- (0.6,1.6)
+            -- (0.6,7.4) -- (7.4,7.4) -- (7.4,-0.4) -- (-1,-0.4)
+            -- (-1,0.4) -- (6.6,0.4) -- (6.6,6.6) -- (1.4,6.6)
+            -- (1.4,2.4) -- (4.6,2.4) -- (4.6,3.6) -- (3,3.6) -- cycle;
+
+        % x inside the worm at center of spiral
+        \node[dot,label={[font=\small]above:$x$}] at (3.8,4) {};
+        \draw[dashed,->] (3.8,4) -- (9,4);
+        \node[dot] at (5.4,4) {};
+        \node[dot] at (6.6,4) {};
+        \node[dot] at (7.4,4) {};
+        \node[font=\small,anchor=west] at (9.2,4) {3 crossings};
+
+        % x' outside the worm but near center
+        \node[dot,label={[font=\small]below:$x'$}] at (3.8,2.8) {};
+        \draw[dashed,->] (3.8,2.8) -- (9,2.8);
+        \node[dot] at (4.6,2.8) {};
+        \node[dot] at (5.4,2.8) {};
+        \node[dot] at (6.6,2.8) {};
+        \node[dot] at (7.4,2.8) {};
+        \node[font=\small,anchor=west] at (9.2,2.8) {4 crossings};
+    \end{tikzpicture}
+    \caption{The ray-casting parity test. A ray from $x$ (inside the worm)
+    crosses the boundary an odd number of times. A ray from $x'$ (outside
+    the worm) crosses the boundary an even number of times.}
+\end{figure}
+
+\section{Dual of a plane graph}
+Every plane graph gives rise to another plane graph, which we call the
+\textit{dual} of the original graph. 
+
+\begin{definition}[Dual of plane graph]
+  The \textit{dual} of a plane graph $G$ is another plane graph $G^*$ whose
+  nodes are the faces of $G$ and whose edges correspond to the edges of $G$ such
+  that two nodes in $G^*$ are adjacent if and only if the corresponding faces in
+  $G$ share a boundary edge. 
+\end{definition}
+
+We call $G^*$ the dual of $G$, since $(G^*)^* \simeq
+G$.\footnote{Recall from lecture 1 that two graphs $G=(V(G),E(G))$ and $H=(V(H),
+E(H))$ are isomorphic if there exists a bijection $\sigma: V(G)\to V(H)$ such
+that $(u,v)\in E(G)$ if and only if $(\sigma(u), \sigma(v))\in E(H)$.} However,
+the duals of different plane embeddings of the same planar graph need not be
+isomorphic to each other. The following definition provides a way to see this.
+
+\begin{definition}[Length of a face]
+  The length of a face in a plane graph $G$ is the total number of steps of
+  the closed walk in $G$ that bounds the face. If $F$ is a face of a plane
+  graph, then we write $\ell(F)$ for the length of face $F$.
+\end{definition}
+
+\begin{example}
+  Consider two different plane embeddings of a planar graph as shown in the
+  figure below. We see that the duals of the plane embeddings $A$ and $B$ are
+  not isomorphic. To see why, we can just compare the lengths of the
+  corresponding faces in both duals:
+
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{c c c c c}
+             & $\ell(F_1)$ & $\ell(F_2)$ & $\ell(F_3)$ & Total\\
+       \hline
+       $A^*$ & 7 & 3 & 6 & 16\\
+       $B^*$ & 4 & 3 & 9 & 16\\ 
+    \end{tabular}
+  \end{table}
+  
+\end{example}
+\begin{figure}[H]
+    \centering
+    % Top row: Embedding A and Dual A*
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \resizebox{\linewidth}{!}{%
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (1) at (-6,0) {};
+            \node[vertex] (2) at (-4,0) {};
+            \node[vertex] (3) at (-2,2) {};
+            \node[vertex] (4) at (-2,-2) {};
+            \node[vertex] (5) at (0,2) {};
+            \node[vertex] (6) at (0,-2) {};
+            \node[vertex] (7) at (-1,1) {};
+            \draw (1) -- (2);
+            \draw (2) -- (3);
+            \draw (2) -- (4);
+            \draw (3) -- (4);
+            \draw (3) -- (5);
+            \draw (4) -- (6);
+            \draw (5) -- (6);
+            \draw (5) -- (7);
+            % Face labels
+            \node at (1,1) {$F_1$};
+            \node at (-2.7,0) {$F_2$};
+            \node at (-1,-1) {$F_3$};
+        \end{tikzpicture}
+        }
+        \caption{Embedding $A$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \resizebox{\linewidth}{!}{%
+        \begin{tikzpicture}[
+            dualnode/.style={circle,draw,minimum size=5mm,
+                             inner sep=0pt,font=\scriptsize}
+        ]
+            \node[dualnode] (F1) at (0,2) {$F_1$};
+            \node[dualnode] (F2) at (-2,-1) {$F_2$};
+            \node[dualnode] (F3) at (2,-1) {$F_3$};
+            % F1-F2: 2 edges (from z-f, w-z)
+            \draw (F1) to[bend left=15] (F2);
+            \draw (F1) to[bend right=15] (F2);
+            % F2-F3: 1 edge (from f-w)
+            \draw (F2) -- (F3);
+            % F1-F3: 3 edges (from f-a, a-d, d-w)
+            \draw (F1) -- (F3);
+            \draw (F1) to[bend left=15] (F3);
+            \draw (F1) to[bend right=15] (F3);
+            % F1 loop (from x-z)
+            \draw (F1) to[loop above,looseness=6,min distance=8mm] (F1);
+            % F3 loop (from a-t)
+            \draw (F3) to[loop right,looseness=6,min distance=8mm] (F3);
+        \end{tikzpicture}
+        }
+        \caption{Dual $A^*$}
+    \end{subfigure}
+
+    \vspace{0.5em}
+
+    % Bottom row: Embedding B and Dual B*
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \resizebox{\linewidth}{!}{%
+        \begin{tikzpicture}[
+            vertex/.style={circle,draw,minimum size=5mm,inner sep=0pt}
+        ]
+            \node[vertex] (1) at (-6,2) {};
+            \node[vertex] (2) at (0,2) {};
+            \node[vertex] (3) at (0,-2) {};
+            \node[vertex] (4) at (-6,-2) {};
+            \node[vertex] (5) at (-4,0) {};
+            \node[vertex] (6) at (-2.5,1) {};
+            \node[vertex] (7) at (-1.5,-0.5) {};
+            \draw (5) -- (1);
+            \draw (5) -- (4);
+            \draw (1) -- (4);
+            \draw (1) -- (2);
+            \draw (2) -- (3);
+            \draw (3) -- (4);
+            \draw (6) -- (5);
+            \draw (2) -- (7);
+            % Face labels
+            \node at (1,0) {$F_1$};
+            \node at (-5.3,0) {$F_2$};
+            \node at (-2,-1.2) {$F_3$};
+        \end{tikzpicture}
+        }
+        \caption{Embedding $B$}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \resizebox{\linewidth}{!}{%
+        \begin{tikzpicture}[
+            dualnode/.style={circle,draw,minimum size=5mm,
+                             inner sep=0pt,font=\scriptsize}
+        ]
+            \node[dualnode] (F1) at (0,2) {$F_1$};
+            \node[dualnode] (F2) at (-2,-1) {$F_2$};
+            \node[dualnode] (F3) at (2,-1) {$F_3$};
+            % F1-F2: 1 edge (from f-w)
+            \draw (F1) -- (F2);
+            % F2-F3: 2 edges (from z-f, w-z)
+            \draw (F2) to[bend left=15] (F3);
+            \draw (F2) to[bend right=15] (F3);
+            % F1-F3: 3 edges (from f-a, a-d, d-w)
+            \draw (F1) -- (F3);
+            \draw (F1) to[bend left=15] (F3);
+            \draw (F1) to[bend right=15] (F3);
+            % F3 loops (from a-t, x-z)
+            \draw (F3) to[loop right,looseness=6,min distance=8mm] (F3);
+            \draw (F3) to[loop below,looseness=6,min distance=8mm] (F3);
+        \end{tikzpicture}
+        }
+        \caption{Dual $B^*$}
+    \end{subfigure}
+    \caption{Two plane embeddings of a planar graph with their duals.}
+\end{figure}
+The fact that the sums of the lengths of the faces of both duals are equal is
+not a coincidence. We conclude the lecture with the following proposition.
+\begin{proposition}
+  In a plane graph $G=(V,E)$ with $|E|=m$, the sum of the lengths of the faces
+  is twice the number of edges in $G$. More formally, let $n$ be the number of
+  faces in $G$ and let $|E|=m$. Then $\sum_{i=1}^n \ell(F_i)=2m$.
+\end{proposition}
+
+\begin{proof}
+ Recall the handshaking lemma, which states that for any graph $G=(V,E)$,
+ \[
+   \sum_{v\in V} \deg(v)=2|E|,
+ \]
+ since every edge contributes 2 to the total degree count (one for each
+ endpoint). Next, note that $|E(G)|=|E(G^*)|=m$, and that
+ $\ell(F_i)=\deg_{G^*}(F_i)$ for all faces $i$ in $G$. Combining these three
+ facts into one identity yields the desired result:
+ \[
+   \sum_{i} \ell(F_i) = \sum_{F_i\in V(G^*)} \deg_{G^*}(F_i)=2m.
+ \]
+\end{proof}
+
+
+\end{document}
