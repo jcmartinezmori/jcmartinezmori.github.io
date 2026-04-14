@@ -1,0 +1,502 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{float}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage[svgnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{pdfpages}
+\usetikzlibrary{decorations.pathmorphing, calc, arrows.meta}
+\usetikzlibrary{patterns}
+\usepackage{enumitem}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\newtheorem{theorem}{Theorem}%[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{20}
+\newcommand{\lecturetitle}{More on Planer Graphs.}
+\newcommand{\scribename}{Noura Allugmani}
+\newcommand{\lecturedate}{April 8, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\noindent 
+We will start with a duality theorem w.r.t cycles in a plane graph and bonds (i.e., minimal edge cuts) in its dual.
+
+\begin{theorem}
+   Edges in a plane graph $G$ form a cycle if and only if the corresponding edges in $G^*$ form a bond.
+\end{theorem}
+
+\begin{proof}
+ Let $D \subseteq E(G)$ and consider its corresponding set $D^* \subseteq E\left(G^*\right)$.\\
+$\Rightarrow$ Suppose $D$ forms a cycle in $G$. Let $S$ be the faces of $G$ inside of $D$ $(S \neq \phi$, because of the Jordan Curve Theorem). Then, the edge cut $\delta(S)$ in $G^*$ Consists of all the edges of $G^*$ that cross edges of $D$, i.e., $D^*$.  
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.5\linewidth]{./figures/lecture_20_IMG_0132.PNG}
+    \caption*{\textcolor{red!70!black}{$D$ forms a cycle.}}
+    \caption*{\textcolor{blue!70!black}{$D^{*}$ is an edge cut in the dual, i.e., $D^{*} = \delta(S)$.}}
+  \end{figure}
+
+% \begin{center}
+ 
+% \begin{tikzpicture}[scale=1.2,
+%     v/.style={circle, draw, minimum size=7mm, inner sep=0pt}]
+
+% % Left square
+% \node[v] (L1) at (0,1) {};
+% \node[v] (L2) at (1,2) {};
+% \node[v] (L3) at (2,1) {};
+% \node[v] (L4) at (1,0) {};
+
+% \draw (L1)--(L2)--(L3);
+% \draw (L1)--(L4);
+
+% % Right square
+% \node[v] (R1) at (5,2) {};
+% \node[v] (R2) at (6,1) {};
+% \node[v] (R3) at (5,0) {};
+% \node[v] (R4) at (4,1) {};
+
+% \draw (R1)--(R2);
+% \draw (R3)--(R2);
+% \draw (R4)--(R1);
+
+% % Bottom hexagon vertices aligned with L3 and R4
+% \node[v] (B1) at (2,-0.9) {};
+% \node[v] (B2) at (4,-0.9) {};
+
+% \draw (L3)--(R4)--(R3)--(B2)--(B1)--(L4)--(L3);
+% % Inner hexagon
+% % \draw[red,decorate, decoration={snake, amplitude=0.8mm, segment length=4mm}]
+
+
+% % % Interior red dots
+% % \fill[red] (2.1,0.02) circle (1.6pt);
+% % \fill[red] (3.3,0.4) circle (1.6pt);
+% % ---------------- LEFT RED DOT ----------------
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=120, in=-70] (1.95,1.2);
+
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=170, in=-20] (1.05,0.75);
+
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=-120, in=30] (1.7,-0.75);
+
+
+% % % ---------------- RIGHT RED DOT ----------------
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=90, in=-100] (4.3,1.2);
+
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=10, in=-170] (5.6,0.55);
+
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=-50, in=140] (4.9,-0.7);
+% % %diagonal 
+% % \draw[black, thick, decorate, decoration={amplitude=0.8mm, segment length=4mm}]
+% % (L3)--(B2);
+
+% \end{tikzpicture}
+% \end{center}
+
+\noindent Conversely, suppose $D$ contains no cycle in $G$. \\
+$\Rightarrow D$ encloses no region.\\
+The unbounded face of $G$ is reachable from any where without crossing $D$.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{./figures/lecture_20_IMG_0131.PNG}
+\caption*{$D$ does not contain a cycle (imagine the diagonal edge on the bottom right is not there).}
+\end{figure}
+% \begin{center}
+    
+% \begin{tikzpicture}[scale=1.2,
+%     v/.style={circle, draw, minimum size=7mm, inner sep=0pt}]
+
+% % Left square
+% \node[v] (L1) at (0,1) {};
+% \node[v] (L2) at (1,2) {};
+% \node[v] (L3) at (2,1) {};
+% \node[v] (L4) at (1,0) {};
+
+% \draw (L1)--(L2)--(L3);
+% \draw (L1)--(L4);
+
+% % Right square
+% \node[v] (R1) at (5,2) {};
+% \node[v] (R2) at (6,1) {};
+% \node[v] (R3) at (5,0) {};
+% \node[v] (R4) at (4,1) {};
+
+% \draw (R1)--(R2);
+% \draw (R3)--(R2);
+% \draw (R4)--(R1);
+
+% % Bottom hexagon vertices aligned with L3 and R4
+% \node[v] (B1) at (2,-0.9) {};
+% \node[v] (B2) at (4,-0.9) {};
+% \draw (L3)--(R4)--(R3)--(B2)--(B1)--(L4)--(L3);
+% % Inner hexagon
+% % \draw[red,decorate, decoration={snake, amplitude=0.8mm, segment length=4mm}]
+
+
+% % % Interior red dots
+% % \fill[red] (2.1,0.02) circle (1.6pt);
+% % \fill[red] (3.3,0.4) circle (1.6pt);
+% % ---------------- LEFT RED DOT ----------------
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=120, in=-70] (1.95,1.2);
+
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=170, in=-20] (1.05,0.75);
+
+% % \draw[blue, thick]
+% % (2.1,0.02) to[out=-120, in=30] (1.7,-0.75);
+
+
+% % % ---------------- RIGHT RED DOT ----------------
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=90, in=-100] (4.3,1.2);
+
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=10, in=-170] (5.6,0.55);
+
+% % \draw[blue, thick]
+% % (3.3,0.4) to[out=-50, in=140] (4.9,-0.7);
+% % %diagonal 
+% % \draw[black, thick, decorate, decoration={amplitude=0.8mm, segment length=4mm}]
+% % (L3)--(B2);
+
+% \end{tikzpicture}
+% \end{center}
+
+\noindent $\Rightarrow G^*-D^*$ is connected. \\
+$\Rightarrow D^*$ is not an edge cut.\\
+Hence, when $D$ is a cycle, $D^*$ is a minimal edge cut, i.e., $D^*$ is a bond. 
+\end{proof}
+
+% Graph! (additional Explination)!
+
+\noindent There is also duality w.r.t deletion and contraction.
+\begin{figure}[H]
+\centering
+    \includegraphics[width=0.5\linewidth]{./figures/lecture_20_IMG_0127.PNG}
+     \caption*{The original graph with primal edge $e$ and dual edge $e^*$}
+    % \label{fig:placeholder}
+\end{figure}
+% \begin{center}
+% \begin{tikzpicture}[scale=1.2,
+%     v/.style={circle, draw, minimum size=7mm, inner sep=0pt}
+% ]
+
+% % Scaled rhombus
+% \node[v] (T) at (0,1.5) {};
+% \node[v] (L) at (-1.5,0) {};
+% \node[v] (R) at (1.5,0) {};
+% \node[v] (B) at (0,-1.5) {};
+
+% % Edges
+% \draw (T)--(L)--(B)--(R)--(T);
+% \draw (T)--(B);
+
+% \end{tikzpicture}
+% \end{center}
+
+%%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{./figures/lecture_20_IMG_0126.PNG}
+    \caption*{We deleted $e$ and contracted $e^*$.}
+    % \label{fig:placeholder}
+\end{figure}
+
+% \begin{center}
+% \begin{tikzpicture}[scale=1.2,
+%     v/.style={circle, draw, minimum size=7mm, inner sep=0pt}
+% ]
+
+% % Scaled rhombus
+% \node[v] (T) at (0,1.5) {};
+% \node[v] (L) at (-1.5,0) {};
+% \node[v] (R) at (1.5,0) {};
+% \node[v] (B) at (0,-1.5) {};
+
+% % Edges
+% \draw (T)--(L)--(B)--(R)--(T);
+% %\draw (T)--(B);
+
+% \end{tikzpicture}
+% \end{center}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{./figures/lecture_20_IMG_0129.PNG}
+    \caption*{We contracted $e$ and deleted $e^*$}
+    \label{fig:placeholder}
+\end{figure}
+
+% \begin{center}
+% \begin{tikzpicture}[scale=1.2,
+%     v/.style={circle, draw, minimum size=7mm, inner sep=0pt}
+% ]
+
+% % Nodes
+% \node[v] (A) at (0,0) {};
+% \node[v] (B) at (3,0) {};
+% \node[v] (C) at (6,0) {};
+
+% % Left bundle (A-B)
+% \draw (A) to[out=40, in=140] (B);
+% \draw (A) to[out=-40, in=-140] (B);
+% % \draw (A) to[out=70, in=110, looseness=1.3] (B);
+
+% % Right bundle (B-C)
+% \draw (B) to[out=40, in=140] (C);
+% \draw (B) to[out=-40, in=-140] (C);
+% % \draw (B) to[out=70, in=110, looseness=1.3] (C);
+% \end{tikzpicture}
+% \end{center}
+
+\noindent Euler's Formula the \# of nodes, edges, and faces of a plane graph.
+
+
+\begin{theorem}[Euler's Formula]
+ Let $G=(V, E)$ be a connected plane graph with $|V|=n,|E|=m$, and $r$ faces. Then $n-m+r=2$.  
+\end{theorem}
+\begin{proof}
+By induction on $n$. \\
+\underline{Base Case} $(n=1)$: \\
+$
+\begin{aligned}
+\hookrightarrow \text{If} \quad m=0 &\Rightarrow r=1 \\
+&\Rightarrow n-m+r=1-0+1=2 .
+\end{aligned}
+$
+
+
+\noindent $\hookrightarrow$ Otherwise, since $n=1, m>0, G$ looks like a bouquet of loops. 
+\begin{center}
+\begin{tikzpicture}[scale=1.5]
+    \fill (0,0) circle (2.2pt);
+
+    % left loop
+    \draw (0,0) .. controls (-0.6,0.6) and (-0.6,-0.6) .. (0,0);
+
+    % three right loops
+    \draw (0,0) .. controls (0.6,0.6) and (0.6,-0.6) .. (0,0);
+    \draw (0,0) .. controls (1.2,1) and (1.2,-1) .. (0,0);
+    \draw (0,0) .. controls (2,1.5) and (2,-1.5) .. (0,0);
+\end{tikzpicture}
+\end{center}
+\noindent Each new loop takes a face and splits it into two faces. $\Rightarrow m$ loops, $r=m+1$
+$$
+\Rightarrow n-m+r=n-m+m+1=1+1=2.
+$$
+
+\noindent \underline{Induction step} $(n>1)$ : since $G$ is connected and $n>1$, there exists some edge $e$ that is not a loop contract $e$, to obtain a new plane graph $G^{\prime}$ with $n^{\prime}=n-1,~ m^{\prime}=m-1$, and $r^{\prime}=r$ since contracting an edge shortens the boundary of a face but does not  remove it. By the inductive hypothesis:
+
+$$
+\begin{aligned}
+2=n^{\prime}-m^{\prime}+r^{\prime} & =n^{\prime}+1-\left(m^{\prime}+1\right)+r^{\prime} \\
+& =n-m+r
+\end{aligned}
+$$
+
+\end{proof}
+\begin{corollary}
+ All plane embeddings of planar graph have the same number of faces.
+ 
+\end{corollary}
+    
+\begin{proof}
+ $n, m$ and 2 are fixed $\Rightarrow r$ is fixed.    
+\end{proof}
+
+\noindent We can use Euler's Formula as a sufficient condition for non planarity.
+
+\begin{theorem}
+ Let $G$ be a simple connected planar graph, with $n \geqslant 3$ nodes, and $m$ edges. Then:
+\begin{enumerate}
+     \item $m \leqslant 3 n-6$.
+     \item If $G$ is triangle-free (i.e., no 3-cycles), $m \leqslant 2 n-4$
+ \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+   \begin{enumerate}
+     
+\item If $n \geq 3, \ell \left(F_i\right) \geqslant 3$ for all faces of its plane embedding. By the dual degree sum formula,
+$2 m=\displaystyle \sum_{i=1} \ell\left(F_i\right) \geqslant 3 r $. \\
+$
+\begin{aligned}
+ \Rightarrow \quad & r \leq \frac{2 m}{3}  \\
+& n-m+r
+\end{aligned} ~ \Longrightarrow m \leq 3 n-6
+$
+
+\item If $G$ is triangle-free, $\ell\left(F_i\right) \geqslant 4, \forall F_i$
+
+$
+\begin{aligned}
+& 2 m \geq 4 r  \\
+& n-m+r = 2
+\end{aligned} ~ \Longrightarrow m \leq 2n-4
+$
+
+ \end{enumerate}
+\end{proof}
+
+\noindent As an application, we can show that $K_5$ is not planar. As another application, we can show that the complete bipartite graph $K_{3,3}$ is not planar.
+
+\begin{figure}[H] 
+    \centering
+\begin{tikzpicture}[scale=1.2, every node/.style={circle, draw, minimum size=7mm}]
+    % Left vertices
+    \node (a) at (0,2) {};
+    \node (b) at (0,1) {};
+    \node (c) at (0,0) {};
+
+    % Right vertices
+    \node (d) at (3,2) {};
+    \node (e) at (3,1) {};
+    \node (f) at (3,0) {};
+
+    % Edges
+    \draw (a) -- (d);
+    \draw (a) -- (e);
+    \draw (a) -- (f);
+
+    \draw (b) -- (d);
+    \draw (b) -- (e);
+    \draw (b) -- (f);
+
+    \draw (c) -- (d);
+    \draw (c) -- (e);
+    \draw (c) -- (f);
+\end{tikzpicture}
+\caption*{$K_{3, 3}$}
+\end{figure}
+%%
+
+
+
+
+
+\begin{enumerate}
+     
+
+\item $n=6,$
+\item $m=3.3=9,$
+\item $K_{3,3}$ is triangle free, because it is bipartite (all cycles have even length).
+
+$$
+m=9 \nleqslant 2 n-4=2.6-4=8
+$$
+\end{enumerate}
+
+\noindent So far, we know that $K_5$ and $K_{3,3}$ are not planar. In fact, these are the main ingredients that lead to non planarity.
+
+\noindent A subdivision of a graph $G$ is a graph obtained from $G$ by subdividing its edges with new nodes from paths.
+
+%%
+
+\noindent \textbf{Example}
+
+
+
+\begin{center}
+\begin{tikzpicture}[scale=1.0,
+    every node/.style={circle, draw, minimum size=6mm, inner sep=0pt}
+]
+
+% --- Left graph ---
+\node (a1) at (0,0) {$a$};
+\node (b1) at (2,0) {$b$};
+\draw (a1) -- (b1);
+
+% Arrow 
+\node[draw=none] at (3.5,0) {$\Rightarrow$};
+
+% --- Right graph ---
+\node (a2) at (5,0) {$a$};
+\node (x1) at (7,0) {};
+\node (x2) at (9,0) {};
+\node (x3) at (11,0) {};
+\node (b2) at (13,0) {$b$};
+
+\draw (a2) -- (x1) -- (x2) -- (x3) -- (b2);
+
+\end{tikzpicture}
+\end{center}
+
+
+\begin{proposition}
+If a graph $G$ Contains a subdivision of $K_5$ or $K_{3,3}$, then $G$ is not planar.
+\end{proposition}
+
+\begin{proof}
+A subgraph of a planar graph is planar. Therefore, it suffices to show that a subdivision of $K_5$ or $K_{3,3}$ is not planar.
+But $K_5$ and $K_{3,3}$ are not planar, and subdividing their edges has no effect on their planarity / non planarity.   
+\end{proof}
+
+\noindent In fact, this is also sufficient.
+\begin{theorem}[Kuratowski] A graph is planar if and only if it dose not contain a subdivision of $K_5$ or $K_{3,3}$
+\end{theorem}
+%
+
+ \noindent \textbf{Note:} This theorem does not directly yield an efficient planarity testing algorithm: there are
+exponentially - many subgraph to check.
+However, there exists polynomial-time algorithms to test planarity.    
+
+\end{document}
