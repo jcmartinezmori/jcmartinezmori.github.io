@@ -1,0 +1,506 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+\newcommand{\lecturenumber}{22}
+\newcommand{\lecturetitle}{The Graph Laplacian}
+\newcommand{\scribename}{Hanbyul (Han) Lee}
+\newcommand{\lecturedate}{April 15, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Spanning Trees}
+
+\begin{definition}
+A subgraph $H \subseteq G$ is \emph{spanning} if $V(H)=V(G)$.
+\end{definition}
+
+\begin{definition}
+A \emph{spanning tree} of $G$ is a subgraph $T$ that is both spanning and a tree. Let
+\[
+\mathcal{ST}(G)
+\]
+be the set of spanning trees of $G$.
+\end{definition}
+
+\begin{example}
+Consider the graph $G$ shown below, with vertex set $\{v,w,x,y\}$ and edge set
+\[
+E(G)=\{e,f,s,h,i\},
+\]
+where $e=\{v,w\}$, $f=\{v,y\}$, $s=\{v,x\}$, $h=\{w,x\}$, and $i=\{y,x\}$.
+\[
+\begin{tikzpicture}[scale=1.05]
+\Vertex[x=0,y=1,label={v},position={above left},Math,size=.25,color=white]{v}
+\Vertex[x=2.4,y=1,label={w},position={above right},Math,size=.25,color=white]{w}
+\Vertex[x=2.4,y=0,label={x},position={below right},Math,size=.25,color=white]{x}
+\Vertex[x=0,y=0,label={y},position={below left},Math,size=.25,color=white]{y}
+\Edge[label={e},position={above},Math](v)(w)
+\Edge[label={f},position={left},Math](v)(y)
+\Edge[label={h},position={right},Math](w)(x)
+\Edge[label={i},position={below},Math](y)(x)
+\Edge[label={s},position={below},Math](v)(x)
+\end{tikzpicture}
+\]
+Then $\mathcal{ST}(G)$ consists of the following eight spanning trees:
+\begin{center}
+\begin{tabular}{@{\quad}c@{\quad}c@{\quad}c@{\quad}c@{\quad}}
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(w)\Edge(v)(y)\Edge(v)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(w)\Edge(v)(y)\Edge(y)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(w)\Edge(w)(x)\Edge(y)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(w)\Edge(v)(x)\Edge(y)(x)
+\end{tikzpicture}
+\\[.1em]
+$\{e,f,s\}$ & $\{e,f,i\}$ & $\{e,h,i\}$ & $\{e,s,i\}$
+\\[1.2em]
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(y)\Edge(w)(x)\Edge(y)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(y)\Edge(v)(x)\Edge(w)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(w)(x)\Edge(y)(x)\Edge(v)(x)
+\end{tikzpicture}
+&
+\begin{tikzpicture}[scale=.95,baseline=-.5ex]
+\Vertex[x=0,y=1,NoLabel,size=.24,color=white]{v}
+\Vertex[x=1.8,y=1,NoLabel,size=.24,color=white]{w}
+\Vertex[x=1.8,y=0,NoLabel,size=.24,color=white]{x}
+\Vertex[x=0,y=0,NoLabel,size=.24,color=white]{y}
+\Edge(v)(w)\Edge(v)(y)\Edge(w)(x)
+\end{tikzpicture}
+\\[.1em]
+$\{f,h,i\}$ & $\{f,s,h\}$ & $\{h,i,s\}$ & $\{e,f,h\}$
+\end{tabular}
+\end{center}
+Thus
+\[
+|\mathcal{ST}(G)|=8.
+\]
+\end{example}
+
+The general goal for the next few lectures is to derive a formula for $|\mathcal{ST}(G)|$. If $G=K_n$, then we know from quite a few lectures ago that
+\[
+|\mathcal{ST}(K_n)|=n^{n-2}.
+\]
+But we want a more general formula.
+
+\section{Matrices Associated to an Undirected Graph}
+
+\begin{definition}
+Let $G=(V,E)$ be an undirected graph. Its \emph{adjacency matrix} is
+\[
+A(G)=A\in \mathbb{R}^{V\times V},
+\]
+where
+\[
+ a_{uv}=\begin{cases}
+1, & \text{if } \{u,v\}\in E,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+We must keep a consistent labeling of the rows and columns; that is, we fix an ordering of $V$ and stick to it. The matrix $A$ is symmetric.
+\end{definition}
+
+For the graph $G$ above, using the vertex order $(v,w,x,y)$, the adjacency matrix is
+\[
+A(G)=
+\begin{array}{c|cccc}
+ & v & w & x & y\\ \hline
+v & 0 & 1 & 1 & 1\\
+w & 1 & 0 & 1 & 0\\
+x & 1 & 1 & 0 & 1\\
+y & 1 & 0 & 1 & 0
+\end{array}.
+\]
+
+\begin{definition}
+The \emph{undirected incidence matrix} of $G$ is
+\[
+B(G)=B\in \mathbb{R}^{V\times E},
+\]
+where
+\[
+ b_{v,e}=\begin{cases}
+1, & \text{if } v \text{ is an endpoint of } e,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+This differs slightly from the incidence matrix for directed graphs.
+\end{definition}
+
+Using the vertex order $(v,w,x,y)$ and the edge order $(e,f,s,h,i)$, the undirected incidence matrix for the example is
+\[
+B(G)=
+\begin{array}{c|ccccc}
+ & e & f & s & h & i\\ \hline
+v & 1 & 1 & 1 & 0 & 0\\
+w & 1 & 0 & 0 & 1 & 0\\
+x & 0 & 0 & 1 & 1 & 1\\
+y & 0 & 1 & 0 & 0 & 1
+\end{array}.
+\]
+
+\begin{definition}
+The \emph{degree matrix} of $G$ is the diagonal matrix
+\[
+C(G)=C\in \mathbb{R}^{V\times V}
+\]
+whose diagonal entries are
+\[
+ c_{uu}=\deg(u).
+\]
+\end{definition}
+
+For the example,
+\[
+C(G)=
+\begin{array}{c|cccc}
+ & v & w & x & y\\ \hline
+v & 3 & 0 & 0 & 0\\
+w & 0 & 2 & 0 & 0\\
+x & 0 & 0 & 3 & 0\\
+y & 0 & 0 & 0 & 2
+\end{array}.
+\]
+
+The matrices $A$, $B$, and $C$ are nicely related.
+
+\begin{proposition}
+For an undirected graph $G$,
+\[
+B(G)B(G)^T=A(G)+C(G).
+\]
+\end{proposition}
+
+\begin{proof}
+Recall that $B\in\mathbb{R}^{V\times E}$, so $BB^T\in\mathbb{R}^{V\times V}$. Thus $BB^T$ is indexed by pairs of vertices.
+
+For $u,v\in V$, the entry $(BB^T)_{uv}$ is obtained by taking the dot product of the $u$-row of $B$ with the $v$-row of $B$:
+\[
+\begin{tikzpicture}[scale=.55,baseline=-.5ex]
+\node at (-.45,1.15) {$u$};
+\draw[fill=black!8] (0,1) rectangle (3,.72);
+\draw (0,0) rectangle (3,2);
+\node at (1.5,-.35) {$e$};
+\node at (4.05,2.35) {$v$};
+\draw[fill=black!8] (4,.15) rectangle (4.28,2.15);
+\draw (3.4,.15) rectangle (4.9,2.15);
+\node at (5.25,1.15) {$e$};
+\draw[fill=black!25] (4,.72) rectangle (4.28,1);
+\node at (2.1,2.35) {$B$};
+\node at (4.15,-.25) {$B^T$};
+\end{tikzpicture}
+\qquad
+(BB^T)_{uv}=\sum_{e\in E} b_{u,e}b_{v,e}.
+\]
+If $u=v$, then
+\[
+(BB^T)_{uu}=\sum_{e\in E} b_{u,e}^2
+=\sum_{e\in E} \mathbf{1}\{u\text{ is an endpoint of }e\}
+=\deg(u)=C_{uu}.
+\]
+If $u\neq v$, then
+\begin{align*}
+(BB^T)_{uv}
+&=\sum_{e\in E} b_{u,e}b_{v,e}\\
+&=\sum_{e\in E}\mathbf{1}\{u\text{ is an endpoint of }e\}\mathbf{1}\{v\text{ is an endpoint of }e\}\\
+&=\mathbf{1}\{\{u,v\}\in E\}=A_{uv}.
+\end{align*}
+Therefore the diagonal entries of $BB^T$ agree with $C$, and the off-diagonal entries agree with $A$. Hence $BB^T=A+C$.
+\end{proof}
+
+\section{Orientations and Directed Incidence Matrices}
+
+We will need a directed version of $G$ going forward.
+
+\begin{definition}
+An \emph{orientation} of an undirected graph $G$ is a directed graph $D$ such that
+\[
+V(D)=V(G),
+\]
+and for each edge $\{u,v\}\in E(G)$, exactly one of $(u,v)$ or $(v,u)$ is in $E(D)$. We say that $G$ is the underlying undirected graph of $D$.
+\end{definition}
+
+For the example, one orientation $D$ is
+\[
+\begin{tikzpicture}[scale=1.05]
+\Vertex[x=0,y=1,label={v},position={above left},Math,size=.25,color=white]{v}
+\Vertex[x=2.4,y=1,label={w},position={above right},Math,size=.25,color=white]{w}
+\Vertex[x=2.4,y=0,label={x},position={below right},Math,size=.25,color=white]{x}
+\Vertex[x=0,y=0,label={y},position={below left},Math,size=.25,color=white]{y}
+\Edge[Direct,label={e},position={above},Math](v)(w)
+\Edge[Direct,label={f},position={left},Math](v)(y)
+\Edge[Direct,label={s},position={below},Math](x)(v)
+\Edge[Direct,label={h},position={right},Math](x)(w)
+\Edge[Direct,label={i},position={below},Math](y)(x)
+\end{tikzpicture}
+\]
+so the directed edges are $e=(v,w)$, $f=(v,y)$, $s=(x,v)$, $h=(x,w)$, and $i=(y,x)$.
+
+\begin{definition}
+Recall the incidence matrix for a directed graph $D$:
+\[
+B(D)=B\in\mathbb{R}^{V\times E},
+\]
+where
+\[
+ b_{v,e}=\begin{cases}
+1, & \text{if } e=(u,v) \text{ for some } u,\\
+-1, & \text{if } e=(v,u) \text{ for some } u,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+\end{definition}
+
+For the oriented graph $D$ above,
+\[
+B(D)=
+\begin{array}{c|ccccc}
+ & e & f & s & h & i\\ \hline
+v & -1 & -1 & 1 & 0 & 0\\
+w & 1 & 0 & 0 & 1 & 0\\
+x & 0 & 0 & -1 & -1 & 1\\
+y & 0 & 1 & 0 & 0 & -1
+\end{array}.
+\]
+
+Here are some properties of $D$.
+
+\begin{proposition}
+Let $G$ be an undirected graph and let $D$ be an orientation of $G$. Then:
+\begin{enumerate}
+\item[(a)] If the rows of $B(D)$ are $b_1,b_2,\ldots,b_n$, then
+\[
+b_1+b_2+\cdots+b_n=\mathbf{0}.
+\]
+\item[(b)] We have
+\[
+B(D)B(D)^T=C(G)-A(G).
+\]
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For part (a), each column of $B(D)$ has exactly one $1$, exactly one $-1$, and zeros everywhere else. Hence the sum of the rows is the zero vector.
+
+For part (b), use the same case analysis as in the previous proof. If $u=v$, then
+\[
+(B(D)B(D)^T)_{uu}=\sum_{e\in E} b_{u,e}^2=\deg(u)=C_{uu}.
+\]
+If $u\neq v$, then a nonzero contribution can occur only when $u$ and $v$ are endpoints of the same edge. In that case one endpoint contributes $1$ and the other contributes $-1$, so
+\[
+(B(D)B(D)^T)_{uv}=-\mathbf{1}\{\{u,v\}\in E(G)\}=-A_{uv}.
+\]
+Therefore $B(D)B(D)^T=C(G)-A(G)$.
+\end{proof}
+
+In part (b), the left-hand side is computed from an arbitrary orientation $D$, but the right-hand side only depends on the underlying undirected graph. Therefore $B(D)B(D)^T$ is independent of the choice of orientation. This matrix is extremely useful.
+
+\section{The Graph Laplacian}
+
+\begin{definition}
+The \emph{Laplacian matrix} of an undirected graph $G$ is
+\[
+L(G)=C(G)-A(G).
+\]
+\end{definition}
+
+For the example,
+\[
+L(G)=
+\begin{array}{c|cccc}
+ & v & w & x & y\\ \hline
+v & 3 & 0 & 0 & 0\\
+w & 0 & 2 & 0 & 0\\
+x & 0 & 0 & 3 & 0\\
+y & 0 & 0 & 0 & 2
+\end{array}
+-
+\begin{array}{c|cccc}
+ & v & w & x & y\\ \hline
+v & 0 & 1 & 1 & 1\\
+w & 1 & 0 & 1 & 0\\
+x & 1 & 1 & 0 & 1\\
+y & 1 & 0 & 1 & 0
+\end{array}
+=
+\begin{bmatrix}
+3 & -1 & -1 & -1\\
+-1 & 2 & -1 & 0\\
+-1 & -1 & 3 & -1\\
+-1 & 0 & -1 & 2
+\end{bmatrix}.
+\]
+The sum of any row of $L(G)$ is zero: there is one $\deg(u)$ entry, $\deg(u)$ many $-1$'s, and zeros everywhere else.
+
+For example,
+\[
+\begin{bmatrix}
+3 & -1 & -1 & -1\\
+-1 & 2 & -1 & 0\\
+-1 & -1 & 3 & -1\\
+-1 & 0 & -1 & 2
+\end{bmatrix}
+\begin{bmatrix}
+4\\2\\5\\3
+\end{bmatrix}
+=
+\begin{bmatrix}
+2\\-5\\6\\-3
+\end{bmatrix}.
+\]
+The corresponding labeled graph is
+\[
+\begin{tikzpicture}[scale=1.05]
+\Vertex[x=0,y=1,label={v},position={left},Math,size=.25,color=white]{v}
+\Vertex[x=2.4,y=1,label={w},position={right},Math,size=.25,color=white]{w}
+\Vertex[x=2.4,y=0,label={x},position={right},Math,size=.25,color=white]{x}
+\Vertex[x=0,y=0,label={y},position={left},Math,size=.25,color=white]{y}
+\node at (0,1.35) {$4$};
+\node at (2.4,1.35) {$2$};
+\node at (2.4,-.35) {$5$};
+\node at (0,-.35) {$3$};
+\Edge(v)(w)
+\Edge(v)(y)
+\Edge(w)(x)
+\Edge(y)(x)
+\Edge(v)(x)
+\end{tikzpicture}
+\]
+
+In particular, since every row sum of $L(G)$ is zero,
+\[
+L(G)\mathbf{1}=\mathbf{0}.
+\]
+Thus the matrix has linearly dependent columns, so
+\[
+\det(L(G))=0.
+\]
+
+Now let $L_{i,j}$ be the submatrix of $L$ obtained by removing the $i$-th row and the $j$-th column. For the example above,
+\[
+L_{1,1}=\begin{bmatrix}
+2 & -1 & 0\\
+-1 & 3 & -1\\
+0 & -1 & 2
+\end{bmatrix}
+\qquad\text{and}\qquad
+L_{1,3}=\begin{bmatrix}
+-1 & 2 & 0\\
+-1 & -1 & -1\\
+-1 & 0 & 2
+\end{bmatrix}.
+\]
+Their determinants are
+\[
+\det(L_{1,1})
+=2\bigl(3\cdot 2-(-1)(-1)\bigr)-(-1)\bigl((-1)(2)-0\bigr)=8,
+\]
+and
+\[
+\det(L_{1,3})
+=-1\bigl((-1)(2)\bigr)-2\bigl((-1)(2)-(-1)(-1)\bigr)=8.
+\]
+Therefore
+\[
+\det(L_{1,1})=\det(L_{1,3})=8=|\mathcal{ST}(G)|.
+\]
+Next time, we will show that this is not a coincidence.
+
+\end{document}
