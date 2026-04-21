@@ -1,0 +1,311 @@
+ \documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$21$}
+\newcommand{\lecturetitle}{Coloring Planar Graphs}
+%\newcommand{\scribename}{Carlos Mart\'inez}
+\newcommand{\scribename}{Mark Johnson}
+\newcommand{\lecturedate}{April 13, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Greedy Coloring}
+
+For a graph $G_1$, the \textbf{greedy coloring} w.r.t. an ordering $v_1, v_2,..., v_n$ of its nodes, colors each node in that order and gives $v_i$ the least index color not used by its earlier-colored neighbors.
+\begin{itemize}
+\item This need not produce an optimal coloring, but whatever coloring it produces gives an upper-bound to the $\chi(G)$. \\
+\end{itemize}
+
+
+\textbf{Proposition:} $\chi(G) \le \triangle(G)+1$, where $\triangle(G)$ is the maximum degree in $G$. \\
+
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+\textbf{Proof} \\
+
+In any ordering of $V(G)$, each node has at most $\triangle(G)$ earlier-colored neighbors. This implies that the Greedy Algorithm will use no more than $\triangle(G)+1$ colors. \\
+\qed
+\end{tcolorbox}
+
+A graph is \textbf{$k$-degenerate} if every subgraph has a node of degree at most $k$. \\
+
+A \textbf{smallest-last ordering} of $V$ is constructed iteratively by letting $v_i$ be a node of minimum degree in $G-\{v_1, v_2, ..., v_{i-1}\}$ \\
+
+\textbf{Proposition (Szkeras-Wilf):} If $G$ is $k$-degenerate, then $G$ is $(k+1)$-colorable. \\
+
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+\textbf{Proof} \\
+
+If $G$ is $k$-degenerate, then the smallest-last ordering gives each node at most $k$ neighbors among the earlier-colored nodes. This implies that the greedy coloring w.r.t. this ordering used at most $k+1$ colors.\\
+ \qed
+\end{tcolorbox}
+\newpage
+
+\section{How Does This Relate to Planar Graphs?}
+
+From lecture 20, we know that a planar graph with $n$ nodes and $m$ edges satisfies $m\le 3n-6$ (this followed from Euler's formula). Therefore, planar graphs are $5$-degenerate.
+$$\sum_{u\in V} \text{deg}(u)=2m\le 6n-12$$
+$$\frac{1}{n}\sum_{u\in V} \text{deg}(u)\le \frac{6n-12}{n}=6-\frac{12}{n}<6$$
+$\implies$ the average node has degree $<6$, but degree is an integer quantity. \\
+$\implies$ for every planar graph, there must exist a node of degree $\le 5$. \\
+
+Together with our proposition (Szkeras-Wilf), we find that planar graphs are $6$-colorable.
+
+\section{A Stronger Result}
+
+\subsection{Setup}
+
+A graph $G$ is \textbf{color-critical} if $X(H)<\chi(G)$ for all subgraphs $H\subseteq G$. If it also holds that $\chi(G)=K$, we say that $G$ is $K$-critical. \\
+
+\textbf{Proposition} If $G$ is $K$-critical, then $\delta(G)\ge K-1$, where $\delta(G)$ is the minimum degree of $G$. \\
+
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+\textbf{Proof} \\
+
+If $G$ is $K$-critical, then $\chi(G-u)=K-1$ for all $u\in V$. \\
+
+Now consider any $u\in V$. Since $\chi(G-u)=K-1$, there exists a proper coloring of $G-u$ with exactly $K-1$ colors (by definition of $\chi$). \\
+
+If deg$(u)<K-1$ in $G$, then $N(u)$ uses $\le K-2$ colors. \\
+
+Therefore, at least one of the $K-1$ colors is not used to color $N(u)$. \\
+
+This implies this color can be used to color $u$ to produce a proper coloring of $G$ with $K-1$ colors. This is a contradiction to the assumption that $\chi(G)=K$. \\
+ \qed
+\end{tcolorbox}
+
+\newpage 
+\subsection{Five Color Theorem}
+
+\textbf{Theorem (Five Color Theorem):} Every planar graph is five-colorable.
+
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+\textbf{Proof} \\
+
+Let $G$ be a planar graph. Subgraphs of planar graphs are planar. Therefore it's sufficient to show there are no $6$-critical planar graphs. \\
+
+BWOC, suppose $G$ is $6$-critical. By the above proposition, $\delta(G)\ge 6-1=5$. \\
+
+Let $u\in V$ s.t. deg$(u)=5$.\\
+Let $c: V-u\to [5]$ be a proper coloring of $G-u$. Then all colors in $[5]$ are used to color $N(u)$. \\
+Let $v_1, v_2, ..., v_5$ be the neighbors of $u$ in clockwise order and wlog set $c(v_i)=i$ \\
+
+
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=0,y=0,label=$u$]{1}
+    \Vertex[x=1,y=1.5,label=$v_1$]{2}
+    \Vertex[x=2,y=0,label=$v_2$]{3}
+    \Vertex[x=1,y=-1.5,label=$v_3$]{4}
+    \Vertex[x=-1.25,y=-1.25,label=$v_4$]{5}
+    \Vertex[x=-1.25,y=1.25,label=$v_5$]{6}
+    \Edge(1)(2)
+    \Edge(1)(3)
+    \Edge(1)(4)
+    \Edge(1)(5)
+    \Edge(1)(6)
+\end{tikzpicture}
+\par}
+
+
+(Note that there could be other objects in the graph) \\
+
+Let $G_{ij}$ be the subgraph of $G-u$ induced by the nodes with colors $i$ and $j$. \\
+
+Now consider any component of $G_{ij}$. If we switch its colors (i.e. nodes with color $i$ are given color $j$ and vice-versa, this produces another $5$-coloring of $G-u$. \\
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=0,y=0,label=$u$]{1} % original
+    \Vertex[x=1,y=1.5,label=$1$]{2}
+    \Vertex[x=2,y=0,label=$2$]{3}
+    \Vertex[x=1,y=-1.5,label=$3$]{4}
+    \Vertex[x=-1.25,y=-1.25,label=$4$]{5}
+    \Vertex[x=-1.25,y=1.25,label=$5$]{6}
+    \Vertex[x=3,y=2, label=$3$]{7} % outer
+    \Vertex[x=5,y=1.5,label=$1$]{8}
+    \Vertex[x=6,y=0,label=$3$]{9} 
+    \Vertex[x=5,y=-1.5,label=$1$]{10}
+    \Vertex[x=3,y=1,label=$4$]{11} % inner
+    \Vertex[x=4,y=0,label=$2$]{12}
+    \Vertex[x=3,y=0,label=$4$]{13}
+    \Vertex[x=3,y=-1,label=$2$]{14}
+    \Edge(1)(2)
+    \Edge(1)(3)
+    \Edge(1)(4)
+    \Edge(1)(5)
+    \Edge(1)(6) % original
+    \Edge(2)(7) % outer
+    \Edge(7)(8)
+    \Edge(8)(9)
+    \Edge(9)(10)
+    \Edge(10)(4)
+    \Edge(3)(11) % inner
+    \Edge(11)(12)
+    \Edge(12)(13)
+    \Edge(13)(3)
+    \Edge(13)(14)
+\end{tikzpicture}
+\par}
+
+Continued on next page...
+
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+
+For example, below is $G_{24}$
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=2,y=0,label=$2$]{3}
+    \Vertex[x=-1.25,y=-1.25,label=$4$]{5}
+    \Vertex[x=3,y=1,label=$4$]{11} % inner
+    \Vertex[x=4,y=0,label=$2$]{12}
+    \Vertex[x=3,y=0,label=$4$]{13}
+    \Vertex[x=3,y=-1,label=$2$]{14}
+
+    \Edge(3)(11) % inner
+    \Edge(11)(12)
+    \Edge(12)(13)
+    \Edge(13)(3)
+    \Edge(13)(14)
+\end{tikzpicture}
+\par}
+
+If we swap $2$ and $4$ in $G_{24}$, then that produces another 5-coloring of the graph. \\
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=2,y=0,label=$4$]{3}
+    \Vertex[x=-1.25,y=-1.25,label=$2$]{5}
+    \Vertex[x=3,y=1,label=$2$]{11} % inner
+    \Vertex[x=4,y=0,label=$4$]{12}
+    \Vertex[x=3,y=0,label=$2$]{13}
+    \Vertex[x=3,y=-1,label=$4$]{14}
+
+    \Edge(3)(11) % inner
+    \Edge(11)(12)
+    \Edge(12)(13)
+    \Edge(13)(3)
+    \Edge(13)(14)
+\end{tikzpicture}
+\par}
+
+Now consider the connected component of $G_{ij}$ containing node $v_i$. If this component does not contain $v_j$, then switching its colors removes color $i$ from $N(u)$. \\
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=2,y=0,label=$4$]{3}
+    \Vertex[x=-1.25,y=-1.25,label=$4$]{5}
+    \Vertex[x=3,y=1,label=$2$]{11} % inner
+    \Vertex[x=4,y=0,label=$4$]{12}
+    \Vertex[x=3,y=0,label=$2$]{13}
+    \Vertex[x=3,y=-1,label=$4$]{14}
+
+    \Edge(3)(11) % inner
+    \Edge(11)(12)
+    \Edge(12)(13)
+    \Edge(13)(3)
+    \Edge(13)(14)
+\end{tikzpicture}
+\par}
+
+But then we can color node $u$ with color $i$ to produce a proper $5$-coloring of $G$. Therefore $G$ is $5$-colorable (a contradiction) unless the component of $G_{ij}$ containing $v_i$ also contains $v_j$ for each $i,j$. \\
+
+Let $P_{ij}$ be a path from $v_i$ to $v_j$ in $G_{ij}$ this path can be completed into a cycle using node $u$. \\
+
+{\centering
+\begin{tikzpicture}
+    \Vertex[x=0,y=0,label=$u$]{1} % original
+    \Vertex[x=1,y=1.5,label=$1$]{2}
+    \Vertex[x=2,y=0,label=$2$]{3}
+    \Vertex[x=1,y=-1.5,label=$3$]{4}
+    \Vertex[x=-1.25,y=-1.25,label=$4$]{5}
+    \Vertex[x=3,y=2, label=$3$]{7} % outer
+    \Vertex[x=5,y=1.5,label=$1$]{8}
+    \Vertex[x=6,y=0,label=$3$]{9} 
+    \Vertex[x=5,y=-1.5,label=$1$]{10}
+    \Edge [style={dotted}](1)(2)
+    \Edge [style={dotted}](1)(3)
+    \Edge [style={dotted}](1)(4)
+    \Edge [style={dotted}](1)(5)
+    \Edge(2)(7) % outer
+    \Edge(7)(8)
+    \Edge(8)(9)
+    \Edge(9)(10)
+    \Edge(10)(4)
+\end{tikzpicture}
+\par}
+
+This cycle $C$ separates two other nodes. In the picture, $C$ separates $v_2$ from $v_4$. By Jordan Curve Theorem, $P_{24}$ must cross $C$. Since $G$ is planar, this crossing must take place at shared nodes, but the nodes of $P_{13}$ have colors $1$ or $3$ and the nodes of $P_{24}$ have colors $2$ or $4$. Therefore, $P_{24}$ and $P_{13}$ have no shared node, a \\ contradiction, so $G$ cannot be $6$ critical. Therefore every planar graph is $5$-colorable. \\
+
+\qed
+
+\end{tcolorbox}
+
+This result was strengthened even further in 1976: \\
+
+\textbf{Theorem (Appel, Haken, Koch):} Every planar graph is $4$-colorable. \\
+
+This was the first major example of a computer-aided proof for case analysis.
+
+\end{document}
