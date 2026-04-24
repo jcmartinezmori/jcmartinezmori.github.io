@@ -1,0 +1,493 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{nicematrix}
+\usetikzlibrary{arrows.meta,calc}
+\usepackage{nicematrix}
+\usetikzlibrary{calc}
+\usepackage{float}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{23}
+\newcommand{\lecturetitle}{The Matrix--Tree Theorem}
+\newcommand{\scribename}{Baihan Liu}
+\newcommand{\lecturedate}{April 20, 2026} % replace with exact date
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+
+
+In this lecture, we study the Matrix–Tree Theorem. To prepare for its proof, we first introduce notation for submatrices and cofactors, and then recall the Cauchy–Binet formula.
+
+\section{Submatrix and Cofactor}
+
+Let $M$ be a matrix indexed by $S \times T$. If $I \subseteq S$ and $J \subseteq T$, let
+\[
+M_{I,J}
+\]
+be the submatrix of $M$ whose rows are indexed by $I$ and whose columns are indexed by $J$.
+
+If
+\[
+I = S - \{s\}
+\qquad\text{and}\qquad
+J = T - \{t\},
+\]
+then
+\[
+M_{\hat{s},\hat{t}} = M_{I,J}.
+\]
+
+If $M$ is a square matrix, meaning $S=T=[n]$, recall that the $(i,j)$-cofactor of $M$ is
+\[
+m_{\hat{i}\hat{j}} = (-1)^{i+j}\det M_{\hat{i},\hat{j}}.
+\]
+
+This notation will be useful later.
+
+\section{The Cauchy--Binet Formula}
+
+\begin{theorem}[Cauchy--Binet]
+Let $Q \in \mathbb{R}^{m \times n}$ and $R \in \mathbb{R}^{n \times m}$. Then
+\[
+\det(QR)
+=
+\sum_{K \in \binom{[n]}{m}}
+\det Q_{[m],K}\cdot \det R_{K,[m]}.
+\]
+\end{theorem}
+
+As noted in class, if $m=n$, this recovers the identity
+\[
+\det(QR)=\det Q \cdot \det R.
+\]
+
+Before proving Cauchy--Binet, we recall that for a square matrix 
+\[
+C \in \mathbb{R}^{n \times n},
+\]
+we have
+\[
+\det C
+=
+\sum_{\pi \in S_n}
+\operatorname{sgn}(\pi)\,
+c_{1,\pi(1)}c_{2,\pi(2)}\cdots c_{n,\pi(n)}.
+\]
+
+
+
+
+Here $S_n$ denotes the set of bijections
+\[
+\pi:[n]\to[n].
+\]
+
+Also, $\operatorname{sgn}(\pi)$ is the sign of $\pi$, i.e., $-1$ or $1$ depending on the parity of
+\[
+\left|\{(i,j): i<j,\ \pi(i)>\pi(j)\}\right|.
+\]
+
+If this number is even, then $\operatorname{sgn}(\pi)=1$, and if it is odd, then $\operatorname{sgn}(\pi)=-1$.
+
+\begin{example}
+Let $\pi=3241$. Then $\operatorname{sgn}(\pi)=1$. 
+Its permutation matrix is
+\[
+P_\pi =
+\begin{pmatrix}
+0&0&1&0\\
+0&1&0&0\\
+0&0&0&1\\
+1&0&0&0
+\end{pmatrix}.
+\]
+\end{example}
+
+
+
+
+\subsection{Proof of the Cauchy--Binet formula}
+
+\begin{proof}
+
+
+Consider
+\[
+A=
+\begin{bNiceArray}{cc|cc}[margin,first-row,first-col]
+ & \multicolumn{2}{c}{m} & \multicolumn{2}{c}{n} \\
+m & I_m & & Q & \\
+\Hline
+n & 0   & & I_n &
+\CodeAfter
+  \tikz \draw (2-|3) -- (4-|3);
+\end{bNiceArray}
+\qquad
+B=
+\begin{bNiceArray}{cc|cc}[margin,first-row,first-col]
+ & \multicolumn{2}{c}{n} & \multicolumn{2}{c}{m} \\
+m & Q   & & 0 & \\
+\Hline
+n & -I_n& & R &
+\CodeAfter
+  \tikz \draw (2-|3) -- (4-|3);
+\end{bNiceArray}
+\]
+and let
+\[
+C=AB=
+\begin{bNiceArray}{cc|cc}[margin,first-row,first-col]
+ & \multicolumn{2}{c}{n} & \multicolumn{2}{c}{m} \\
+m & 0   & & QR & \\
+\Hline
+n & -I_n& & R  &
+\CodeAfter
+  \tikz \draw (2-|3) -- (4-|3);
+\end{bNiceArray}.
+\]
+
+\textbf{Step 1: Compute $\det A$.}
+Note that $\det A = 1$ since $A$ is triangular and its diagonal entries are all $1$'s.
+
+\textbf{Step 2: Compute $\det C$.}
+To find $\det C$, we need to pick permutations $\pi$ of $[n+m]$. Lots of these terms will involve zero entries, in which case they do not add to the sum. So we need to focus on the $\pi$'s that avoid zero entries.
+
+So, $\pi$ needs to assign each of the first $n$ columns to its corresponding $-1$ entry in the $-I_n$ block of $C$. Then the last $n$ rows of $C$ are already assigned bijectively to the first $n$ columns, so they cannot be assigned to a column among the last $m$; that is, they cannot be assigned to the $R$ block of $C$.
+
+Meanwhile, the first $m$ rows can be assigned bijectively to any of the last $m$ columns, i.e., to the $QR$ block of $C$.
+
+But then this shows that,
+\[
+\det C = \pm \det(QR).
+\]
+A more careful tracking of the $-1$'s shows that
+\[
+\det C = \det(QR).
+\]
+
+
+\textbf{Step 3: Compute $\det B$.}
+To find $\det B$, we use a similar argument.
+
+We need to consider permutations $\pi$ avoiding zero summands.
+
+
+
+
+\begin{figure}[h!]
+\[
+\begin{tikzpicture}[x=0.9cm,y=0.9cm,>=Latex]
+  \colorlet{boardblue}{blue!65!black}
+  \colorlet{boardgreen}{green!75!black}
+
+  % block sizes
+  \def\nw{4.2}   % width of first n columns
+  \def\mw{2.1}   % width of last m columns
+  \def\mh{1.8}   % height of first m rows
+  \def\nh{4.2}   % height of last n rows
+
+  % outer block matrix
+  \draw[boardblue, thick] (0,0) rectangle (\nw+\mw,\nh+\mh);
+  \draw[boardblue, thick] (\nw,0) -- (\nw,\nh+\mh);
+  \draw[boardblue, thick] (0,\nh) -- (\nw+\mw,\nh);
+
+  % big 0 in upper-right block
+  \node[boardblue, scale=2.2] at (\nw+\mw/2,\nh+\mh/2) {$0$};
+
+  % top dimension labels
+  \draw[boardblue] (0,\nh+\mh+0.18) -- (\nw,\nh+\mh+0.18);
+  \draw[boardblue] (\nw,\nh+\mh+0.18) -- (\nw+\mw,\nh+\mh+0.18);
+  \node[boardblue] at (\nw/2,\nh+\mh+0.42) {$n$};
+  \node[boardblue] at (\nw+\mw/2,\nh+\mh+0.42) {$m$};
+
+  % right dimension labels
+  \draw[boardblue] (\nw+\mw+0.15,\nh) -- (\nw+\mw+0.15,\nh+\mh);
+  \draw[boardblue] (\nw+\mw+0.15,0) -- (\nw+\mw+0.15,\nh);
+  \node[boardblue, right] at (\nw+\mw+0.2,\nh+\mh/2) {$m$};
+  \node[boardblue, right] at (\nw+\mw+0.2,\nh/2) {$n$};
+
+  % bottom label for first block
+  \draw[boardblue] (0,-0.18) -- (\nw,-0.18);
+  \node[boardblue] at (\nw/2,-0.42) {$n$};
+
+  % external Q and R labels (bigger)
+  \node[boardblue, left, scale=1.5] at (-0.75,\nh+\mh/2) {$Q$};
+  \draw[->, boardblue, thick] (-0.60,\nh+\mh/2) -- (0.10,\nh+\mh/2);
+
+  \node[boardblue, right, scale=1.5] at (\nw+\mw+0.85,0.35) {$R$};
+  \draw[->, boardblue, thick] (\nw+\mw+0.58,0.35) -- (\nw+\mw-0.08,0.35);
+
+  % label K (upper-left) with two arrows
+  \node[boardgreen,scale=1.2] (Kup) at (2.2,\nh+\mh+0.9) {$K\in\binom{[n]}{m}$};
+  \draw[->, boardgreen, thick] (Kup.south west) -- (1.05,\nh+\mh+0.02);
+  \draw[->, boardgreen, thick] (Kup.south east) -- (3.15,\nh+\mh+0.02);
+
+  % label K (lower-right) with two arrows
+  \node[boardgreen, right,scale=1.2] (Kright) at (\nw+\mw+0.75,2.1) {$K$};
+  \draw[->, boardgreen, thick] (Kright.west) -- (\nw+\mw-0.02,3.15);
+  \draw[->, boardgreen, thick] (Kright.west) -- (\nw+\mw-0.02,1.05);
+
+  %------------------------------------------------
+  % two green columns in Q block: outline + several vertical lines
+  % first selected column
+  \draw[boardgreen, line width=1pt] (0.70,\nh) rectangle (1.40,\nh+\mh);
+  \draw[boardgreen, line width=0.8pt] (0.82,\nh+0.05) -- (0.82,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (0.96,\nh+0.05) -- (0.96,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (1.10,\nh+0.05) -- (1.10,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (1.24,\nh+0.05) -- (1.24,\nh+\mh-0.05);
+
+  % second selected column
+  \draw[boardgreen, line width=1pt] (2.80,\nh) rectangle (3.50,\nh+\mh);
+  \draw[boardgreen, line width=0.8pt] (2.92,\nh+0.05) -- (2.92,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (3.06,\nh+0.05) -- (3.06,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (3.20,\nh+0.05) -- (3.20,\nh+\mh-0.05);
+  \draw[boardgreen, line width=0.8pt] (3.34,\nh+0.05) -- (3.34,\nh+\mh-0.05);
+
+  % two green rows in R block: outline + several horizontal lines
+  % first selected row
+  \draw[boardgreen, line width=1pt] (\nw,2.80) rectangle (\nw+\mw,3.50);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,2.92) -- (\nw+\mw-0.05,2.92);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,3.06) -- (\nw+\mw-0.05,3.06);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,3.20) -- (\nw+\mw-0.05,3.20);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,3.34) -- (\nw+\mw-0.05,3.34);
+
+  % second selected row
+  \draw[boardgreen, line width=1pt] (\nw,0.70) rectangle (\nw+\mw,1.40);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,0.82) -- (\nw+\mw-0.05,0.82);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,0.96) -- (\nw+\mw-0.05,0.96);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,1.10) -- (\nw+\mw-0.05,1.10);
+  \draw[boardgreen, line width=0.8pt] (\nw+0.05,1.24) -- (\nw+\mw-0.05,1.24);
+  %------------------------------------------------
+
+  % diagonal -1's in the -I block
+  \node[boardblue] at (0.35,3.85) {$-1$};
+  \node[boardblue] at (1.05,3.15) {$-1$};
+  \node[boardblue] at (1.75,2.45) {$-1$};
+  \node[boardblue] at (2.45,1.75) {$-1$};
+  \node[boardblue] at (3.15,1.05) {$-1$};
+  \node[boardblue] at (3.85,0.35) {$-1$};
+
+  % four hollow green boxes
+  \draw[boardgreen, line width=1.2pt] (0.10,3.60) rectangle (0.60,4.10);
+  \draw[boardgreen, line width=1.2pt] (1.50,2.20) rectangle (2.00,2.70);
+  \draw[boardgreen, line width=1.2pt] (2.20,1.50) rectangle (2.70,2.00);
+  \draw[boardgreen, line width=1.2pt] (3.60,0.10) rectangle (4.10,0.60);
+
+\end{tikzpicture}\]
+\caption{Matrix $B$}
+\end{figure}
+
+
+
+The choice of $m$ out of $n$ columns for the first $m$ rows fixes a set
+\[
+K \in \binom{[n]}{m}
+\]
+of columns.
+
+To avoid $0$'s in the last $n$ rows of $B$, for each column in $[n]\setminus K$, we have to pick its corresponding $-1$ in the $-I$ block of $B$.
+
+But then we still need to pick columns for the rows $K$ among the last $n$.
+
+So, we are picking a permutation for $Q_{[m],K}$, and another permutation for $R_{K,[m]}$, i.e.,
+\[
+\det\!\bigl(Q_{[m],K}\bigr)\cdot \det\!\bigl(R_{K,[m]}\bigr)
+\]
+up to sign.
+
+A more careful tracking of the $-1$'s shows that the sign is correct.
+
+Thus,
+\[
+\det B
+=
+\sum_{K\in \binom{[n]}{m}}
+\det\!\bigl(Q_{[m],K}\bigr)\,
+\det\!\bigl(R_{K,[m]}\bigr).
+\]
+
+Therefore,
+
+\[\det(C) = \det(AB) = \det(A) \det(B) = \det(B)\]
+\[
+\det(QR)
+=
+\sum_{K \in \binom{[n]}{m}}
+\det Q_{[m],K}\cdot \det R_{K,[m]}.
+\]
+
+\end{proof}
+
+\section{The Matrix--Tree Theorem}
+
+We now return to graphs. 
+\begin{theorem}[Kirchhoff]
+Let $G$ be an undirected graph and let $L=L(G)$ be its Laplacian matrix. Then, for any $i,j\in[n]$,
+\[
+|ST(G)|=\ell_{\hat{i},\hat{j}}=(-1)^{i+j}\det L_{\hat{i},\hat{j}},
+\]
+where $\ell_{\hat{i},\hat{j}}$ denotes the $(i,j)$-cofactor of $L$.
+\end{theorem}
+
+\begin{proof}
+We will only show the case in which $i=j=n$.
+
+So,
+\[
+\ell_{\hat{n},\hat{n}}=(-1)^{n+n}\det L_{\hat{n},\hat{n}}=\det L_{\hat{n},\hat{n}}.
+\]
+
+Let $D$ be any orientation of $G$, and let
+\[
+B=B(D)
+\]
+be the directed incidence matrix of $D$.
+
+Last time we showed that
+\[
+L=BB^T,
+\] where $L$ is independent of the choice of orientation $D$.
+
+Let
+\[
+W=[n-1].
+\]
+
+Therefore,
+\[
+L_{\hat{n},\hat{n}}=B_{W,E}\cdot (B_{W,E})^T.
+\]
+
+By the Cauchy--Binet formula,
+\[
+\det L_{\hat{n},\hat{n}}
+=
+\sum_{F\in \binom{E}{n-1}}
+\det(B_{W,F})\cdot \det\bigl((B_{W,F})^T\bigr)
+=
+\sum_{F\in \binom{E}{n-1}}
+\bigl(\det(B_{W,F})\bigr)^2.
+\]
+
+Note that $B_{W,F}$ has a combinatorial meaning. It is the directed incidence matrix of a digraph $D_F$ with
+\[
+V(D_F)=V,
+\qquad
+E(D_F)=F,
+\]
+but for which we have removed the last row of $B(D_F)$, corresponding to node $n$.
+
+We will say $D_F$ is a tree if its corresponding underlying undirected graph is a tree.
+
+If $D_F$ is not a tree, then given that $|F|=n-1$, it must be disconnected. Thus, there is a component of $D_F$ that does not contain node $n$.
+
+The sum of the rows of $B_{W,F}$ corresponding to this component is zero (from our proposition last time). Hence,
+\[
+\det(B_{W,F})=0.
+\]
+
+If $D_F$ is a tree, we can turn $B_{W,F}$ into a lower triangular matrix with all 1's along the diagonal so that 
+\[
+\det(B_{W,F})=\pm 1.
+\]
+
+We can do this inductively.
+
+If $n=1$, then $B_{W,F}$ is an empty matrix, with determinant $1$ by convention.
+
+If $n>1$, then since $D_F$ is a tree, it has at least two leaves, one of which must lie in $W=[n-1]$.
+
+We can then do elementary row operations to relabel the graph such that the first row of $B_{W,F}$ corresponds to a leaf. Then $B_{W,F}$ has entry $\pm 1$ in position $(1,1)$ and zeros everywhere else along this row given that this row corresponds to a leaf. 
+
+We then use induction. 
+We have shown
+\[
+\det(B_{W,F})=
+\begin{cases}
+\pm 1, & \text{if } F \text{ forms a spanning tree of } G,\\[4pt]
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+Hence,
+\[
+\sum_{F\in\binom{E}{n-1}} \bigl(\det(B_{W,F})\bigr)^2
+=
+|ST(G)|.
+\]
+
+Combining this with the earlier computation gives
+\[
+\det L_{\hat{n},\hat{n}}=|ST(G)|.
+\]
+
+Thus,
+\[
+\ell_{\hat{n},\hat{n}}=|ST(G)|.
+\]
+This proves the result in the case $i=j=n$.
+\end{proof}
+
+\noindent
+\textbf{An Observation:}
+Our proof shows that every square submatrix of $B$ has determinant $0$, $1$, or $-1$. Hence $B$ is totally unimodular. This is extremely useful in combinatorial optimization.
+
+
+
+
+\end{document}
