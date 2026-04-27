@@ -1,0 +1,274 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$24$}
+\newcommand{\lecturetitle}{The Spectrum of the Graph Laplacian}
+\newcommand{\scribename}{Simon Ruland}
+\newcommand{\lecturedate}{April 22, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Graph Laplacian of $K_n$}
+
+Before moving on, consider $K_n$ and $L=L(K_n)$. It consists of 
+
+\begin{enumerate}
+    \item $n-1$'s along the diagonal
+    \item $-1$'s everywhere else
+\end{enumerate}
+
+$$L(K_5) = 
+\begin{bmatrix} 4 & -1 & -1 & -1 & -1 \\  
+ -1 & 4 & -1 & -1 & -1 \\
+  -1 & -1 & 4 & -1 & -1 \\
+   -1 & -1 & -1 & 4 & -1 \\
+    -1 & -1 & -1 & -1 & 4 \\
+    \end{bmatrix}$$
+
+So, $L_{\hat{n},\hat{n}}$ (removing the last column and the last row) is the same matrix except of shape $(n-1) \times(n-1)$.
+
+\begin{example}
+    $$L_{\hat{5},\hat{5}} = 
+    \begin{bmatrix} 4 & -1 & -1 & -1 \\  
+     -1 & 4 & -1 & -1 \\
+      -1 & -1 & 4 & -1 \\
+       -1 & -1 & -1 & 4\\
+        \end{bmatrix}$$
+    
+    Using elementary row operations, $L_{\hat{5},\hat{5}}$ becomes
+    
+    $$\begin{bmatrix} 1&1&1&1 \\  
+     -1 & 4 & -1 & -1 \\
+      -1 & -1 & 4 & -1 \\
+       -1 & -1 & -1 & 4\\
+        \end{bmatrix}\textasciitilde 
+    \begin{bmatrix} 1&1&1&1 \\  
+     0 & 5 & 0 & 0 \\
+      0 & 0 & 5 & 0 \\
+       0 & 0 & 0 & 5\\
+       \end{bmatrix}$$
+
+which is triangular and has determinant $\det(L_{\hat{5},\hat{5}}) =5^3 = n^{(n-2)}$
+\end{example}
+
+More generally, this argument works for any $n$ and we recover Cayley's formula.
+
+$$|SP(K_n)| = \det(L_{\hat{n}\hat{n}})$$
+
+\section{Properties of the Graph Laplacian}
+
+Moving on, let $G = (V,E)$ be an undirected graph. Consider any orientation of $E$.
+
+For $(i,j) \in E$, $(e_i - e_j)(e_i-e_j)^T$ is a matrix of zeros with $(i,i) = 1, (j,j)=1, (i,j)=-1, (j,i)=-1$.
+
+Much like building the graph one edge at a time, the graph Laplacian can be constructed in the following way:
+$$L(G)=\sum_{(i,j)\in E}(e_i - e_j)(e_i-e_j)^T$$
+
+\begin{definition}[Positive semi-definite]
+    $A \in \mathbb{R}^{n \times n}$ is positive semi-definite if $$x^TAx \geq 0 \ \forall x \in \mathbb{R}^N$$
+    
+    In this case, we write $A \succeq 0$.
+\end{definition}
+
+For a symmetric $A \in \mathbb{R}^{(n\times n)}$, the following are equivalent 
+\begin{enumerate}
+    \item $A \succeq 0$
+    \item $A = VV^T$ for some $V$
+    \item $A$ has non-negative eigenvalues
+\end{enumerate}
+
+\begin{remark}
+    $L \succeq 0$
+\end{remark}
+
+First note that $L$ is symmetric.
+
+\begin{proof}[First proof]
+    If $A,B\succeq0$, then
+
+    $A+B \succeq0$ since $x^T(A+B)x=x^TAx+x^TBx\geq 0$ for all $x \in \mathbb{R}^n$
+
+    In particular, $L$ is the sum of positive semi-definite matrices, so $L$ itself is positive semi-definite.
+\end{proof}
+
+\begin{proof}[Second proof]
+    Our first definition was $L = BB^T$, the directed incidence matrix
+\end{proof}
+
+\begin{proof}[Third proof]
+    For any $x \in \mathbb{R}^n$
+
+    $$x^TLx = x^T\left[ \sum_{(i,j)\in E} (e_i-e_j)(e_i-e_j)^T \right]x$$
+
+    $$ = \sum_{(i,j)\in E} x^T (e_i-e_j)(e_i-e_j)^T x$$
+
+    $ = \sum_{(i,j)\in E} (x_i - x_j)^2$, which is always non-negative.
+\end{proof}
+
+Since $L$ is positive semi-definite, we can write its eigenvalues as
+
+$$0 \leq \lambda_1 \leq \lambda_2 \leq ... \leq \lambda_n$$
+
+Note that $e$ (the all 1's vector) is an eigenvector with the eigenvalue of 0.
+
+$$Le = \sum_{(i,j) \in E} (e_i - e_j)(e_i - e_j)^Te = \sum_{(i,j) \in E} (e_i - e_j) \cdot 0 = 0$$
+
+Thus, $\lambda_1=0$. This checks out since $L$ is linearly dependent $\det(L) = 0$.
+
+$\lambda_2$ is more interesting.
+
+\begin{theorem}
+
+$\lambda_2 = 0$ iff $G$ is disconnected.
+
+\end{theorem}
+
+\begin{proof}
+    If $G$ is disconnected, it can be partitioned as $G = G_1 \sqcup G_2$ with no shared edges.
+
+    Thus, after re-indexing, we can write $L= \begin{bmatrix} L_{G_1} & 0 \\ 0 & L_{G_2} \end{bmatrix}$
+
+    Let $e_{G_1}$ and $e_{G_2}$ be the indicator vectors for the edges in $G_1$ and $G_2$ respectively.
+
+    $L_Ge_{G_1} = L_Ge_{G_2} = 0$
+
+    So $e_{G_1}$ and $e_{G_2}$ are eigenvectors of $G$ with the eigenvalue of 0.
+
+    Also, $e_{G_1}e_{G_2}^T = 0$, so $e_{G_1}$ and $e_{G_2}$ are orthogonal. The eigen-space corresponding to $\lambda=0$ has dimension at least 2. 
+
+    $$\implies \lambda_2 = 0$$
+
+    Conversely, let $x_2$ be an eigenvector of $L_G$ with $\lambda_2=0$. 
+
+    We may assume $x_2^Te=0$, possibly after finding an orthogonal basis fo the eigenspace of $\lambda=0$, then
+
+    $$x_2^TLx_2 = x_2^T\lambda_2x_2 = 0$$
+
+    Also, $x_2^TLx_2 = \sum_{(i,j) \in E}[x_2(i)-x_2(j)]^2 = 0$
+
+    $$\implies x_2(i) = x_2(j) \ \forall \ (i,j) \in E$$
+
+    Let $V_1 = \{i \in V x_2(i) \geq 0\}$ and
+    $V_2 = \{i \in V x_2(i) < 0\}$
+
+    So, $V_1$ and $V_2$ share no edges.
+
+    But $x_2^Te = 0$ and $x_2 \neq 0$ (since it is an eigenvector), so $x_2$ must have both positive and negative entries.
+\end{proof}
+
+$\lambda_2$ is the ``algebraic connectivity" of $G$.
+
+More generally, one can compute this argument to show that $\lambda_k=0$ iff $G$ has at least $k$ components.
+
+We now present several lemmas without proof to demonstrate the utility of the spectrum of $L$.
+
+\begin{lemma}
+    $\lambda_2(G) \leq \kappa(G)$ where $\kappa$ is the vertex connectivity of $G$.
+\end{lemma}
+
+\begin{lemma}
+    If $|V|$ is even, let $b(G)$ be the smallest bisection of $G$ i.e.
+
+    $$b(G) = \min_{S \subset V: |S| = |V-S|}|\delta(s)|$$
+
+    Then,
+    $$\frac{n}{4}\lambda_2(G) \leq b(G)$$
+\end{lemma}
+
+\begin{lemma}
+    Let the maximum cut of G be $\max_{S \subseteq V}|\delta(s)|$, then
+
+    $$\max_{S \subseteq V}|\delta(s)| \leq \lambda_n(L_G)$$
+\end{lemma}
+
+Lastly, we return to the matrix-tree theorem.
+
+\begin{theorem}
+    Let $L_G$ have the eigenvalues
+
+    $0 = \lambda_1 \leq \lambda_2 \leqq ... \leq \lambda_n$, then
+
+    $$|ST(G)|=\frac{1}{n}\prod_{i=2}^n\lambda_i$$
+\end{theorem}
+
+Before proving this, we need a fact from linear algebra:
+
+$$\det(A+B)_ = \sum_{S \subseteq [n]}\det(A_S)$$
+where $A_S$ is the matrix obtained from $A$ after replacing each row $a_i$ for $i \in S$ with row $b_i$ of $B$.
+This follows from a multi-linear property of determinants.
+
+\begin{proof}
+    If $G$ is not connected, then $\lambda_2 = 0$ so
+
+    $$0 = |ST(G)| = \frac{1}{n}\lambda_2\prod_{i=3}^n\lambda_i = 0$$
+
+    Suppose $G$ is connected. Consider the characteristic polynomial of $L_G$
+
+    $$(\lambda-\lambda_1)(\lambda-\lambda_2)...(\lambda-\lambda_n) = \lambda(\lambda-\lambda_2)...(\lambda-\lambda_n)$$
+
+    Thus, the term linear in $\lambda$ is $(-1)^{n-1}\prod_{i=2}^n\lambda_i$
+
+    But also, the characteristic polynomial is defined as $\det(\lambda I-L)$.
+
+    Using the linear algebraic fact, the linear term in $\det(\lambda I-L)$ is
+
+    $$\sum_{S\subseteq[n]:|S|=n-1}\det(L_s) = (-1)^{n-1}\sum_{i=1}^n\det((L_G)_{\hat{i},\hat{i}}) = (-1)^{n-1}n|ST(G)|$$
+\end{proof}
+
+\end{document}
