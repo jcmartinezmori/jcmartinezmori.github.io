@@ -1,0 +1,266 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyhead[c]{
+    \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph Theory} \hfill CU Denver} \\
+    \rule{\textwidth}{0.5pt} \\
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$26$}
+\newcommand{\lecturetitle}{Lov\'asz Local Lemma}
+\newcommand{\scribename}{Lily Renneker and Hunter Pearson}
+\newcommand{\lecturedate}{April 29, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+
+\section{Symmetric Local Lemma}
+We will prove two theorems, the first will follow from the second.
+
+\vspace{0.25cm}
+Let $A_1, ..., A_n$ be events in a probability space. For disjoint $S,T \subseteq [n]$, let $A(S,T)$ be the compound event in which all $A_i$ for $i \in S$ hold and all $\bar{A_i}$ for $i \in T$ hold.
+
+An event B is mutually independent of $A_i,...A_n$ if $P(B | A(S,T)) = P(B)$ for all $S, T$
+\vspace{0.25cm}
+This is a stronger notion of independence than pairwise independence.
+
+ex. $P(A \cap B \cap C)$ = $P(A) \cap P(B) \cap P(C)$
+
+However, pairwise independence does not generally imply mutual independence.
+
+\begin{theorem}
+    (Erd\"os-Lov\'asz, Symmetric Local Lemma) Consider events $A_i, ... A_n$ in a probability space. Suppose:
+    \begin{enumerate}
+        \item $\Pr[A_i] \leq p < 1$ for all $i$
+        \item Each $A_i$ is mutally independent of any set of all but d events.
+    \end{enumerate}
+
+    If $epd \leq 1$ then $\Pr[\bigcap_{i=1}^n \bar{A_i}] > 0$.
+\end{theorem}
+
+Note: $e$ is the best possible constant for the claim to hold. 
+You may also see the lemma stated with the condition $ep(d+1) \leq 1$, in which case the statement ``mutually independent of any set of all but $d$ events'' is replaced with ``mutually independent of any set of all but $d$ other events.''
+
+\section{General Local Lemma}
+
+Before proving the symmetric local lemma, we will first discuss a  more general lemma that will be used later.
+
+\begin{theorem}
+    (Erd\"os-Lov\'asz, General Local Lemma) Consider events $A_i, ... A_n$ in a probability space for each $i \in [n]$. Let $D_i \subseteq [n] \setminus \{i\}$ such that $A_i$ is mutually independent of the events indexed by this set. 
+    Then, if there exists weights $x_1, x_2, ... x_n$ with:
+    \begin{enumerate}
+        \item $0 \leq x_i < 1$ for all $i$
+        \item $\Pr[A_i] \leq x_i \prod_{j \in D_i} (1 - x_j)$
+    \end{enumerate}
+    Then, $\Pr[\bigcap_{i=1}^n\bar{A_i}] > 0$
+\end{theorem}
+
+\begin{proof}{Proof of General Local Lemma}
+    Let $I_S = \bigcap\limits_{j \in S} \overline{A_j}$, i.e. $I_S$ is the event that no event indexed by $j \in S$ holds. Suppose $\Pr[I_S] > 0$ and $\Pr[A_t|I_S] \leq x_t \; \forall \; t \not \in S$, for any choice of $S$. 
+    Then 
+    \begin{align*}
+    \Pr\left[\bigcap_{t = 1}^{n} \bar{A_t}\right] &= \prod_{t=1}^n \Pr\left[\bar{A_t}\right] | I_{[t-1]}]\\
+    &\geq \prod_{t=1}^n (1-x_t)\\
+    &> 0.
+    \end{align*}
+    So it suffices to show our assumptions.
+
+    We can prove this by induction on $|S|$.
+
+    For $|S|=0$, then immediately $\Pr[I_\emptyset ] = 1$, and $\Pr[A_t | I_\emptyset] = \Pr[A_t] \leq x_t$
+
+    Now suppose $|S|>0$. To show the first claim, choose any $t \in S$ and consider $S' = \setminus \{t\}$. 
+    By the induction hypothesis, $\Pr[I_S] = \Pr[\bar{A_t} |I_S] \Pr[I_{S'}] > 0$, and thus $\Pr[I_S] > 0$.
+
+    To show the second assumption, choose $t \not \in S$. Let $T=S\cap D_t$. 
+    
+    If $T = \emptyset$, then $A_t$ is mutually independent of $\{A_j:j \in S\}$.
+    Hence $\Pr[A_t|I_S] = \Pr[A_t] \leq x_t$.
+
+    If $T \not = \emptyset$, note that $I_S = I_T \cap I_{S \setminus T}$. 
+    Thus \begin{align*}
+        \Pr[A_t|I_S] &= \frac{\Pr[A_t \cap I_S]}{\Pr[I_S]}\\
+        &= \frac{\Pr[A_t \cap I_T|I_{S \setminus T}] \Pr[I_{S \setminus T}]}{\Pr[I_T|I_{S \setminus T}]\Pr[I_{S \setminus T}]}\\
+        &= \frac{\Pr[A_t \cap I_T|I_{S \setminus T}]}{\Pr[I_T|I_{S \setminus T}]}\\
+    \end{align*}
+
+    Now we will upper-bound the numerator and lower-bound the denominator.
+
+    Note: \begin{align*}
+        \Pr[A_t \cap I_T | I_{S \setminus T}] &\leq \Pr[A_t | I_{S \setminus T}]\\
+        &= \Pr[A_t],
+    \end{align*}
+    where the equality holds by mutual independence.
+    
+    Also let $T_j = \{i \in T : i < j\}$. Then $\Pr[I_T|I_{S \setminus T}] = \prod \limits_{j \in T} \Pr[\bar{A_j} | I_{T_j} \cap I_{S \setminus T}] \geq \prod \limits_{j \in T} (1-x_j)$,
+    where the inequality holds by the inductive hypothesis.
+
+    Then \begin{align*}
+        \Pr[A_t|I_S] &\leq \frac{\Pr[A_t]}{\prod_{j \in T}(1-x_j)}\\
+        & \leq \frac{x_t \prod_{j \in D_t} (1-x_j)}{\prod_{j \in T} (1-x_j)}\\
+        &= x_t \prod_{j \in D_t \setminus T} (1-x_j) \\
+        &\leq x_t
+    \end{align*}
+
+    
+
+    
+\end{proof}
+
+We will use the general local lemma to prove the symmetric version.
+
+\begin{proof} \textit{Proof of Symmetric Local Lemma}
+
+    Each $A_i$ is mutually independent of the events indexed by $D_i \subseteq [n]$ where $|{D_i}| < d$.
+
+    Let $x = x_1 = x_2 = ... =x_n =\frac{1}{d}$. 
+    Then:
+
+    $$\Pr[A_i] \leq p \leq \frac{1}{ed}$$
+    $$ \leq \frac{1}{d}(1-\frac{1}{d})^{d-1}$$
+    $$ = x_i\prod_{j \in D_i} (1-x_j)$$
+
+    Thus the general version applies.
+\end{proof}
+
+\section{Application of Symmetric Local Lemma}
+
+\begin{lemma}
+    Let G be a graph with maximum degree k. Partition the node set $V(G)$ into set of size at least $2ek$
+
+    Then, there exists an independent set of G containing exactly one node from each part of the partition
+\end{lemma}
+
+\begin{proof}
+    Let $\alpha = \lceil 2ek \rceil$ and let $V(G) = V_1 \sqcup V_2 \sqcup .. \sqcup V_n$. we may assume $|V_i| = \alpha \; \forall \; i$ by discarding excess nodes. Pick a node $v_i \in V_i$ independently and uniformly at random for each $i$, call this collection of random samples $S$.
+
+    We want to show that $\Pr[S \text{ an independent set}] > 0$.
+
+    For each $x,y \in E(G)$ with endpoints in different parts  of the partition, let $A_{xy}$ be the event that $x,y \in S$.
+
+    $$Pr[A_{xy}] = \frac{1}{\alpha} \frac{1}{\alpha} = \frac{1}{\alpha^2} = p.$$
+
+    If $x \in V_i$ and $y \in V_j$, $A_{xy}$ is a mutually independent of the events corresponding to edges whose both endpoints are in $V \setminus (V_i \sqcup V_j)$. Let the parameter $d$ in the symmetric local lemma be $d = 2 \alpha k - 1$.
+
+    This is from there being two parts of size $\alpha$ and max degree $k$  minus $xy$.
+\begin{center}
+    \begin{tikzpicture}
+        \draw[vermillion] (0,0) circle (1 cm);
+        \draw[vermillion] (4,0) circle (1 cm);
+
+        \node[vermillion] (vi) at (0,0) {$V_i$};
+        \node[vermillion] (vj) at (4,0) {$V_j$};
+
+        \draw[] (0.75,0) -- (3.25,0);
+
+        %V_i lines
+        \draw[] (0.55,0.4) -- (1.05,0.9);
+        \draw[] (0,0.75) -- (0,1.25);
+        \draw[] (-0.55,0.4) -- (-1.05,0.9);
+        \draw[] (-0.75,0) -- (-1.25,0);
+        \draw[] (0,-.75) -- (0,-1.25);
+        \draw[] (-0.55,-0.4) -- (-1.05,-0.9);
+        \draw[] (0.55,-0.4) -- (1.05,-0.9);
+
+        %V_j lines
+        \draw[] (4.55,0.4) -- (5.05,0.9);
+        \draw[] (4,0.75) -- (4,1.25);
+        \draw[] (3.45,0.4) -- (2.95,0.9);
+        \draw[] (4.75,0) -- (5.25,0);
+        \draw[] (4,-.75) -- (4,-1.25);
+        \draw[] (3.45,-0.4) -- (2.95,-0.9);
+        \draw[] (4.55,-0.4) -- (5.05,-0.9);
+    \end{tikzpicture}
+\end{center}
+
+We have \begin{align*}
+    epd &= e \frac{1}{\alpha^2} (2 \alpha k - 1)\\
+    &< e \frac{2 \alpha k}{\alpha^2}\\
+    &= \frac{2ek}{\alpha}\\
+    &= \frac{2ek}{\lceil 2ek \rceil}\\
+    &< 1
+\end{align*}
+
+The symmetric lemma thus applies.
+
+\end{proof}
+
+As a consequence, if you draw $11t$ points along a circle and color them with $t$ colors, each color used for 11 nodes, there is a set of $t$ points with distinct colors such that no two are consecutive along the circle.
+This can be seen from the above lemma applied on the cycle graph.
+\begin{center}
+\begin{tikzpicture}[scale = 2]
+    \node[draw, circle] (1) at (0.5,0) {};
+    \node[draw, circle] (2) at (1,0.5) {};
+    \node[draw, circle] (3) at (2,0.7) {};
+    \node[draw, circle] (4) at (3,0.5) {};
+    \node[draw, circle] (5) at (3.5,0) {};
+    \node[draw, circle] (6) at (0.5,-1) {};
+    \node[draw, circle] (7) at (1,-1.5) {};
+    \node[draw, circle] (8) at (2,-1.7) {};
+    \node[draw, circle] (9) at (3,-1.5) {};
+    \node[draw, circle] (10) at (3.5,-1) {};
+
+    \draw[] (1) -- (2) -- (3) -- (4)-- (5) -- (10) -- (9) -- (8) -- (7) -- (6);
+    \draw[dotted] (6) -- (1);
+    
+\end{tikzpicture}
+\end{center}
+
+A final comment: there is a constructive version of the local lemma due to Moser and Tardos.
+
+
+\end{document}
