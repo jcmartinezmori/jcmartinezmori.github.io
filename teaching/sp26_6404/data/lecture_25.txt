@@ -1,0 +1,248 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in,headheight=24pt]{geometry}
+\usepackage{fancyhdr}
+\setlength{\headheight}{55pt}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+\usepackage{amsfonts,amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{tikz-network}
+\usepackage{listings}
+\usepackage{float}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+
+\definecolor{black}{RGB}{0,0,0}
+\definecolor{orange}{RGB}{230,159,0}
+\definecolor{skyblue}{RGB}{86,180,233}
+\definecolor{bluishgreen}{RGB}{0,158,115}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{vermillion}{RGB}{213,94,0}
+\definecolor{reddishpurple}{RGB}{204,121,167}
+\definecolor{cugold}{RGB}{207,184,124}
+
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\range}{range}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\F}{\mathbb{F}}
+
+\pagestyle{plain}
+
+\fancypagestyle{firstpage}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+ % Add course number and course name 
+  \fancyhead[c]{
+  \makebox[\textwidth][l]{\textbf{MATH 6404: Applied [Combinatorics and] Graph
+  Theory} \hfill CU Denver} \
+    \rule{\textwidth}{0.5pt} \
+ % Add semester and instructor
+    \makebox[\textwidth][l]{Spring 2026 \hfill Instructor: Carlos Mart\'inez}
+  }
+  \fancyfoot[C]{\thepage}
+}
+
+\newcommand{\scribebox}[4]{
+\begin{tcolorbox}[colback=cugold!40,colframe=black,left=6pt,right=6pt,top=10pt,bottom=10pt]
+    \centering
+    \textbf{Lecture #1:} #2 \\
+    \textbf{Date:} #3 \hfill     \textbf{Scribe:} #4
+\end{tcolorbox}
+}
+
+
+%%% -+-+-+-+-+-+- BEGIN HERE -+-+-+-+-+-+- %%%
+\newcommand{\lecturenumber}{$25$}
+\newcommand{\lecturetitle}{Sperner's Lemma}
+\newcommand{\scribename}{Jon Terry}
+\newcommand{\lecturedate}{April 27, 2026}
+
+\begin{document}
+
+\thispagestyle{firstpage}
+\scribebox{\lecturenumber}{\lecturetitle}{\lecturedate}{\scribename}
+The aim of this lecture is to prove Sperner's Lemma, which states that every
+proper coloring of a simplicial subdivision of a $d$-dimensional simplex $T$ has
+a colorful cell. In fact, we will show a stronger result, which is that every
+proper coloring of a simplicial subdivision has an \textit{odd number} of
+colorful cells, so there is at least one. 
+
+\section{Sperner's Lemma: The Two-Dimensional Case}
+We build up to the proof of Sperner's Lemma by establishing some definitions.
+These definitions lead to a proof of the lemma in two-dimensions, which we will
+use later in the main proof.
+
+\subsection{Definitions}
+\begin{definition}[Simplex]
+ For our purposes, a \textit{simplex} is the generalization of a
+ triangle to arbitrary dimensions\footnote{See
+ \href{https://en.wikipedia.org/wiki/Simplex}
+ {https://en.wikipedia.org/wiki/Simplex}. The term refers to the fact that the
+ simplex is the simplest \textit{polytope} representable in a given dimension.}.
+ In zero dimensions, a simplex is a point.  In one dimension a simplex is a
+ line segment.  In two dimensions, a simplex is a triangle, and a
+ three-dimensional simplex is a tetrahedron.
+ \end{definition}
+
+\begin{definition}[Simplicial Subdivision]
+  Given a simplex $S$, a \textit{subdivision} of $S$ is a decomposition of $S$
+  into smaller simplexes. We require that the union of the simplices is the
+  original simplex $S$, and that any two simplices meet along a shared edge, at
+  a shared vertex, or not at all (i.e., they are disjoint).
+\end{definition}
+
+\begin{definition}[Proper Coloring of a Simplicial Subdivision]
+ A \textit{proper coloring} of a subdivision of a simplex $S$ ensures that each
+ corner $v_0,v_1,v_2$ of $S$ receives a distinct color $0,1,2$. Each subdivision
+ vertex on edge $\{v_i,v_j\}$ must carry color $i$ or $j$. Interior subdivision
+ vertices can take any color.
+\end{definition}
+
+\begin{definition}[Colorful Triangle]
+ A \textit{colorful triangle} in a properly colored simplicial subdivision of a
+ simplex $S$ is a triangle whose three vertices carry all three of the colors
+ $0,1,2$.
+\end{definition}
+
+\subsection{Sperner's Lemma in Two Dimensions}
+\begin{lemma}[Sperner: Two-Dimensional Case]
+  Every properly labeled simplicial subdivision of a $2$-dimensional simplex $S$
+  contains an odd number of colorful triangles. 
+\end{lemma}
+
+\begin{proof}
+  Let $T$ be a properly colored subdivision of a $2$-dimensional simplex $S$.
+  Construct a subgraph $G$ of its dual as follows. The nodes of $G$ are the cells of $T$ plus
+  one more node for the unbounded face. Stipulate that two nodes of $G$ are
+  adjacent if and only if their corresponding cells in $T$ share an edge whose
+  endpoints are colored $0$ and $1$.  Then the following color combinations are
+  possible: 
+  \begin{table}[H]
+    \centering
+    \caption{Possible vertex colorings of cells in $T$ and the degree count of
+    the node corresponding to that cell in $G$} 
+    \label{tab:label}
+    \begin{tabular}{l l l}
+      Cell vertex coloring & $\{0,1\}$-edges & Degree in $G$\\
+      \hline
+      $\{0,0,0\},\,\{1,1,1\},\,\{2,2,2\}$ & 0 & 0\\
+      $\{0,0,2\},\,\{1,1,2\},\,\{0,2,2\},\,\{1,2,2\}$ & 0 & 0\\
+      $\{0,0,1\},\,\{0,1,1\}$ & 2 &2\\
+      $\{0,1,2\}$ & 1 &1
+    \end{tabular}
+  \end{table}
+  Since this table lists all possible cases, then among bounded cells, colorful
+  triangles are the only cells that correspond to odd-degree nodes in $G$. 
+  
+  Next, label $W$ as the node in the dual that corresponds to the unbounded
+  face of $T$. We claim $W$ has odd degree. Why? The $0,1$ side of $T$ (that is,
+  the side of $T$ whose endpoints are colored $0$ and $1$) starts with color
+  $0$, alternates between runs of $0$'s and runs of $1$'s, and ends with color
+  $1$. Thus, the number of $0 - 1$ and $1 - 0$ switches must be odd. 
+
+  Finally, any graph has an even number of odd-degree nodes by the handshaking
+  lemma. Since the degree of $W$ in $G$ is odd, $G$ must contain an odd number
+  of colorful triangles.
+\end{proof}
+
+\section{Sperner's Lemma in \texorpdfstring{$n$}{n}-Dimensions}
+It turns out the lemma holds for higher dimension. Indeed, the lemma is just the
+inductive step needed to obtain the higher-dimensional result, which we call
+Sperner's Lemma. However, before we can prove it, we need to add to
+our list of definitions.
+
+\subsection{Definitions}
+\begin{definition}[$d$-Dimensional Simplex]
+  A \textit{$d$-dimensional simplex} in $\mathbb{R}^n$ ($d\le n$) is the set of
+  convex combinations of $d+1$ points that are not all in one affine
+  $(d-1)$-dimensional space.
+\end{definition}
+
+\begin{definition}[Simplicial Subdivision in $\mathbb{R}^n$]
+  A simplicial subdivision of a $d$-dimensional simplex $S\subset \mathbb{R}^n$
+  is a decomposition of $S$ into smaller $d$-dimensional simplices. We call the
+  smaller $d$-dimensional simplices \textit{cells}. As in the
+  two-dimensional case above, the union of the pieces is $S$, and the
+  intersection of any two pieces is a shared face (possibly empty).
+\end{definition}
+
+\begin{definition}[Facet]
+  For a $d$-dimensional simplex $S$ with corners $w_0,w_1,\ldots,w_d$, a
+  \textit{facet} is a $(d-1)$-dimensional simplex generated by $d$ of the
+  corners of $S$ (i.e., by all but one).
+\end{definition}
+
+\begin{definition}[Proper coloring in $\mathbb{R}^n$]
+  A proper coloring of a subdivision of a $d$-dimensional simplex $S$
+  is a coloring of the vertices from the colors $0,1,\ldots,d$ such that color
+  $i$ does not appear on the $i$th facet of $S$ (that is, the facet that omits
+  corner $w_i$).
+\end{definition}
+
+\begin{definition}[Colorful Cell]
+  A colorful cell is a cell that has all $d+1$ colors $0,1,\ldots,d$.
+\end{definition}
+
+\subsection{Sperner's Lemma}
+\begin{lemma}[Sperner's Lemma]
+  Every proper coloring of a simplicial subdivision $T$ of a $d$-dimensional
+  simplex $S$ has an odd number of colorful cells. 
+\end{lemma}
+
+\begin{proof}
+  The proof is by induction on $d$. If $d=0$ the result is immediate. 
+  For $d = 2$ we have the 2-dimensional result which we just proved.
+  For $d \geq 3$, form a graph $G$ with a node for each cell of $T$ and a node $W$ for
+  the unbounded face. Join any two nodes with an edge if their
+  corresponding cells in $T$ intersect in a $(d-1)$-dimensional simplex whose
+  corners have every color $0,1,\ldots,d-1$, but not color $d$. Every colorful
+  cell has degree one, (as argued before), while every other bounded cell has
+  degree 0 or degree 2. The vertex $W$ has neighbors in $G$ only through $T'$,
+  the subdivision induced by $T$ on the $d$th facet of $S$ (the facet of $S$
+  that omits corner $w_d$). Restricting the coloring of $T$ to $T'$ yields a
+  proper coloring in $d-1$ dimensions: its completely labeled regions connect
+  to $W$ in $G$. By the inductive hypothesis, the number of colorful cells in
+  $T'$ is odd. Therefore, $W$ has odd degree in $G$. Since the number of odd
+  degree nodes in $G$ is even, then $G$ must contain an odd number of colorful
+  cells.
+\end{proof}
+
+
+\section{Relation to Other Results}
+Taking the limit of subdivisions of $T$ results in Brouwer's Fixed Point Theorem,
+which we state but don't prove.
+
+\begin{theorem}[Brouwer's Fixed Point Theorem]
+  Let $S$ be a set in $\mathbb{R}^d$ that is homeomorphic to a closed unit cube.
+  Then every continuous function $f:S\to S$ has a fixed point.
+\end{theorem}
+
+This result is useful when proving existence of equilibria in game theory, for
+example, when trying to establish mixed Nash equilibria. However, Brouwer's
+theorem is not an algorithmic result. That is, Brouwer tells you that under
+the theorem's assumptions, $f$ has a fixed point, but it does not tell you how
+to find it.  It turns out that this class of problem is believed to be computationally hard
+(specifically PPAD-complete [not defined in the lecture]), but the evidence of hardness is not as strong as that of NP-hard problems. There are also simplifications available that
+lead to approximate equilibria, which may be just as useful, and much easier to
+obtain, than exact equilibria.
+
+\end{document}
