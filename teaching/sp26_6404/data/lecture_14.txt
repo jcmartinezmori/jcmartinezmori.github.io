@@ -217,7 +217,7 @@ The goal is to find a vertex cover that is as small as possible. Let $\beta(G)$ 
 \begin{proof}
     $\alpha(G) \leq \beta(G)$: Let $M^*$  be a maximum matching. No node in a vertex cover can cover more than 1 edge in $M^*$ because the edges in $M^*$ are non adjacent. So you need at least $m^* = \alpha(G)$ nodes to cover $G$
 
-    $\alpha(G) \geq \beta(G)$: It suffices to produce a vertex cover $S \subseteq X$ such that $|S| = \alpha(G)$. Since by definition of $\beta(G)$, we will have $\alpha(G) = |S| \geq \beta(G)$. By Ore's defect formula, we have that $$\alpha(G) = |x|-\df(T) = |X|-|T|+|N(T)|$$ for some $T \subseteq X$ with $\df(T) = d^*$. Note that $N(T) \sqcup (X-T)$ is a vertex cover.
+    $\alpha(G) \geq \beta(G)$: It suffices to produce a vertex cover $S \subseteq X \cup Y$ such that $|S| = \alpha(G)$ since by definition of $\beta(G)$ we will have $\alpha(G) = |S| \geq \beta(G)$. By Ore's defect formula, we have that $$\alpha(G) = |X|-\df(T) = |X|-|T|+|N(T)|$$ for some $T \subseteq X$ with $\df(T) = d^*$. Note that $N(T) \sqcup (X-T)$ is a vertex cover.
 
     Finally, the size of $N(T) \sqcup (X-T)$ is $|N(T)| + |X|-|T| = \alpha(G)$.
 \end{proof}
