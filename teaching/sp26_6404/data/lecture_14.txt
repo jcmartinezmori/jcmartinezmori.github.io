@@ -119,16 +119,16 @@ Acronym: A.C.O: Algorithms, Combinatorial, and Optimization. (The Barriers betwe
         \end{corollary}
 
         \begin{proof}
-            Every matching misses to match $\df(S)$ nodes from $S \subseteq X$. This implies $$|\alpha(G)| \leq |X|-\df(S) \forall S \subseteq X$$ Then 
+            Every matching misses to match $\df(S)$ nodes from $S \subseteq X$. This implies $$|\alpha(G)| \leq |X|-\df(S) \ \forall S \subseteq X$$ Then 
             \begin{align*}
                 \alpha(G) &\leq \min_{\emptyset \not = S \subseteq X}\{|X|-\df(S)\}\\
                 &= |X|-\max_S \df(S)\\
-                &= |x|-d^*
+                &= |X|-d^*
             \end{align*}
 
-            Thus we have $$\alpha(G) \leq |x|-d^*$$
+            Thus we have $$\alpha(G) \leq |X|-d^*$$
 
-            Now we want to show that $\alpha(G) \geq |x|-d^*$. It suffices to produce a matching of $G$ of size $|x|-d^*$.
+            Now we want to show that $\alpha(G) \geq |X|-d^*$. It suffices to produce a matching of $G$ of size $|X|-d^*$.
 
             Idea: Produce a new graph $G'$ by adding $d^*$ dummy nodes to $Y$, each of which is  connected to all of $x$.
 
