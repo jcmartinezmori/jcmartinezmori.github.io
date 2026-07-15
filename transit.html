@@ -136,15 +136,13 @@ This plan optimizes for coverage subject to the constraint that at least 70% of 
   </ul>
 </p>
 
-<div id="panel"></div>
 
-<script>
-fetch("./transit/results/figures/level_of_service_DENVER.html")
-    .then(response => response.text())
-    .then(html => {
-        document.getElementById("panel").innerHTML = html;
-    });
-</script>
+<div class="panel">
+    <iframe src="./transit/results/figures/level_of_service_DENVER.html"
+            width="100%"
+            height="500">
+    </iframe>
+</div>
   
 </body>
 </html>
