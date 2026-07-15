@@ -135,6 +135,16 @@ This plan optimizes for coverage subject to the constraint that at least 70% of 
     <li> <a href="https://jcmartinezmori.github.io/transit/diff_neutral_coverage_service_plan_DENVER_BUDGET_FACTOR-0.8_RIDERSHIP_FACTOR-0.7.html">Diff Neutral</a>
   </ul>
 </p>
+
+<div id="panel"></div>
+
+<script>
+fetch("./transit/results/figures/level_of_service_DENVER.html")
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById("panel").innerHTML = html;
+    });
+</script>
   
 </body>
 </html>
