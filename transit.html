@@ -73,7 +73,6 @@ J. Carlos Martínez Mori, Stavros Roditis, and Saigopal Rangaraj, extended abstr
 <h3>Maps</h3>
 <p>
 Click on any point on the scatter plot to assess the corresponding service plan.
-The clickable display mode controls whether to show the corresponding service plan, the routes with service gain, or the routes with service loss (with respect to the current service plan).
 The symbols are:
 <ul style="list-style-type: none;">
   <li>
@@ -89,6 +88,7 @@ The symbols are:
 </ul>
 </p>
 <p>
+The buttons mode controls whether to show the corresponding service plan, the routes with service gain, or the routes with service loss (all with respect to the current service plan).
 In the maps, the different lines are color-coded and their width is proportional to their frequency.
 There are more lines than colors I can distinguish, so the colors may be repeated.
 Lines that overlap in their physical route may overlap in their rendering (again, this is work in progress).
@@ -97,9 +97,9 @@ The dots represent bus stops; their size is proportional to the number of amenit
 
 <div class="panel">
 
-  <button onclick="showFigure('./transit/results/figures/service_plan_level_of_service_DENVER.html')">Service Plan</button>
-  <button onclick="showFigure('./transit/results/figures/diff_gain_level_of_service_DENVER.html')">Routes with Service Gain</button>
-  <button onclick="showFigure('./transit/results/figures/diff_loss_level_of_service_DENVER.html')">Routes with Service Loss</button>
+  <button onclick="showFigure('./transit/results/figures/service_plan_level_of_service_DENVER.html')">Show Service Plan</button>
+  <button onclick="showFigure('./transit/results/figures/diff_gain_level_of_service_DENVER.html')">Show Routes with Service Gain</button>
+  <button onclick="showFigure('./transit/results/figures/diff_loss_level_of_service_DENVER.html')">Show Routes with Service Loss</button>
 
   <iframe
     id="scatter-figure"
